@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -12,12 +11,12 @@ import {
   X,
   ArrowLeft,
   Users,
-  Calendar,
   Clock,
   AlertTriangle,
   FileText,
   MessageSquare,
-  MoreHorizontal
+  MoreHorizontal,
+  CalendarIcon
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { 
@@ -46,7 +45,6 @@ import {
 } from "@/components/ui/select";
 import { Case as CaseType, getCases, createCase, getCase, getCaseDocuments, updateCaseDetails } from '@/utils/documents';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 
 const CaseManagement = () => {
@@ -71,7 +69,6 @@ const CaseManagement = () => {
   const [editCaseDeadline, setEditCaseDeadline] = useState<Date | undefined>(undefined);
   const [editCaseDescription, setEditCaseDescription] = useState('');
   
-  // Initialize with cases from storage
   useEffect(() => {
     const loadCases = () => {
       try {
@@ -87,16 +84,14 @@ const CaseManagement = () => {
     loadCases();
   }, []);
 
-  // Load case details when a case is selected
   useEffect(() => {
     if (selectedCase) {
       const caseInfo = getCase(selectedCase);
       if (caseInfo) {
         setCaseData({
           ...caseInfo,
-          // Demo data for UI - in a real app, this would be fetched from a database
           caseNumber: `CASE-${caseInfo.id.substring(5, 10)}`,
-          clientName: 'Client Name', // This would be fetched from the database
+          clientName: 'Client Name',
           date: new Date(caseInfo.createdAt).toLocaleDateString(),
           status: caseInfo.status || 'active',
           priority: caseInfo.priority || 'medium',
@@ -107,7 +102,6 @@ const CaseManagement = () => {
           assignedTo: ['Case Manager'],
         });
         
-        // Load case documents
         const docs = getCaseDocuments(selectedCase);
         setCaseDocuments(docs.map(doc => ({
           id: doc.id,
@@ -138,12 +132,11 @@ const CaseManagement = () => {
   };
 
   const handleCaseClick = (caseId: string) => {
-    // Navigate to case chat
     navigate(`/case-chat/${caseId}`);
   };
   
   const handleEditCase = (e: React.MouseEvent, caseId: string) => {
-    e.stopPropagation(); // Prevent navigating to the case
+    e.stopPropagation();
     const caseToEdit = getCase(caseId);
     if (caseToEdit) {
       setEditingCaseId(caseId);
@@ -151,7 +144,7 @@ const CaseManagement = () => {
       setEditCaseStatus(caseToEdit.status || 'active');
       setEditCasePriority(caseToEdit.priority || 'medium');
       setEditCaseDeadline(caseToEdit.deadline ? new Date(caseToEdit.deadline) : undefined);
-      setEditCaseDescription(''); // Add description if you have it in your case data
+      setEditCaseDescription('');
       setIsEditCaseDialogOpen(true);
     }
   };
@@ -168,7 +161,6 @@ const CaseManagement = () => {
       });
       
       if (updatedCase) {
-        // Update the cases list
         setCases(prevCases => 
           prevCases.map(c => 
             c.id === editingCaseId ? updatedCase : c
@@ -186,11 +178,9 @@ const CaseManagement = () => {
   const filteredCases = cases.filter((caseItem) => {
     const matchesSearch = caseItem.name.toLowerCase().includes(searchQuery.toLowerCase());
     
-    // Filter by status if status filters are applied
     const matchesStatus = statusFilter.length === 0 || 
       (caseItem.status && statusFilter.includes(caseItem.status));
     
-    // Filter by priority if priority filters are applied
     const matchesPriority = priorityFilter.length === 0 || 
       (caseItem.priority && priorityFilter.includes(caseItem.priority));
     
@@ -443,7 +433,6 @@ const CaseManagement = () => {
         </motion.div>
       </main>
 
-      {/* Edit Case Dialog */}
       <Dialog open={isEditCaseDialogOpen} onOpenChange={setIsEditCaseDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
@@ -526,7 +515,7 @@ const CaseManagement = () => {
                     <Calendar
                       mode="single"
                       selected={editCaseDeadline}
-                      onSelect={setEditCaseDeadline}
+                      onSelect={(date) => setEditCaseDeadline(date)}
                       initialFocus
                     />
                   </PopoverContent>
