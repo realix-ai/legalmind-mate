@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import Navigation from '@/components/Navigation';
 import DocumentTemplate from '@/components/DocumentTemplate';
+import { toast } from '@/components/ui/use-toast';
 import { 
   Save, 
   Download, 
@@ -16,13 +17,17 @@ import {
   AlignCenter,
   AlignRight,
   ListOrdered,
-  List
+  List,
+  Sparkles
 } from 'lucide-react';
 
 const DocumentDrafting = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [documentTitle, setDocumentTitle] = useState('Untitled Document');
   const [documentContent, setDocumentContent] = useState('');
+  const [isAiProcessing, setIsAiProcessing] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [showAiPrompt, setShowAiPrompt] = useState(false);
   
   const templates = [
     {
@@ -218,19 +223,48 @@ Dated: [DATE]                   Respectfully submitted,
     setDocumentContent('');
   };
   
+  const handleAiAssist = () => {
+    if (!aiPrompt.trim()) {
+      toast({
+        title: "Prompt required",
+        description: "Please enter a prompt for AI assistance.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setIsAiProcessing(true);
+    
+    // Simulate AI processing
+    setTimeout(() => {
+      const currentContent = documentContent;
+      const aiGeneratedContent = `${currentContent}\n\n[AI-GENERATED CONTENT BASED ON: "${aiPrompt}"]\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus.`;
+      
+      setDocumentContent(aiGeneratedContent);
+      setIsAiProcessing(false);
+      setShowAiPrompt(false);
+      setAiPrompt('');
+      
+      toast({
+        title: "AI content generated",
+        description: "The AI has updated your document based on your prompt.",
+      });
+    }, 2000);
+  };
+  
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
         delayChildren: 0.1,
-        staggerChildren: 0.1
+        staggerChildren: 0.05
       }
     }
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 10, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
@@ -258,12 +292,12 @@ Dated: [DATE]                   Respectfully submitted,
             
             <motion.p 
               variants={itemVariants}
-              className="text-muted-foreground text-center mb-10"
+              className="text-muted-foreground text-center mb-8"
             >
               Create a new document or select from our professional templates.
             </motion.p>
             
-            <motion.div variants={itemVariants} className="mb-10">
+            <motion.div variants={itemVariants} className="mb-8">
               <Button 
                 size="lg" 
                 onClick={() => handleSelectTemplate('new')}
@@ -274,9 +308,9 @@ Dated: [DATE]                   Respectfully submitted,
             </motion.div>
             
             <motion.div variants={itemVariants}>
-              <h2 className="text-xl font-medium mb-6">Templates</h2>
+              <h2 className="text-xl font-medium mb-4">Templates</h2>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                 {templates.map((template) => (
                   <DocumentTemplate
                     key={template.id}
@@ -295,81 +329,110 @@ Dated: [DATE]                   Respectfully submitted,
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-4">
               <Button
                 variant="ghost"
                 size="sm"
-                className="gap-2"
+                className="gap-1"
                 onClick={handleNewDocument}
               >
                 <ArrowLeft className="h-4 w-4" />
-                Back to Templates
+                Back
               </Button>
               
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="gap-2"
+                  className="gap-1 text-xs"
                 >
-                  <Save className="h-4 w-4" />
+                  <Save className="h-3 w-3" />
                   Save
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="gap-2"
+                  className="gap-1 text-xs"
                 >
-                  <Download className="h-4 w-4" />
+                  <Download className="h-3 w-3" />
                   Export
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="gap-2"
+                  className="gap-1 text-xs"
                 >
-                  <Share2 className="h-4 w-4" />
+                  <Share2 className="h-3 w-3" />
                   Share
+                </Button>
+                <Button
+                  variant={showAiPrompt ? "default" : "outline"}
+                  size="sm"
+                  className="gap-1 text-xs"
+                  onClick={() => setShowAiPrompt(!showAiPrompt)}
+                >
+                  <Sparkles className="h-3 w-3" />
+                  AI Assist
                 </Button>
               </div>
             </div>
             
+            {showAiPrompt && (
+              <div className="mb-4 flex gap-2">
+                <input
+                  type="text"
+                  value={aiPrompt}
+                  onChange={(e) => setAiPrompt(e.target.value)}
+                  placeholder="Enter a prompt for AI assistance (e.g., 'Add a liability clause')"
+                  className="flex-1 px-3 py-2 rounded-md border text-sm"
+                  disabled={isAiProcessing}
+                />
+                <Button 
+                  onClick={handleAiAssist}
+                  disabled={isAiProcessing || !aiPrompt.trim()}
+                  size="sm"
+                >
+                  {isAiProcessing ? "Processing..." : "Generate"}
+                </Button>
+              </div>
+            )}
+            
             <div className="border rounded-xl overflow-hidden mb-6">
-              <div className="bg-muted p-4 flex items-center">
+              <div className="bg-muted p-3 flex items-center">
                 <input
                   type="text"
                   value={documentTitle}
                   onChange={(e) => setDocumentTitle(e.target.value)}
-                  className="bg-transparent border-none focus:ring-0 font-medium text-lg w-full"
+                  className="bg-transparent border-none focus:ring-0 font-medium text-base w-full"
                 />
               </div>
               
-              <div className="border-t p-2 flex items-center gap-1 flex-wrap">
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <Bold className="h-4 w-4" />
+              <div className="border-t p-1 flex items-center gap-1 flex-wrap">
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                  <Bold className="h-3.5 w-3.5" />
                 </Button>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <Italic className="h-4 w-4" />
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                  <Italic className="h-3.5 w-3.5" />
                 </Button>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <Underline className="h-4 w-4" />
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                  <Underline className="h-3.5 w-3.5" />
                 </Button>
-                <div className="w-px h-5 bg-border mx-1" />
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <AlignLeft className="h-4 w-4" />
+                <div className="w-px h-4 bg-border mx-1" />
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                  <AlignLeft className="h-3.5 w-3.5" />
                 </Button>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <AlignCenter className="h-4 w-4" />
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                  <AlignCenter className="h-3.5 w-3.5" />
                 </Button>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <AlignRight className="h-4 w-4" />
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                  <AlignRight className="h-3.5 w-3.5" />
                 </Button>
-                <div className="w-px h-5 bg-border mx-1" />
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <List className="h-4 w-4" />
+                <div className="w-px h-4 bg-border mx-1" />
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                  <List className="h-3.5 w-3.5" />
                 </Button>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <ListOrdered className="h-4 w-4" />
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                  <ListOrdered className="h-3.5 w-3.5" />
                 </Button>
               </div>
               
@@ -383,7 +446,7 @@ Dated: [DATE]                   Respectfully submitted,
             </div>
             
             <div className="text-center text-sm text-muted-foreground">
-              All changes are automatically saved as you type.
+              {isAiProcessing ? "AI is generating content..." : "All changes are automatically saved as you type."}
             </div>
           </motion.div>
         )}

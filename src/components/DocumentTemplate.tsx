@@ -37,37 +37,37 @@ const DocumentTemplate = ({ title, description, category, onClick }: DocumentTem
 
   return (
     <div
-      className="border rounded-xl overflow-hidden transition-all duration-300 hover:shadow-subtle hover:border-primary/30 cursor-pointer group"
+      className="border rounded-lg overflow-hidden transition-all duration-300 hover:shadow-subtle hover:border-primary/30 cursor-pointer group"
       onClick={onClick}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      <div className="p-5">
+      <div className="p-3">
         <div className="flex justify-between items-start">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <FileText className="h-5 w-5 text-primary" />
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
+              <FileText className="h-4 w-4 text-primary" />
             </div>
             <div>
-              <h3 className="font-medium group-hover:text-primary transition-colors">{title}</h3>
-              <p className="text-sm text-muted-foreground mt-1">{description}</p>
+              <h3 className="font-medium text-sm group-hover:text-primary transition-colors">{title}</h3>
+              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{description}</p>
             </div>
           </div>
           <button
             className={cn(
-              "p-1.5 rounded-full transition-all",
+              "p-1 rounded-full transition-all",
               isCopied ? "bg-green-100 text-green-600" : "bg-muted text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-muted/90"
             )}
             onClick={handleCopy}
             aria-label="Copy template"
           >
-            {isCopied ? <CheckCircle className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            {isCopied ? <CheckCircle className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
           </button>
         </div>
         
-        <div className="mt-4 flex items-center justify-between">
+        <div className="mt-2 flex items-center justify-between">
           <span className={cn(
-            "text-xs font-medium py-1 px-2.5 rounded-full",
+            "text-xs font-medium py-0.5 px-2 rounded-full",
             getCategoryColor(category)
           )}>
             {category}
