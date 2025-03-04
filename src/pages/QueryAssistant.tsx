@@ -11,12 +11,12 @@ const QueryAssistant = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
 
-  const handleSubmit = async (query: string, selectedOption: QueryType) => {
+  const handleSubmit = async (query: string, selectedOption: QueryType, file: File | null) => {
     setIsProcessing(true);
     setResponse(null);
     
     try {
-      const result = await processLegalQuery(query, selectedOption);
+      const result = await processLegalQuery(query, selectedOption, file);
       
       if (result.status === 'success') {
         setResponse(result.content);

@@ -8,7 +8,7 @@ import { QueryType } from '@/services/legalQueryService';
 import { toast } from 'sonner';
 
 interface QueryFormProps {
-  onSubmit: (query: string, queryType: QueryType) => Promise<void>;
+  onSubmit: (query: string, queryType: QueryType, file: File | null) => Promise<void>;
   isProcessing: boolean;
 }
 
@@ -29,7 +29,7 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
-    await onSubmit(query.trim(), selectedOption);
+    await onSubmit(query.trim(), selectedOption, file);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
