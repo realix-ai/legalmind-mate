@@ -10,9 +10,10 @@ interface ChatPanelProps {
   messages: ChatMessageProps[];
   isAiTyping: boolean;
   onSendMessage: (message: string) => void;
+  onNewDialog: () => void;
 }
 
-const ChatPanel = ({ messages, isAiTyping, onSendMessage }: ChatPanelProps) => {
+const ChatPanel = ({ messages, isAiTyping, onSendMessage, onNewDialog }: ChatPanelProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Scroll to bottom when messages change
@@ -47,6 +48,7 @@ const ChatPanel = ({ messages, isAiTyping, onSendMessage }: ChatPanelProps) => {
         onSendMessage={onSendMessage} 
         isDisabled={isAiTyping} 
         messages={messages} 
+        onNewDialog={onNewDialog}
       />
     </motion.div>
   );

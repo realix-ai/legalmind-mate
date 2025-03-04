@@ -1,28 +1,21 @@
+
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, History } from 'lucide-react';
+import { Send, History, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { usePrompts } from '@/hooks/use-prompts';
-import PromptManagerSection from '@/components/query/PromptManagerSection';
-import { ChatMessageProps } from '@/components/case/ChatMessage';
 import ChatHistory from '@/components/case/ChatHistory';
+import { ChatMessageProps } from '@/components/case/ChatMessage';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   isDisabled: boolean;
   messages: ChatMessageProps[];
+  onNewDialog: () => void;
 }
 
-const ChatInput = ({ onSendMessage, isDisabled, messages }: ChatInputProps) => {
+const ChatInput = ({ onSendMessage, isDisabled, messages, onNewDialog }: ChatInputProps) => {
   const [currentMessage, setCurrentMessage] = useState('');
-  
-  // Prompt manager state and hooks
-  const { 
-    showPromptManager, 
-    promptManagerRef, 
-    togglePromptManager 
-  } = usePromptManager();
   
   const handleSendMessage = () => {
     if (!currentMessage.trim()) return;
@@ -30,11 +23,6 @@ const ChatInput = ({ onSendMessage, isDisabled, messages }: ChatInputProps) => {
     // Send message
     onSendMessage(currentMessage);
     setCurrentMessage('');
-  };
-
-  const handleLoadPrompt = (promptText: string) => {
-    setCurrentMessage(promptText);
-    togglePromptManager();
   };
   
   const handleSelectHistoryMessage = (messageText: string) => {
@@ -53,24 +41,17 @@ const ChatInput = ({ onSendMessage, isDisabled, messages }: ChatInputProps) => {
 
   return (
     <div className="p-4 border-t bg-gradient-to-b from-background to-accent/10 rounded-b-xl">
-      <PromptManagerSection
-        showPromptManager={showPromptManager}
-        promptManagerRef={promptManagerRef}
-        togglePromptManager={togglePromptManager}
-        onLoadPrompt={handleLoadPrompt}
-        onHistoryClick={() => {}}
-      />
-      
-      <div className="flex gap-3 items-end">
+      <div className="flex gap-2 mb-2">
         <Popover>
           <PopoverTrigger asChild>
             <Button 
               variant="outline" 
-              size="icon" 
-              className="h-12 w-12 rounded-full bg-background"
+              size="sm"
+              className="flex items-center gap-1 z-10 text-xs py-1 px-2 h-7"
               data-history-button="true"
             >
-              <History className="h-5 w-5" />
+              <History className="h-3 w-3" />
+              History
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-80 p-0" align="start">
@@ -81,6 +62,18 @@ const ChatInput = ({ onSendMessage, isDisabled, messages }: ChatInputProps) => {
           </PopoverContent>
         </Popover>
         
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="flex items-center gap-1 z-10 text-xs py-1 px-2 h-7"
+          onClick={onNewDialog}
+        >
+          <PlusCircle className="h-3 w-3" />
+          New Dialog
+        </Button>
+      </div>
+      
+      <div className="flex gap-3 items-end">
         <Textarea 
           value={currentMessage}
           onChange={handleTextareaChange}
@@ -108,43 +101,6 @@ const ChatInput = ({ onSendMessage, isDisabled, messages }: ChatInputProps) => {
       </div>
     </div>
   );
-};
-
-// Create a local hook for managing prompt visibility
-const usePromptManager = () => {
-  const [showPromptManager, setShowPromptManager] = useState(false);
-  const promptManagerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        promptManagerRef.current && 
-        !promptManagerRef.current.contains(event.target as Node) &&
-        !(event.target as Element).closest('[data-prompt-button="true"]')
-      ) {
-        setShowPromptManager(false);
-      }
-    };
-
-    if (showPromptManager) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showPromptManager]);
-
-  const togglePromptManager = () => {
-    setShowPromptManager(!showPromptManager);
-  };
-
-  return {
-    showPromptManager,
-    promptManagerRef,
-    togglePromptManager,
-    setShowPromptManager
-  };
 };
 
 export default ChatInput;

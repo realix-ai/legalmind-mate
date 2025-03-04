@@ -10,7 +10,8 @@ import {
   saveChatMessages, 
   addChatMessage, 
   generateWelcomeMessage,
-  generateAIResponse
+  generateAIResponse,
+  clearChatHistory
 } from '@/utils/documents/chatManager';
 import Navigation from '@/components/Navigation';
 import Loading from '@/components/case/Loading';
@@ -33,6 +34,8 @@ const CaseChat = () => {
   // Chat state
   const [messages, setMessages] = useState<ChatMessageProps[]>([]);
   const [isAiTyping, setIsAiTyping] = useState(false);
+  // Track active conversation with a session ID
+  const [sessionId, setSessionId] = useState<string>(`session-${Date.now()}`);
   
   useEffect(() => {
     if (!caseId) {
@@ -99,7 +102,7 @@ const CaseChat = () => {
     
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
-    saveChatMessages(caseId, updatedMessages);
+    saveChatMessages(caseId, updatedMessages, sessionId);
     
     // Simulate AI thinking
     setIsAiTyping(true);
@@ -114,13 +117,32 @@ const CaseChat = () => {
       
       const messagesWithAiResponse = [...updatedMessages, aiResponse];
       setMessages(messagesWithAiResponse);
-      saveChatMessages(caseId, messagesWithAiResponse);
+      saveChatMessages(caseId, messagesWithAiResponse, sessionId);
     } catch (error) {
       console.error('Error generating AI response:', error);
       toast.error('Failed to generate AI response');
     } finally {
       setIsAiTyping(false);
     }
+  };
+  
+  const handleNewDialog = () => {
+    if (!caseId || !caseData) return;
+    
+    // Create a new session ID
+    const newSessionId = `session-${Date.now()}`;
+    setSessionId(newSessionId);
+    
+    // Generate a new welcome message
+    const welcomeMessage = generateWelcomeMessage(caseData.name);
+    
+    // Reset current messages
+    setMessages([welcomeMessage]);
+    
+    // Save the welcome message to the new session
+    saveChatMessages(caseId, [welcomeMessage], newSessionId);
+    
+    toast.success('Started a new conversation');
   };
   
   if (loading) {
@@ -152,6 +174,7 @@ const CaseChat = () => {
             messages={messages}
             isAiTyping={isAiTyping}
             onSendMessage={handleSendMessage}
+            onNewDialog={handleNewDialog}
           />
         </div>
       </main>
