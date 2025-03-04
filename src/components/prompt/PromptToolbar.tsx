@@ -12,7 +12,7 @@ const PromptToolbar = ({ onAddClick, onExportClick, onDeleteClick }: PromptToolb
   return (
     <div className="flex gap-1">
       <Button
-        variant="destructive"
+        variant="outline"
         size="sm"
         className="h-7 px-2"
         onClick={onDeleteClick}
