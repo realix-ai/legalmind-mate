@@ -3,7 +3,16 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navigation from '@/components/Navigation';
 import { toast } from '@/components/ui/use-toast';
-import { templates, getTemplateContent, saveDocument, getSavedDocuments, getSavedDocument, SavedDocument } from '@/utils/documentTemplates';
+import { 
+  templates, 
+  getTemplateContent, 
+  saveDocument, 
+  getSavedDocuments, 
+  getSavedDocument, 
+  SavedDocument,
+  getCustomTemplates,
+  CustomTemplate
+} from '@/utils/documentTemplates';
 import TemplateList from '@/components/document/TemplateList';
 import DocumentToolbar from '@/components/document/DocumentToolbar';
 import AiPromptInput from '@/components/document/AiPromptInput';
@@ -18,10 +27,12 @@ const DocumentDrafting = () => {
   const [aiPrompt, setAiPrompt] = useState('');
   const [showAiPrompt, setShowAiPrompt] = useState(false);
   const [savedDocuments, setSavedDocuments] = useState<SavedDocument[]>([]);
+  const [customTemplates, setCustomTemplates] = useState<CustomTemplate[]>([]);
   
-  // Load saved documents on mount
+  // Load saved documents and custom templates on mount
   useEffect(() => {
     setSavedDocuments(getSavedDocuments());
+    setCustomTemplates(getCustomTemplates());
   }, []);
   
   const handleSelectTemplate = (id: string) => {
@@ -34,8 +45,17 @@ const DocumentDrafting = () => {
         setDocumentContent(savedDoc.content);
         setSelectedTemplate('saved');
       }
+    } else if (id.startsWith('custom-')) {
+      // This is a custom template
+      const customTemplate = customTemplates.find(t => t.id === id);
+      if (customTemplate) {
+        setCurrentDocumentId(null);
+        setSelectedTemplate(id);
+        setDocumentContent(customTemplate.content);
+        setDocumentTitle(`${customTemplate.title} Copy`);
+      }
     } else {
-      // This is a template
+      // This is a predefined template
       setCurrentDocumentId(null);
       setSelectedTemplate(id);
       setDocumentContent(getTemplateContent(id));
@@ -68,6 +88,10 @@ const DocumentDrafting = () => {
         variant: "destructive"
       });
     }
+  };
+  
+  const handleTemplateAdded = () => {
+    setCustomTemplates(getCustomTemplates());
   };
   
   const handleAiAssist = () => {
@@ -107,9 +131,11 @@ const DocumentDrafting = () => {
         {!selectedTemplate ? (
           <TemplateList 
             templates={templates}
+            customTemplates={customTemplates}
             savedDocuments={savedDocuments}
             onSelectTemplate={handleSelectTemplate}
             onCreateBlank={() => handleSelectTemplate('new')}
+            onTemplateAdded={handleTemplateAdded}
           />
         ) : (
           <motion.div

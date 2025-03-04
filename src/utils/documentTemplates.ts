@@ -1,4 +1,3 @@
-
 export interface Template {
   id: string;
   title: string;
@@ -11,6 +10,15 @@ export interface SavedDocument {
   title: string;
   content: string;
   lastModified: number;
+}
+
+export interface CustomTemplate {
+  id: string;
+  title: string;
+  description: string;
+  content: string;
+  category: string;
+  createdAt: number;
 }
 
 export const templates: Template[] = [
@@ -53,6 +61,12 @@ export const templates: Template[] = [
 ];
 
 export const getTemplateContent = (id: string): string => {
+  const customTemplates = getCustomTemplates();
+  const customTemplate = customTemplates.find(template => template.id === id);
+  if (customTemplate) {
+    return customTemplate.content;
+  }
+
   const templateContents: Record<string, string> = {
     'contract-service': `SERVICE AGREEMENT
 
@@ -194,6 +208,41 @@ Dated: [DATE]                   Respectfully submitted,
   };
   
   return templateContents[id] || `[Template content for ${id}]`;
+};
+
+// Custom templates storage functions
+export const saveCustomTemplate = (title: string, description: string, content: string, category: string = "Custom"): CustomTemplate => {
+  const customTemplates = getCustomTemplates();
+  
+  const newTemplate: CustomTemplate = {
+    id: `custom-${Date.now()}`,
+    title,
+    description,
+    content,
+    category,
+    createdAt: Date.now()
+  };
+  
+  customTemplates.push(newTemplate);
+  localStorage.setItem('customTemplates', JSON.stringify(customTemplates));
+  return newTemplate;
+};
+
+export const getCustomTemplates = (): CustomTemplate[] => {
+  const saved = localStorage.getItem('customTemplates');
+  if (!saved) return [];
+  try {
+    return JSON.parse(saved);
+  } catch (e) {
+    console.error('Error parsing custom templates', e);
+    return [];
+  }
+};
+
+export const deleteCustomTemplate = (id: string): void => {
+  const customTemplates = getCustomTemplates();
+  const filtered = customTemplates.filter(template => template.id !== id);
+  localStorage.setItem('customTemplates', JSON.stringify(filtered));
 };
 
 // Document storage functions

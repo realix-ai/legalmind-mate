@@ -2,7 +2,8 @@
 import { motion } from 'framer-motion';
 import DocumentTemplate from '@/components/DocumentTemplate';
 import { Button } from '@/components/ui/button';
-import { SavedDocument } from '@/utils/documentTemplates';
+import { SavedDocument, CustomTemplate } from '@/utils/documentTemplates';
+import TemplateUploadDialog from './TemplateUploadDialog';
 
 export interface Template {
   id: string;
@@ -13,12 +14,21 @@ export interface Template {
 
 interface TemplateListProps {
   templates: Template[];
+  customTemplates: CustomTemplate[];
   savedDocuments?: SavedDocument[];
   onSelectTemplate: (id: string) => void;
   onCreateBlank: () => void;
+  onTemplateAdded: () => void;
 }
 
-const TemplateList = ({ templates, savedDocuments = [], onSelectTemplate, onCreateBlank }: TemplateListProps) => {
+const TemplateList = ({ 
+  templates, 
+  customTemplates,
+  savedDocuments = [], 
+  onSelectTemplate, 
+  onCreateBlank,
+  onTemplateAdded
+}: TemplateListProps) => {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -59,14 +69,15 @@ const TemplateList = ({ templates, savedDocuments = [], onSelectTemplate, onCrea
         Create a new document or select from our professional templates.
       </motion.p>
       
-      <motion.div variants={itemVariants} className="mb-8">
+      <motion.div variants={itemVariants} className="mb-8 flex gap-4 justify-center">
         <Button 
           size="lg" 
           onClick={onCreateBlank}
-          className="mx-auto block"
         >
           Create Blank Document
         </Button>
+        
+        <TemplateUploadDialog onTemplateAdded={onTemplateAdded} />
       </motion.div>
 
       {savedDocuments.length > 0 && (
@@ -81,6 +92,24 @@ const TemplateList = ({ templates, savedDocuments = [], onSelectTemplate, onCrea
                 description={`Last modified: ${new Date(doc.lastModified).toLocaleDateString()}`}
                 category="Your Document"
                 onClick={() => onSelectTemplate(doc.id)}
+              />
+            ))}
+          </div>
+        </motion.div>
+      )}
+      
+      {customTemplates.length > 0 && (
+        <motion.div variants={itemVariants} className="mb-8">
+          <h2 className="text-xl font-medium mb-4">Your Templates</h2>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {customTemplates.map((template) => (
+              <DocumentTemplate
+                key={template.id}
+                title={template.title}
+                description={template.description}
+                category={template.category}
+                onClick={() => onSelectTemplate(template.id)}
               />
             ))}
           </div>
