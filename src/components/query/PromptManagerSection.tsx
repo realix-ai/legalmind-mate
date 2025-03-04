@@ -24,7 +24,7 @@ const PromptManagerSection = ({
           type="button"
           variant="outline" 
           size="sm"
-          className="flex items-center gap-1 absolute right-0 -bottom-10 z-10"
+          className="flex items-center gap-1 absolute left-0 -bottom-10 z-10"
           onClick={togglePromptManager}
           data-prompt-button="true"
         >
