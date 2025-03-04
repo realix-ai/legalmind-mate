@@ -4,13 +4,20 @@ import { toast } from "sonner";
 import Navigation from '@/components/Navigation';
 import QueryForm from '@/components/QueryForm';
 import QueryResponseDisplay from '@/components/QueryResponseDisplay';
+import CitationBox from '@/components/citation/CitationBox';
+import UserProfileButton from '@/components/profile/UserProfileButton';
+import CollaborationPanel from '@/components/collaboration/CollaborationPanel';
+import BatchProcessingPanel from '@/components/batch/BatchProcessingPanel';
 import { processLegalQuery, QueryType } from '@/services/legalQueryService';
+import { fetchRelatedCitations, Citation } from '@/services/citationService';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 const QueryAssistant = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('query');
+  const [citations, setCitations] = useState<Citation[]>([]);
 
-  // Log when component mounts
   useEffect(() => {
     console.log("QueryAssistant component mounted");
   }, []);
@@ -66,37 +73,80 @@ const QueryAssistant = () => {
     <div className="min-h-screen pb-16">
       <Navigation />
       
-      <main className="container max-w-7xl mx-auto pt-24 px-4">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="max-w-3xl mx-auto"
-        >
+      <div className="container max-w-7xl mx-auto pt-16 px-4">
+        <div className="flex justify-between items-center mb-8">
           <motion.h1 
-            variants={itemVariants}
-            className="text-3xl md:text-4xl font-semibold mb-4 text-center"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-3xl font-bold"
           >
-            Query Assistant
+            Legal Assistant
           </motion.h1>
           
-          <motion.p 
-            variants={itemVariants}
-            className="text-muted-foreground text-center mb-8"
-          >
-            Ask a legal question and select how you'd like the AI to process your query.
-          </motion.p>
+          <UserProfileButton />
+        </div>
+      </div>
+      
+      <main className="container max-w-7xl mx-auto px-4">
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)} className="mb-8">
+          <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto">
+            <TabsTrigger value="query">Single Query</TabsTrigger>
+            <TabsTrigger value="batch">Batch Processing</TabsTrigger>
+            <TabsTrigger value="collaboration">Collaboration</TabsTrigger>
+          </TabsList>
           
-          <QueryForm 
-            onSubmit={handleSubmit}
-            isProcessing={isProcessing}
-          />
-        </motion.div>
-        
-        <QueryResponseDisplay
-          isProcessing={isProcessing}
-          response={response}
-        />
+          <TabsContent value="query">
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="max-w-3xl mx-auto"
+            >
+              <motion.h2 
+                variants={itemVariants}
+                className="text-2xl md:text-3xl font-semibold mb-4 text-center"
+              >
+                Query Assistant
+              </motion.h2>
+              
+              <motion.p 
+                variants={itemVariants}
+                className="text-muted-foreground text-center mb-8"
+              >
+                Ask a legal question and select how you'd like the AI to process your query.
+              </motion.p>
+              
+              <QueryForm 
+                onSubmit={handleSubmit}
+                isProcessing={isProcessing}
+              />
+            </motion.div>
+            
+            <QueryResponseDisplay
+              isProcessing={isProcessing}
+              response={response}
+            />
+            
+            {!isProcessing && citations.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="max-w-4xl mx-auto"
+              >
+                <CitationBox citations={citations} />
+              </motion.div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="batch">
+            <BatchProcessingPanel />
+          </TabsContent>
+          
+          <TabsContent value="collaboration">
+            <CollaborationPanel />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
