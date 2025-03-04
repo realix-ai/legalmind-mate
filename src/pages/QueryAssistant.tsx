@@ -15,6 +15,20 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { shareQuery } from '@/services/collaborationService';
 import { formatRelativeTime } from '@/components/collaboration/utils';
 
+// Load user profile from localStorage
+const loadUserName = () => {
+  const savedProfile = localStorage.getItem('userProfile');
+  if (savedProfile) {
+    try {
+      const profile = JSON.parse(savedProfile);
+      return profile.name;
+    } catch (e) {
+      console.error('Error parsing profile data:', e);
+    }
+  }
+  return 'John Doe';
+};
+
 const QueryAssistant = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
@@ -22,10 +36,24 @@ const QueryAssistant = () => {
   const [citations, setCitations] = useState<Citation[]>([]);
   const [currentQuery, setCurrentQuery] = useState<string>('');
   const [currentQueryType, setCurrentQueryType] = useState<QueryType>('legal-research');
-  const [userName, setUserName] = useState('John Doe'); // Added state for user name
+  const [userName, setUserName] = useState(loadUserName());
 
   useEffect(() => {
     console.log("QueryAssistant component mounted");
+    
+    // Listen for profile updates
+    const handleProfileUpdate = (event: CustomEvent) => {
+      console.log('Profile updated event received:', event.detail);
+      if (event.detail && event.detail.name) {
+        setUserName(event.detail.name);
+      }
+    };
+    
+    window.addEventListener('profileUpdated', handleProfileUpdate as EventListener);
+    
+    return () => {
+      window.removeEventListener('profileUpdated', handleProfileUpdate as EventListener);
+    };
   }, []);
 
   const handleSubmit = async (query: string, selectedOption: QueryType, file: File | null) => {

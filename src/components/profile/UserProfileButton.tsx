@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -17,17 +17,58 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from "sonner";
 import { Settings, User, LogOut } from 'lucide-react';
 
+// Type for user profile data
+interface UserProfile {
+  name: string;
+  role: string;
+  specialization: string;
+}
+
+// Load profile from localStorage
+const loadProfile = (): UserProfile => {
+  const savedProfile = localStorage.getItem('userProfile');
+  if (savedProfile) {
+    try {
+      return JSON.parse(savedProfile);
+    } catch (e) {
+      console.error('Error parsing profile data:', e);
+    }
+  }
+  
+  // Default profile
+  return {
+    name: 'John Doe',
+    role: 'attorney',
+    specialization: 'corporate'
+  };
+};
+
+// Save profile to localStorage
+const saveProfile = (profile: UserProfile): void => {
+  localStorage.setItem('userProfile', JSON.stringify(profile));
+};
+
 const UserProfileButton = () => {
   const [profileOpen, setProfileOpen] = useState(false);
-  const [name, setName] = useState('John Doe');
-  const [role, setRole] = useState('attorney');
-  const [specialization, setSpecialization] = useState('corporate');
+  
+  // Initialize state from localStorage
+  const [profile, setProfile] = useState<UserProfile>(loadProfile);
+  const { name, role, specialization } = profile;
   
   const handleSaveProfile = () => {
-    // In a real app, you would save this to a database
-    console.log('Saving profile:', { name, role, specialization });
+    // Save to localStorage
+    saveProfile(profile);
+    
+    // Broadcast profile change event for other components to listen
+    window.dispatchEvent(new CustomEvent('profileUpdated', { detail: profile }));
+    
+    console.log('Saving profile:', profile);
     toast.success('Profile settings saved');
     setProfileOpen(false);
+  };
+  
+  const updateProfile = (field: keyof UserProfile, value: string) => {
+    setProfile(prev => ({ ...prev, [field]: value }));
   };
   
   const getInitials = (name: string) => {
@@ -80,13 +121,13 @@ const UserProfileButton = () => {
               <Input
                 id="name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => updateProfile('name', e.target.value)}
                 className="col-span-3"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="role" className="text-right">Role</Label>
-              <Select value={role} onValueChange={setRole}>
+              <Select value={role} onValueChange={(value) => updateProfile('role', value)}>
                 <SelectTrigger className="col-span-3" id="role">
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
@@ -103,7 +144,7 @@ const UserProfileButton = () => {
               <Label htmlFor="specialization" className="text-right">
                 Specialization
               </Label>
-              <Select value={specialization} onValueChange={setSpecialization}>
+              <Select value={specialization} onValueChange={(value) => updateProfile('specialization', value)}>
                 <SelectTrigger className="col-span-3" id="specialization">
                   <SelectValue placeholder="Select specialization" />
                 </SelectTrigger>
