@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
@@ -7,14 +7,17 @@ import {
   MessageSquare, 
   FileText,
   MoreHorizontal,
-  Send
+  Send,
+  User,
+  Bot
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { getCase, getCaseDocuments } from '@/utils/documents';
 import { Input } from '@/components/ui/input';
 import Navigation from '@/components/Navigation';
-import { Avatar } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
 
 type CaseChatParams = {
   caseId: string;
@@ -30,6 +33,7 @@ interface ChatMessage {
 const CaseChat = () => {
   const { caseId } = useParams<CaseChatParams>();
   const navigate = useNavigate();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const [caseData, setCaseData] = useState<any | null>(null);
   const [caseDocuments, setCaseDocuments] = useState<any[]>([]);
@@ -86,6 +90,11 @@ const CaseChat = () => {
     
     loadCase();
   }, [caseId, navigate]);
+  
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isAiTyping]);
   
   const handleBack = () => {
     navigate('/case-management');
@@ -154,21 +163,23 @@ const CaseChat = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="lg:col-span-1 bg-card rounded-lg shadow p-6"
+            className="lg:col-span-1 bg-card rounded-lg shadow-md p-6 max-h-[calc(100vh-160px)] overflow-auto"
           >
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h2 className="text-xl font-semibold">Documents</h2>
-                <p className="text-muted-foreground">Case: {caseData?.caseNumber}</p>
+                <p className="text-muted-foreground text-sm">Case: {caseData?.caseNumber}</p>
               </div>
             </div>
             
             {caseDocuments.length > 0 ? (
               <ul className="space-y-3">
                 {caseDocuments.map((doc) => (
-                  <li key={doc.id} className="flex items-center justify-between p-3 rounded-md border">
+                  <li key={doc.id} className="flex items-center justify-between p-3 rounded-md border hover:border-primary/50 transition-colors duration-200">
                     <div className="flex items-center">
-                      <FileText className="h-4 w-4 mr-3 text-muted-foreground" />
+                      <div className="bg-primary/10 rounded-full p-2 mr-3">
+                        <FileText className="h-4 w-4 text-primary" />
+                      </div>
                       <div>
                         <h4 className="text-sm font-medium">{doc.name}</h4>
                         <p className="text-xs text-muted-foreground">{doc.date}</p>
@@ -178,6 +189,7 @@ const CaseChat = () => {
                       variant="ghost" 
                       size="icon" 
                       onClick={() => navigate(`/document-drafting/edit/${doc.id}`)}
+                      className="hover:bg-primary/5"
                     >
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
@@ -186,7 +198,9 @@ const CaseChat = () => {
               </ul>
             ) : (
               <div className="flex flex-col items-center justify-center py-8 text-center">
-                <FileText className="h-12 w-12 text-muted-foreground mb-3" />
+                <div className="bg-primary/10 rounded-full p-4 mb-3">
+                  <FileText className="h-8 w-8 text-primary/70" />
+                </div>
                 <h3 className="text-lg font-medium mb-1">No documents yet</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   Create a document and assign it to this case
@@ -202,11 +216,16 @@ const CaseChat = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0, transition: { delay: 0.1 } }}
-            className="lg:col-span-2 bg-card rounded-lg shadow flex flex-col h-[700px]"
+            className="lg:col-span-2 bg-card rounded-lg shadow-md flex flex-col h-[calc(100vh-160px)]"
           >
-            <div className="p-4 border-b flex items-center">
-              <MessageSquare className="h-5 w-5 mr-2 text-primary" />
-              <h2 className="text-lg font-semibold">Case Assistant</h2>
+            <div className="p-4 border-b flex items-center bg-primary/5 rounded-t-lg">
+              <div className="bg-primary/10 rounded-full p-2 mr-2">
+                <Bot className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold">Case Assistant</h2>
+                <p className="text-xs text-muted-foreground">AI-powered legal assistant</p>
+              </div>
             </div>
             
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -215,24 +234,47 @@ const CaseChat = () => {
                   key={message.id} 
                   className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
+                  {message.sender === 'ai' && (
+                    <Avatar className="h-8 w-8 mr-2 mt-1 shrink-0">
+                      <AvatarFallback className="bg-primary/20 text-primary">
+                        <Bot className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                  
                   <div 
-                    className={`max-w-[80%] rounded-lg p-3 ${
+                    className={cn(
+                      "max-w-[85%] rounded-xl p-3 shadow-sm", 
                       message.sender === 'user' 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'bg-muted'
-                    }`}
+                        ? 'bg-primary text-primary-foreground rounded-tr-none' 
+                        : 'bg-muted rounded-tl-none'
+                    )}
                   >
-                    <p className="text-sm">{message.content}</p>
-                    <p className="text-xs opacity-70 mt-1">
-                      {new Date(message.timestamp).toLocaleTimeString()}
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <p className="text-[10px] opacity-70 mt-1 text-right">
+                      {new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                     </p>
                   </div>
+                  
+                  {message.sender === 'user' && (
+                    <Avatar className="h-8 w-8 ml-2 mt-1 shrink-0">
+                      <AvatarFallback className="bg-secondary text-foreground">
+                        <User className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
                 </div>
               ))}
               
               {isAiTyping && (
                 <div className="flex justify-start">
-                  <div className="max-w-[80%] rounded-lg p-3 bg-muted">
+                  <Avatar className="h-8 w-8 mr-2 shrink-0">
+                    <AvatarFallback className="bg-primary/20 text-primary">
+                      <Bot className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  <div className="max-w-[85%] rounded-xl p-3 bg-muted rounded-tl-none shadow-sm">
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0ms' }}></div>
                       <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '150ms' }}></div>
@@ -241,28 +283,35 @@ const CaseChat = () => {
                   </div>
                 </div>
               )}
+              
+              {/* This empty div is used for scrolling to the bottom */}
+              <div ref={messagesEndRef} />
             </div>
             
-            <div className="p-4 border-t">
-              <div className="flex gap-2">
+            <div className="p-4 border-t bg-secondary/30">
+              <form 
+                className="flex gap-2 items-center"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSendMessage();
+                }}
+              >
                 <Input 
                   value={currentMessage}
                   onChange={(e) => setCurrentMessage(e.target.value)}
                   placeholder="Ask about this case..."
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSendMessage();
-                    }
-                  }}
+                  className="flex-1 bg-white dark:bg-card border shadow-sm focus-visible:ring-primary"
                 />
                 <Button 
+                  type="submit"
                   onClick={handleSendMessage}
                   disabled={!currentMessage.trim() || isAiTyping}
+                  className="shrink-0"
+                  size="icon"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
-              </div>
+              </form>
             </div>
           </motion.div>
         </div>
