@@ -1,5 +1,5 @@
 
-import { Loader2, FileText, Download, Mail, Link } from 'lucide-react';
+import { Loader2, FileText, Download, Mail, Link, Share2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { toast } from "sonner";
@@ -14,6 +14,8 @@ import {
 interface QueryResponseDisplayProps {
   isProcessing: boolean;
   response: string | null;
+  onShare?: () => void;
+  showShareButton?: boolean;
 }
 
 const processingStages = [
@@ -23,7 +25,7 @@ const processingStages = [
   "Generating response..."
 ];
 
-const QueryResponseDisplay = ({ isProcessing, response }: QueryResponseDisplayProps) => {
+const QueryResponseDisplay = ({ isProcessing, response, onShare, showShareButton }: QueryResponseDisplayProps) => {
   const [copied, setCopied] = useState(false);
   
   // Don't show anything if we're not processing and have no response
@@ -114,28 +116,37 @@ const QueryResponseDisplay = ({ isProcessing, response }: QueryResponseDisplayPr
             )}
             
             {!isProcessing && response && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-8">
-                    <Download className="h-3.5 w-3.5 mr-1" />
-                    Export
+              <div className="flex gap-2">
+                {showShareButton && (
+                  <Button variant="outline" size="sm" className="h-8" onClick={onShare}>
+                    <Share2 className="h-3.5 w-3.5 mr-1" />
+                    Share
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={handleExportPDF}>
-                    <Download className="h-4 w-4 mr-2" />
-                    Save as PDF
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleEmailShare}>
-                    <Mail className="h-4 w-4 mr-2" />
-                    Share via Email
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleCopyLink}>
-                    <Link className="h-4 w-4 mr-2" />
-                    Copy Shareable Link
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                )}
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-8">
+                      <Download className="h-3.5 w-3.5 mr-1" />
+                      Export
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={handleExportPDF}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Save as PDF
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleEmailShare}>
+                      <Mail className="h-4 w-4 mr-2" />
+                      Share via Email
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleCopyLink}>
+                      <Link className="h-4 w-4 mr-2" />
+                      Copy Shareable Link
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             )}
           </div>
         </div>
