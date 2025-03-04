@@ -11,7 +11,8 @@ import {
   addChatMessage, 
   generateWelcomeMessage,
   generateAIResponse,
-  clearChatHistory
+  clearChatHistory,
+  getSessionsList
 } from '@/utils/documents/chatManager';
 import Navigation from '@/components/Navigation';
 import Loading from '@/components/case/Loading';
@@ -60,15 +61,35 @@ const CaseChat = () => {
             date: new Date(doc.lastModified).toLocaleDateString()
           })));
           
-          // Load existing chat messages or add welcome message
-          const existingMessages = getChatMessages(caseId);
-          if (existingMessages.length > 0) {
-            setMessages(existingMessages);
+          // Load existing chat messages for the most recent session
+          const sessions = getSessionsList(caseId);
+          console.log("Available sessions:", sessions);
+          
+          if (sessions.length > 0) {
+            // Use the most recent session by default
+            const mostRecentSession = sessions[0];
+            setSessionId(mostRecentSession.id);
+            
+            // Load messages for this session
+            const existingMessages = getChatMessages(caseId, mostRecentSession.id);
+            if (existingMessages.length > 0) {
+              setMessages(existingMessages);
+              console.log("Loaded messages for session:", mostRecentSession.id, existingMessages);
+            } else {
+              // Fallback to welcome message if no messages in the session
+              const welcomeMessage = generateWelcomeMessage(caseInfo.name);
+              setMessages([welcomeMessage]);
+              saveChatMessages(caseId, [welcomeMessage], mostRecentSession.id);
+            }
           } else {
+            // No sessions exist yet, create a new one with welcome message
+            const newSessionId = `session-${Date.now()}`;
+            setSessionId(newSessionId);
+            
             // Add initial welcome message from AI
             const welcomeMessage = generateWelcomeMessage(caseInfo.name);
             setMessages([welcomeMessage]);
-            saveChatMessages(caseId, [welcomeMessage]);
+            saveChatMessages(caseId, [welcomeMessage], newSessionId);
           }
         } else {
           toast.error('Case not found');

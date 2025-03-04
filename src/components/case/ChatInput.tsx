@@ -1,11 +1,12 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, History, PlusCircle } from 'lucide-react';
+import { Send, List, History, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import ChatHistory from '@/components/case/ChatHistory';
 import { ChatMessageProps } from '@/components/case/ChatMessage';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import PromptManager from '@/components/PromptManager';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -16,6 +17,7 @@ interface ChatInputProps {
 
 const ChatInput = ({ onSendMessage, isDisabled, messages, onNewDialog }: ChatInputProps) => {
   const [currentMessage, setCurrentMessage] = useState('');
+  const [showPrompts, setShowPrompts] = useState(false);
   
   const handleSendMessage = () => {
     if (!currentMessage.trim()) return;
@@ -27,6 +29,11 @@ const ChatInput = ({ onSendMessage, isDisabled, messages, onNewDialog }: ChatInp
   
   const handleSelectHistoryMessage = (messageText: string) => {
     setCurrentMessage(messageText);
+  };
+  
+  const handleSelectPrompt = (promptText: string) => {
+    setCurrentMessage(promptText);
+    setShowPrompts(false);
   };
 
   // Auto-resize textarea based on content
@@ -71,6 +78,23 @@ const ChatInput = ({ onSendMessage, isDisabled, messages, onNewDialog }: ChatInp
           <PlusCircle className="h-3 w-3" />
           New Dialog
         </Button>
+        
+        <Popover open={showPrompts} onOpenChange={setShowPrompts}>
+          <PopoverTrigger asChild>
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="flex items-center gap-1 z-10 text-xs py-1 px-2 h-7"
+              data-prompt-button="true"
+            >
+              <List className="h-3 w-3" />
+              Load Prompts
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80 p-0" align="start">
+            <PromptManager onSelectPrompt={handleSelectPrompt} />
+          </PopoverContent>
+        </Popover>
       </div>
       
       <div className="flex gap-3 items-end">

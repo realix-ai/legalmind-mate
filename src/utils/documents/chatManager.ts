@@ -1,10 +1,9 @@
-
 import { ChatMessageProps } from '@/components/case/ChatMessage';
 
 // Maximum number of messages to keep in conversation context
 const MAX_CONTEXT_LENGTH = 10;
 
-// Get stored chat messages for a specific case
+// Get stored chat messages for a specific case and session
 export const getChatMessages = (caseId: string, sessionId?: string): ChatMessageProps[] => {
   // If a sessionId is provided, try to get messages for that session first
   if (sessionId) {
