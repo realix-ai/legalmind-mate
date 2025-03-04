@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from "sonner";
@@ -23,21 +22,10 @@ const QueryAssistant = () => {
     try {
       console.log("QueryAssistant: Starting to process query:", query);
       console.log("QueryAssistant: Selected option:", selectedOption);
-      console.log("QueryAssistant: File information:", file ? {
-        name: file.name,
-        size: `${(file.size / 1024).toFixed(2)} KB`,
-        type: file.type,
-        lastModified: new Date(file.lastModified).toISOString()
-      } : "No file");
+      console.log("QueryAssistant: File upload has been disabled");
       
-      // Explicit check and log for file
-      if (file) {
-        console.log("QueryAssistant: File is present, proceeding with file processing");
-      } else {
-        console.log("QueryAssistant: No file attached, proceeding with text-only query");
-      }
-      
-      const result = await processLegalQuery(query, selectedOption, file);
+      // Always pass null for file since we've removed file upload functionality
+      const result = await processLegalQuery(query, selectedOption, null);
       console.log("QueryAssistant: Received result:", result);
       
       if (result.status === 'success') {

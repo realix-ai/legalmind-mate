@@ -2,14 +2,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
 import QueryOptions from '@/components/QueryOptions';
 import QueryTextarea from '@/components/QueryTextarea';
 import { QueryType } from '@/services/legalQueryService';
-import { useFileUpload } from '@/hooks/use-file-upload';
 import { usePromptManager } from '@/hooks/use-prompt-manager';
 import { useQueryHistory } from '@/hooks/use-query-history';
-import FileUploadSection from '@/components/query/FileUploadSection';
 import PromptManagerSection from '@/components/query/PromptManagerSection';
 import QueryHistory from '@/components/query/QueryHistory';
 
@@ -30,17 +27,6 @@ const itemVariants = {
 const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
   const [query, setQuery] = useState('');
   const [selectedOption, setSelectedOption] = useState<QueryType>('legal-research');
-  
-  const { 
-    file, 
-    fileError, 
-    previewUrl, 
-    fileInputRef,
-    handleFileChange,
-    handleFileDrop,
-    clearFile,
-    triggerFileUpload
-  } = useFileUpload((updateFn) => setQuery(updateFn));
   
   const {
     showPromptManager,
@@ -67,19 +53,13 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
       return;
     }
     
-    if (fileError) {
-      toast.error("Please fix the file error before submitting");
-      return;
-    }
-    
     console.log("Submitting form with query:", query);
-    console.log("Selected file:", file ? `${file.name} (${file.type})` : "No file selected");
     
     try {
       // Add query to history
       addToHistory(query);
       
-      await onSubmit(query.trim(), selectedOption, file);
+      await onSubmit(query.trim(), selectedOption, null);
       console.log("Form submission completed");
     } catch (error) {
       console.error("Error in form submission:", error);
@@ -103,11 +83,10 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
         <QueryTextarea
           query={query}
           onChange={(e) => setQuery(e.target.value)}
-          onTriggerFileUpload={triggerFileUpload}
+          onTriggerFileUpload={() => toast.info('File upload has been disabled')}
           isProcessing={isProcessing}
-          hasFile={!!file}
-          fileError={fileError}
-          onFileDrop={handleFileDrop}
+          hasFile={false}
+          fileError={null}
         />
         
         <PromptManagerSection 
@@ -130,15 +109,6 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
             />
           </div>
         )}
-        
-        <FileUploadSection 
-          file={file}
-          fileError={fileError}
-          previewUrl={previewUrl}
-          fileInputRef={fileInputRef}
-          isProcessing={isProcessing}
-          onClearFile={clearFile}
-        />
         
         <p className="text-sm font-medium mb-2">Select analysis type:</p>
         <QueryOptions
