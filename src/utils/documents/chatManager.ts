@@ -1,4 +1,5 @@
 import { ChatMessageProps } from '@/components/case/ChatMessage';
+import { getCaseDocumentsContent } from './caseManager';
 
 // Maximum number of messages to keep in conversation context
 const MAX_CONTEXT_LENGTH = 10;
@@ -105,7 +106,7 @@ const updateSessionsList = (caseId: string, sessionId: string, timestamp: number
 export const generateWelcomeMessage = (caseName: string): ChatMessageProps => {
   return {
     id: `msg-${Date.now()}`,
-    content: `Welcome to case "${caseName}". How can I assist you with this case today?`,
+    content: `Welcome to case "${caseName}". I have access to all documents associated with this case. How can I assist you today?`,
     sender: 'ai',
     timestamp: Date.now()
   };
@@ -123,7 +124,7 @@ export const getConversationContext = (messages: ChatMessageProps[]): string => 
   }).join('\n\n');
 };
 
-// Generate AI response based on conversation context
+// Generate AI response based on conversation context and case documents
 export const generateAIResponse = async (
   caseId: string,
   caseName: string,
@@ -132,32 +133,75 @@ export const generateAIResponse = async (
   // Get conversation context
   const context = getConversationContext(messages);
   
-  // Here we would normally send the context to an AI service
-  // Since we don't have a real AI backend, we'll simulate responses
-  // In a real implementation, this would call an API
+  // Get case documents content
+  const caseDocuments = getCaseDocumentsContent(caseId);
+  console.log(`Found ${caseDocuments.length} documents for case ${caseId}`);
+  
+  // Extract the last user message
+  const lastUserMessage = messages.filter(m => m.sender === 'user').pop()?.content || '';
   
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 1500));
   
-  // Generate a more context-aware response
-  const lastUserMessage = messages.filter(m => m.sender === 'user').pop()?.content || '';
   let aiResponse = '';
   
-  // Use different response types based on conversation
-  if (lastUserMessage.toLowerCase().includes('document') || lastUserMessage.toLowerCase().includes('file')) {
-    aiResponse = `I've analyzed the documents related to "${caseName}". There are ${Math.floor(Math.random() * 5) + 1} key documents that seem particularly relevant to your query about ${lastUserMessage.substring(0, 30)}...`;
+  // Check if user is asking about documents
+  if (lastUserMessage.toLowerCase().includes('document') || 
+      lastUserMessage.toLowerCase().includes('file') || 
+      lastUserMessage.toLowerCase().includes('content') ||
+      lastUserMessage.toLowerCase().includes('information')) {
+    
+    if (caseDocuments.length === 0) {
+      aiResponse = `I don't see any documents associated with "${caseName}" yet. You can add documents to this case from the document drafting page.`;
+    } else {
+      // Construct response based on available documents
+      aiResponse = `I found ${caseDocuments.length} document(s) related to case "${caseName}":\n\n`;
+      
+      caseDocuments.forEach((doc, index) => {
+        aiResponse += `${index + 1}. "${doc.title}"\n`;
+        
+        // Add a short excerpt from each document (first 100 chars)
+        const excerpt = doc.content.substring(0, 100).trim();
+        aiResponse += `   Excerpt: "${excerpt}${doc.content.length > 100 ? '...' : ''}"\n\n`;
+      });
+      
+      // Attempt to answer the specific query based on document content
+      if (lastUserMessage.toLowerCase().includes('summary') || lastUserMessage.toLowerCase().includes('summarize')) {
+        aiResponse += `\nHere's a brief summary of the documents: The documents appear to be related to ${
+          caseDocuments[0].title.includes('contract') ? 'contractual matters' : 
+          caseDocuments[0].title.includes('legal') ? 'legal proceedings' : 
+          'case-relevant information'
+        }. Would you like me to analyze any specific document in more detail?`;
+      }
+    }
   } 
+  // Use different response types based on conversation
   else if (lastUserMessage.toLowerCase().includes('deadline') || lastUserMessage.toLowerCase().includes('date')) {
     aiResponse = `Based on our previous conversation about "${caseName}", I notice there are some important deadlines coming up. The main filing deadline appears to be ${new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toLocaleDateString()}.`;
+    
+    // Add document-specific date information if available
+    if (caseDocuments.length > 0) {
+      const docsWithDates = caseDocuments.filter(doc => 
+        doc.content.toLowerCase().includes('date') || 
+        doc.content.toLowerCase().includes('deadline') ||
+        doc.content.match(/\d{1,2}\/\d{1,2}\/\d{2,4}/)
+      );
+      
+      if (docsWithDates.length > 0) {
+        aiResponse += `\n\nI also found date references in ${docsWithDates.length} of your case documents that might be relevant.`;
+      }
+    }
   }
   else if (lastUserMessage.toLowerCase().includes('summary') || lastUserMessage.toLowerCase().includes('overview')) {
     aiResponse = `Here's a summary of case "${caseName}" based on our discussion so far:\n\n1. Case involves ${['contract dispute', 'intellectual property', 'employment law', 'regulatory compliance'][Math.floor(Math.random() * 4)]}\n2. Current stage: ${['Initial filing', 'Discovery', 'Pre-trial', 'Settlement negotiation'][Math.floor(Math.random() * 4)]}\n3. Key concerns we've discussed: ${lastUserMessage.substring(0, 20)}...`;
-  }
-  else if (context.toLowerCase().includes('precedent') || lastUserMessage.toLowerCase().includes('similar')) {
-    aiResponse = `Following up on our discussion about precedents for "${caseName}", I found ${Math.floor(Math.random() * 3) + 2} similar cases that might be relevant. The most applicable appears to be Smith v. Johnson (2021), which dealt with similar ${lastUserMessage.substring(0, 15)}... issues.`;
+    
+    // Add document count if available
+    if (caseDocuments.length > 0) {
+      aiResponse += `\n4. Case has ${caseDocuments.length} associated document(s)`;
+    }
   }
   else {
-    // Generic responses that reference previous conversation
+    // Generic responses that reference previous conversation and documents
     const responses = [
       `Based on what we've discussed about "${caseName}" so far, I think we should focus on the ${['legal strategy', 'document preparation', 'witness statements', 'settlement options'][Math.floor(Math.random() * 4)]}.`,
       `Continuing our analysis of "${caseName}", I'd recommend looking into the ${['jurisdictional issues', 'procedural requirements', 'statutory deadlines', 'evidentiary standards'][Math.floor(Math.random() * 4)]}.`,
@@ -166,6 +210,11 @@ export const generateAIResponse = async (
     ];
     
     aiResponse = responses[Math.floor(Math.random() * responses.length)];
+    
+    // Add reference to documents if available
+    if (caseDocuments.length > 0) {
+      aiResponse += `\n\nBy the way, I have access to ${caseDocuments.length} document(s) associated with this case. Let me know if you'd like me to provide information from any of them.`;
+    }
   }
   
   return {

@@ -46,14 +46,18 @@ const CaseChat = () => {
     
     const loadCase = () => {
       try {
+        console.log("Loading case with ID:", caseId);
         const caseInfo = getCase(caseId);
         if (caseInfo) {
+          console.log("Case found:", caseInfo);
           setCaseData({
             ...caseInfo,
             caseNumber: `CASE-${caseInfo.id.substring(5, 10)}`
           });
           
           const docs = getCaseDocuments(caseId);
+          console.log(`Found ${docs.length} documents for case:`, caseId);
+          
           setCaseDocuments(docs.map(doc => ({
             id: doc.id,
             name: doc.title,
@@ -92,6 +96,7 @@ const CaseChat = () => {
             saveChatMessages(caseId, [welcomeMessage], newSessionId);
           }
         } else {
+          console.error("Case not found with ID:", caseId);
           toast.error('Case not found');
           navigate('/case-management');
         }

@@ -2,8 +2,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FileText, MoreHorizontal } from 'lucide-react';
+import { FileText, MoreHorizontal, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface Document {
   id: string;
@@ -47,14 +48,43 @@ const DocumentsPanel = ({ caseNumber, caseName, documents }: DocumentsPanelProps
                   <p className="text-xs text-muted-foreground">{doc.date}</p>
                 </div>
               </div>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => navigate(`/document-drafting/edit/${doc.id}`)}
-                className="hover:bg-primary/5"
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
+              <div className="flex space-x-1">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => navigate(`/document-drafting/edit/${doc.id}`)}
+                        className="hover:bg-primary/5"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Edit document</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => navigate(`/document-drafting/edit/${doc.id}`)}
+                        className="hover:bg-primary/5"
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>More options</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             </li>
           ))}
         </ul>

@@ -1,4 +1,3 @@
-
 import { Case, SavedDocument } from './types';
 import { getSavedDocuments, updateDocumentCaseId } from './documentManager';
 
@@ -16,6 +15,7 @@ export const createCase = (name: string): Case => {
   
   cases.push(newCase);
   localStorage.setItem('cases', JSON.stringify(cases));
+  console.log("Case created and saved to storage:", newCase);
   return newCase;
 };
 
@@ -52,6 +52,15 @@ export const deleteCase = (id: string): void => {
 export const getCaseDocuments = (caseId: string): SavedDocument[] => {
   const documents = getSavedDocuments();
   return documents.filter(doc => doc.caseId === caseId);
+};
+
+export const getCaseDocumentsContent = (caseId: string): Array<{id: string, title: string, content: string}> => {
+  const documents = getCaseDocuments(caseId);
+  return documents.map(doc => ({
+    id: doc.id,
+    title: doc.title,
+    content: doc.content
+  }));
 };
 
 export const updateCase = (id: string, name: string): Case | null => {
