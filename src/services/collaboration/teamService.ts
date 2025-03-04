@@ -22,7 +22,7 @@ export const addTeamMember = (member: Omit<TeamMember, 'id'>): TeamMember => {
   addActivityItem({
     userId: '1', // Current user
     userName: 'You',
-    action: `invited ${member.name} to the team`
+    action: `added ${member.name} to the team`
   });
   
   return newMember;
@@ -46,8 +46,20 @@ export const inviteTeamMember = (email: string): boolean => {
     return false;
   }
   
-  // In a real application, this would send an email
-  console.log(`Invitation sent to ${email}`);
+  // In a real application, this would send an email via a backend service
+  console.log(`Inviting team member: ${email}`);
+  
+  // Create a simulated team member from the email
+  const name = email.split('@')[0];
+  const initials = name.substring(0, 2).toUpperCase();
+  
+  // Add a new team member to represent the invitation
+  addTeamMember({
+    name: `${name} (Pending)`,
+    role: 'Invited User',
+    initials: initials,
+    email: email
+  });
   
   // Add activity
   addActivityItem({

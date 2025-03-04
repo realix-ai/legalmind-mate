@@ -28,12 +28,15 @@ const ShareQueryTab = ({ sharedQueries, setSharedQueries }: ShareQueryTabProps) 
       return;
     }
     
+    // Generate a shareable link
     const newLink = generateShareLink(queryToShare);
     setShareURL(newLink);
     
     // Create shared query in storage
     const newQuery = shareQuery(queryToShare, queryType);
-    setSharedQueries([newQuery, ...sharedQueries]);
+    
+    // Update the shared queries array
+    setSharedQueries(prev => [newQuery, ...prev.filter(q => q.id !== newQuery.id)]);
     
     toast.success('Share link generated successfully');
   };
@@ -120,6 +123,15 @@ interface SharedQueryItemProps {
 }
 
 const SharedQueryItem = ({ item, onDelete }: SharedQueryItemProps) => {
+  const handleCopyLink = () => {
+    if (item.url) {
+      navigator.clipboard.writeText(item.url);
+      toast.success('Share link copied to clipboard');
+    } else {
+      toast.error('No share link available');
+    }
+  };
+
   return (
     <div className="p-3 border rounded-md mb-2 text-sm group">
       <div className="flex justify-between">
@@ -148,10 +160,7 @@ const SharedQueryItem = ({ item, onDelete }: SharedQueryItemProps) => {
             variant="outline" 
             size="sm" 
             className="text-xs h-7"
-            onClick={() => {
-              navigator.clipboard.writeText(item.url!);
-              toast.success('Share link copied to clipboard');
-            }}
+            onClick={handleCopyLink}
           >
             <Copy className="h-3 w-3 mr-1" />
             Copy Link
