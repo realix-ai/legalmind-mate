@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { getCase, getCaseDocuments } from '@/utils/documents';
+import { getChatMessages, saveChatMessages, addChatMessage, generateWelcomeMessage } from '@/utils/documents/chatManager';
 import Navigation from '@/components/Navigation';
 import Loading from '@/components/case/Loading';
 import DocumentsPanel from '@/components/case/DocumentsPanel';
@@ -50,15 +51,16 @@ const CaseChat = () => {
             date: new Date(doc.lastModified).toLocaleDateString()
           })));
           
-          // Add initial welcome message from AI
-          setMessages([
-            {
-              id: `msg-${Date.now()}`,
-              content: `Welcome to case "${caseInfo.name}". How can I assist you with this case today?`,
-              sender: 'ai',
-              timestamp: Date.now()
-            }
-          ]);
+          // Load existing chat messages or add welcome message
+          const existingMessages = getChatMessages(caseId);
+          if (existingMessages.length > 0) {
+            setMessages(existingMessages);
+          } else {
+            // Add initial welcome message from AI
+            const welcomeMessage = generateWelcomeMessage(caseInfo.name);
+            setMessages([welcomeMessage]);
+            saveChatMessages(caseId, [welcomeMessage]);
+          }
         } else {
           toast.error('Case not found');
           navigate('/case-management');
@@ -79,6 +81,8 @@ const CaseChat = () => {
   };
   
   const handleSendMessage = (currentMessage: string) => {
+    if (!caseId) return;
+    
     // Add user message
     const userMessage: ChatMessageProps = {
       id: `msg-${Date.now()}`,
@@ -87,7 +91,9 @@ const CaseChat = () => {
       timestamp: Date.now()
     };
     
-    setMessages(prev => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    saveChatMessages(caseId, updatedMessages);
     
     // Simulate AI thinking
     setIsAiTyping(true);
@@ -108,7 +114,9 @@ const CaseChat = () => {
         timestamp: Date.now()
       };
       
-      setMessages(prev => [...prev, aiResponse]);
+      const messagesWithAiResponse = [...updatedMessages, aiResponse];
+      setMessages(messagesWithAiResponse);
+      saveChatMessages(caseId, messagesWithAiResponse);
       setIsAiTyping(false);
     }, 1500);
   };

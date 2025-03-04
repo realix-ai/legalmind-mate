@@ -5,3 +5,4 @@ export * from './templateData';
 export * from './templateManager';
 export * from './documentManager';
 export * from './caseManager';
+export * from './chatManager';
