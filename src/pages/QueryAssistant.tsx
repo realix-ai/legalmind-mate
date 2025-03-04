@@ -13,6 +13,7 @@ import { processLegalQuery, QueryType } from '@/services/legalQueryService';
 import { fetchRelatedCitations, Citation } from '@/services/citationService';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { shareQuery } from '@/services/collaborationService';
+import { formatRelativeTime } from '@/components/collaboration/utils';
 
 const QueryAssistant = () => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -21,6 +22,7 @@ const QueryAssistant = () => {
   const [citations, setCitations] = useState<Citation[]>([]);
   const [currentQuery, setCurrentQuery] = useState<string>('');
   const [currentQueryType, setCurrentQueryType] = useState<QueryType>('legal-research');
+  const [userName, setUserName] = useState('John Doe'); // Added state for user name
 
   useEffect(() => {
     console.log("QueryAssistant component mounted");
@@ -90,7 +92,7 @@ const QueryAssistant = () => {
   };
 
   return (
-    <div className="min-h-screen pb-16">
+    <div className="min-h-screen pb-16 relative">
       <Navigation />
       
       <div className="container max-w-7xl mx-auto pt-16 px-4">
@@ -162,6 +164,11 @@ const QueryAssistant = () => {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* User name display at the bottom left */}
+      <div className="fixed bottom-4 left-4 bg-background/80 backdrop-blur-sm rounded-full px-3 py-1.5 text-sm font-medium shadow-sm border border-border">
+        <span className="text-muted-foreground mr-1">Welcome,</span> {userName}
+      </div>
     </div>
   );
 };
