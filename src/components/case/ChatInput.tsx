@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, List, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { usePrompts } from '@/hooks/use-prompts';
 import PromptManagerSection from '@/components/query/PromptManagerSection';
 import { ChatMessageProps } from '@/components/case/ChatMessage';
+import ChatHistory from '@/components/case/ChatHistory';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
