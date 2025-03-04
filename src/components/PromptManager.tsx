@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Plus, Minus, Upload, Save, Search } from 'lucide-react';
+import { Plus, Minus, Upload, Save, Search, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
@@ -203,13 +203,13 @@ const PromptManager = ({ onSelectPrompt }: PromptManagerProps) => {
                 {prompt.text}
               </p>
               <Button
-                variant="ghost"
+                variant="destructive"
                 size="sm"
-                className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="h-6 w-6 p-0"
                 onClick={() => handleDeletePrompt(prompt.id)}
                 title="Delete prompt"
               >
-                <Minus className="h-3.5 w-3.5" />
+                <Trash2 className="h-3.5 w-3.5" />
               </Button>
             </div>
           ))}
