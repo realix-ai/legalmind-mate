@@ -1,11 +1,12 @@
+
 import { useState, useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Send, Loader2, FileUp, AlertCircle, X, Image, FileText } from 'lucide-react';
 import { motion } from 'framer-motion';
-import QueryOptions from '@/components/QueryOptions';
-import { QueryType } from '@/services/legalQueryService';
 import { toast } from 'sonner';
-import { isFileTypeSupported, getReadableFileSize, getFileTypeInfo } from '@/services/fileProcessingService';
+import QueryOptions from '@/components/QueryOptions';
+import QueryTextarea from '@/components/QueryTextarea';
+import FilePreview from '@/components/FilePreview';
+import { QueryType } from '@/services/legalQueryService';
+import { isFileTypeSupported, getFileTypeInfo } from '@/services/fileProcessingService';
 
 // Maximum file size in bytes (10MB)
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -144,110 +145,36 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
     }
   };
 
-  const renderFilePreview = () => {
-    if (!file) return null;
-    
-    const fileInfo = getFileTypeInfo(file);
-    
-    return (
-      <div className={`${fileError ? 'bg-destructive/10 border-destructive/50' : 'bg-primary/5'} border rounded-xl p-3 mb-4`}>
-        <div className="flex justify-between items-start">
-          <div className="flex space-x-3">
-            {previewUrl && fileInfo.isImage ? (
-              <div className="h-16 w-16 rounded-md overflow-hidden border bg-background flex-shrink-0">
-                <img 
-                  src={previewUrl} 
-                  alt={file.name} 
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            ) : (
-              <div className="h-16 w-16 rounded-md border bg-muted flex items-center justify-center flex-shrink-0">
-                {fileInfo.isPdf ? (
-                  <FileText className="h-8 w-8 text-muted-foreground" />
-                ) : (
-                  <Image className="h-8 w-8 text-muted-foreground" />
-                )}
-              </div>
-            )}
-            
-            <div className="space-y-1 flex-grow overflow-hidden">
-              <p className="font-medium text-sm truncate">{file.name}</p>
-              <p className="text-xs text-muted-foreground">{getReadableFileSize(file.size)}</p>
-              {fileError && (
-                <p className="text-xs text-destructive flex items-center">
-                  <AlertCircle className="h-3 w-3 mr-1" />
-                  {fileError}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={clearFile}
-            className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <motion.div variants={itemVariants}>
       <form onSubmit={handleSubmit} className="mb-8">
-        <div className="relative mb-6">
-          <textarea
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Describe your legal question or issue..."
-            className="w-full min-h-[80px] p-4 pr-12 rounded-xl border border-input bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all duration-200 resize-y"
-            disabled={isProcessing}
-          />
-          <div className="absolute bottom-3 right-3 flex space-x-2">
-            <Button 
-              type="button"
-              size="icon"
-              variant="ghost"
-              disabled={isProcessing}
-              className="hover:bg-primary/10 relative"
-              onClick={triggerFileUpload}
-            >
-              <FileUp className={`h-5 w-5 ${file ? 'text-primary' : ''}`} />
-              {file && (
-                <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                  <span className="animate-none absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
-                </span>
-              )}
-            </Button>
-            <input
-              ref={fileInputRef}
-              id="file-upload"
-              type="file"
-              accept=".pdf,.doc,.docx,.txt,.rtf,.jpg,.jpeg,.png"
-              className="hidden"
-              onChange={handleFileChange}
-              disabled={isProcessing}
-            />
-            <Button
-              type="submit"
-              size="icon"
-              disabled={!query.trim() || isProcessing || !!fileError}
-            >
-              {isProcessing ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <Send className="h-5 w-5" />
-              )}
-            </Button>
-          </div>
-        </div>
+        <QueryTextarea
+          query={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onTriggerFileUpload={triggerFileUpload}
+          isProcessing={isProcessing}
+          hasFile={!!file}
+          fileError={fileError}
+        />
         
-        {renderFilePreview()}
+        <input
+          ref={fileInputRef}
+          id="file-upload"
+          type="file"
+          accept=".pdf,.doc,.docx,.txt,.rtf,.jpg,.jpeg,.png"
+          className="hidden"
+          onChange={handleFileChange}
+          disabled={isProcessing}
+        />
+        
+        {file && (
+          <FilePreview 
+            file={file}
+            previewUrl={previewUrl}
+            fileError={fileError}
+            onClearFile={clearFile}
+          />
+        )}
         
         <p className="text-sm font-medium mb-2">Select analysis type:</p>
         <QueryOptions
