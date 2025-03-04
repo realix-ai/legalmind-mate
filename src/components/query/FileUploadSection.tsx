@@ -1,6 +1,5 @@
 
 import { useRef } from 'react';
-import { FileTypeInfo } from '@/services/fileProcessingService';
 import FilePreview from '@/components/FilePreview';
 
 interface FileUploadSectionProps {
