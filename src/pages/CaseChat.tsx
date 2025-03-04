@@ -5,7 +5,13 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { getCase, getCaseDocuments } from '@/utils/documents';
-import { getChatMessages, saveChatMessages, addChatMessage, generateWelcomeMessage } from '@/utils/documents/chatManager';
+import { 
+  getChatMessages, 
+  saveChatMessages, 
+  addChatMessage, 
+  generateWelcomeMessage,
+  generateAIResponse
+} from '@/utils/documents/chatManager';
 import Navigation from '@/components/Navigation';
 import Loading from '@/components/case/Loading';
 import DocumentsPanel from '@/components/case/DocumentsPanel';
@@ -80,8 +86,8 @@ const CaseChat = () => {
     navigate('/case-management');
   };
   
-  const handleSendMessage = (currentMessage: string) => {
-    if (!caseId) return;
+  const handleSendMessage = async (currentMessage: string) => {
+    if (!caseId || !caseData) return;
     
     // Add user message
     const userMessage: ChatMessageProps = {
@@ -98,27 +104,23 @@ const CaseChat = () => {
     // Simulate AI thinking
     setIsAiTyping(true);
     
-    // Simulate AI response after a delay
-    setTimeout(() => {
-      const aiResponses = [
-        `I'll analyze the case details for "${caseData?.name}" right away.`,
-        `Looking at the documents for this case, I can provide some insights about ${caseData?.name}.`,
-        `Based on the case priority and status, I recommend focusing on the following aspects...`,
-        `I've analyzed similar cases and can provide precedents that may be helpful for ${caseData?.name}.`
-      ];
-      
-      const aiResponse: ChatMessageProps = {
-        id: `msg-${Date.now()}`,
-        content: aiResponses[Math.floor(Math.random() * aiResponses.length)],
-        sender: 'ai',
-        timestamp: Date.now()
-      };
+    try {
+      // Generate context-aware AI response
+      const aiResponse = await generateAIResponse(
+        caseId,
+        caseData.name,
+        updatedMessages
+      );
       
       const messagesWithAiResponse = [...updatedMessages, aiResponse];
       setMessages(messagesWithAiResponse);
       saveChatMessages(caseId, messagesWithAiResponse);
+    } catch (error) {
+      console.error('Error generating AI response:', error);
+      toast.error('Failed to generate AI response');
+    } finally {
       setIsAiTyping(false);
-    }, 1500);
+    }
   };
   
   if (loading) {
