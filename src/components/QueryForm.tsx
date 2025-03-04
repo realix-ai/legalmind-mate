@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -29,7 +28,6 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
   const [query, setQuery] = useState('');
   const [selectedOption, setSelectedOption] = useState<QueryType>('legal-research');
   
-  // Use the custom hooks
   const { 
     file, 
     fileError, 
@@ -91,14 +89,12 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
           onFileDrop={handleFileDrop}
         />
         
-        <div className="relative">
-          <PromptManagerSection 
-            showPromptManager={showPromptManager}
-            promptManagerRef={promptManagerRef}
-            togglePromptManager={togglePromptManager}
-            onLoadPrompt={handleLoadPrompt}
-          />
-        </div>
+        <PromptManagerSection 
+          showPromptManager={showPromptManager}
+          promptManagerRef={promptManagerRef}
+          togglePromptManager={togglePromptManager}
+          onLoadPrompt={handleLoadPrompt}
+        />
         
         <FileUploadSection 
           file={file}
