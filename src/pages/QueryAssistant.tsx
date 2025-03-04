@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from "sonner";
@@ -11,12 +12,15 @@ import BatchProcessingPanel from '@/components/batch/BatchProcessingPanel';
 import { processLegalQuery, QueryType } from '@/services/legalQueryService';
 import { fetchRelatedCitations, Citation } from '@/services/citationService';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { shareQuery } from '@/services/collaborationService';
 
 const QueryAssistant = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('query');
   const [citations, setCitations] = useState<Citation[]>([]);
+  const [currentQuery, setCurrentQuery] = useState<string>('');
+  const [currentQueryType, setCurrentQueryType] = useState<QueryType>('legal-research');
 
   useEffect(() => {
     console.log("QueryAssistant component mounted");
@@ -25,6 +29,8 @@ const QueryAssistant = () => {
   const handleSubmit = async (query: string, selectedOption: QueryType, file: File | null) => {
     setIsProcessing(true);
     setResponse(null);
+    setCurrentQuery(query);
+    setCurrentQueryType(selectedOption);
     
     try {
       console.log("QueryAssistant: Starting to process query:", query);
@@ -38,6 +44,10 @@ const QueryAssistant = () => {
       if (result.status === 'success') {
         setResponse(result.content);
         toast.success('Query processed successfully');
+        
+        // Fetch citations related to the query
+        const relatedCitations = await fetchRelatedCitations(query);
+        setCitations(relatedCitations);
       } else {
         toast.error('Failed to process query: ' + (result.content || 'Unknown error'));
       }
@@ -46,6 +56,16 @@ const QueryAssistant = () => {
       toast.error('An unexpected error occurred');
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const handleShareQuery = () => {
+    if (currentQuery && response) {
+      const shared = shareQuery(currentQuery, currentQueryType);
+      toast.success('Query shared successfully');
+      setActiveTab('collaboration');
+    } else {
+      toast.error('No query results to share');
     }
   };
 
@@ -125,6 +145,8 @@ const QueryAssistant = () => {
             <QueryResponseDisplay
               isProcessing={isProcessing}
               response={response}
+              onShare={handleShareQuery}
+              showShareButton={!!response && !isProcessing}
             />
             
             {!isProcessing && citations.length > 0 && (
