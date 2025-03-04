@@ -6,7 +6,8 @@ import {
   Search,
   FileText,
   Briefcase,
-  ArrowRight
+  ArrowRight,
+  Cpu
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -233,8 +234,8 @@ const Index = () => {
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center gap-2 mb-6 md:mb-0">
-              <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
-                <span className="text-white font-medium text-lg">R</span>
+              <div className="w-8 h-8 rounded-md bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <Cpu className="text-white h-4 w-4" />
               </div>
               <span className="font-medium text-xl">Realix.ai</span>
             </div>
