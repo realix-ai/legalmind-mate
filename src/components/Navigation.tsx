@@ -8,7 +8,8 @@ import {
   Briefcase, 
   Settings, 
   Menu, 
-  X 
+  X,
+  Scale
 } from 'lucide-react';
 
 const Navigation = () => {
@@ -47,8 +48,8 @@ const Navigation = () => {
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
-                <span className="text-white font-medium text-lg">L</span>
+              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-purple-700 flex items-center justify-center shadow-md">
+                <Scale className="h-5 w-5 text-white" />
               </div>
               <span className="font-medium text-xl hidden sm:block">LegalMind</span>
             </Link>
@@ -93,8 +94,8 @@ const Navigation = () => {
           <div className="flex flex-col h-full">
             <div className="p-4 flex justify-between items-center border-b">
               <Link to="/" className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
-                  <span className="text-white font-medium text-lg">L</span>
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-purple-700 flex items-center justify-center shadow-md">
+                  <Scale className="h-5 w-5 text-white" />
                 </div>
                 <span className="font-medium text-xl">LegalMind</span>
               </Link>
