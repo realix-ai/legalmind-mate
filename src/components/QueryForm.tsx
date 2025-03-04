@@ -1,12 +1,11 @@
-
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Send, Loader2, FileUp, AlertCircle } from 'lucide-react';
+import { Send, Loader2, FileUp, AlertCircle, X, Image, FileText } from 'lucide-react';
 import { motion } from 'framer-motion';
 import QueryOptions from '@/components/QueryOptions';
 import { QueryType } from '@/services/legalQueryService';
 import { toast } from 'sonner';
-import { isFileTypeSupported, getReadableFileSize } from '@/services/fileProcessingService';
+import { isFileTypeSupported, getReadableFileSize, getFileTypeInfo } from '@/services/fileProcessingService';
 
 // Maximum file size in bytes (10MB)
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -30,7 +29,16 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
   const [selectedOption, setSelectedOption] = useState<QueryType>('legal-research');
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,38 +65,58 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
     }
   };
 
+  const generatePreview = (selectedFile: File) => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
+    const fileInfo = getFileTypeInfo(selectedFile);
+    
+    if (fileInfo.isImage) {
+      const url = URL.createObjectURL(selectedFile);
+      setPreviewUrl(url);
+      console.log("Preview URL generated:", url);
+    } else {
+      setPreviewUrl(null);
+    }
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     setFileError(null);
     
     if (!selectedFile) {
       console.log("No file selected");
+      setPreviewUrl(null);
+      setFile(null);
       return;
     }
     
-    // Check file size
     if (selectedFile.size > MAX_FILE_SIZE) {
       const errorMsg = `File too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB`;
       setFileError(errorMsg);
       e.target.value = ''; // Clear the input
       toast.error(errorMsg);
+      setPreviewUrl(null);
+      setFile(null);
       return;
     }
     
-    // Check file type
     if (!isFileTypeSupported(selectedFile)) {
       const errorMsg = "Unsupported file type. Please upload a PDF, image, or text document.";
       setFileError(errorMsg);
       e.target.value = ''; // Clear the input
       toast.error(errorMsg);
+      setPreviewUrl(null);
+      setFile(null);
       return;
     }
     
     console.log("File selected:", selectedFile.name, "Type:", selectedFile.type, "Size:", selectedFile.size);
     setFile(selectedFile);
+    generatePreview(selectedFile);
     toast.success(`File "${selectedFile.name}" uploaded successfully`);
     
-    // Optionally add file name to query text
     if (!query.includes(selectedFile.name)) {
       setQuery(prev => 
         prev ? `${prev}\n\nAttached file: ${selectedFile.name}` : `Attached file: ${selectedFile.name}`
@@ -99,11 +127,13 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
   const clearFile = () => {
     setFile(null);
     setFileError(null);
-    // Remove the file mention from the query if needed
     setQuery(prev => prev.replace(/\n\nAttached file:.*$/g, '').replace(/^Attached file:.*$/g, '').trim());
-    // Clear the file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
     }
     console.log("File cleared");
   };
@@ -112,6 +142,58 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
+  };
+
+  const renderFilePreview = () => {
+    if (!file) return null;
+    
+    const fileInfo = getFileTypeInfo(file);
+    
+    return (
+      <div className={`${fileError ? 'bg-destructive/10 border-destructive/50' : 'bg-primary/5'} border rounded-xl p-3 mb-4`}>
+        <div className="flex justify-between items-start">
+          <div className="flex space-x-3">
+            {previewUrl && fileInfo.isImage ? (
+              <div className="h-16 w-16 rounded-md overflow-hidden border bg-background flex-shrink-0">
+                <img 
+                  src={previewUrl} 
+                  alt={file.name} 
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            ) : (
+              <div className="h-16 w-16 rounded-md border bg-muted flex items-center justify-center flex-shrink-0">
+                {fileInfo.isPdf ? (
+                  <FileText className="h-8 w-8 text-muted-foreground" />
+                ) : (
+                  <Image className="h-8 w-8 text-muted-foreground" />
+                )}
+              </div>
+            )}
+            
+            <div className="space-y-1 flex-grow overflow-hidden">
+              <p className="font-medium text-sm truncate">{file.name}</p>
+              <p className="text-xs text-muted-foreground">{getReadableFileSize(file.size)}</p>
+              {fileError && (
+                <p className="text-xs text-destructive flex items-center">
+                  <AlertCircle className="h-3 w-3 mr-1" />
+                  {fileError}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={clearFile}
+            className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -165,35 +247,7 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
           </div>
         </div>
         
-        {file && (
-          <div className={`text-sm border rounded-md p-2 mb-4 ${fileError ? 'bg-destructive/10 border-destructive/50' : 'bg-primary/5'} flex justify-between items-center`}>
-            <div className="flex items-center space-x-2">
-              {fileError ? (
-                <AlertCircle className="h-4 w-4 text-destructive" />
-              ) : (
-                <FileUp className="h-4 w-4 text-primary" />
-              )}
-              <span className="truncate max-w-[200px] md:max-w-md">
-                {file.name} ({getReadableFileSize(file.size)})
-              </span>
-            </div>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={clearFile}
-              className="h-6 w-6 p-0"
-            >
-              ✕
-            </Button>
-          </div>
-        )}
-        
-        {fileError && (
-          <div className="text-sm text-destructive mb-4 flex items-center">
-            <AlertCircle className="h-4 w-4 mr-2" />
-            <span>{fileError}</span>
-          </div>
-        )}
+        {renderFilePreview()}
         
         <p className="text-sm font-medium mb-2">Select analysis type:</p>
         <QueryOptions
