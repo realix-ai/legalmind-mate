@@ -51,3 +51,18 @@ export const getCaseDocuments = (caseId: string): SavedDocument[] => {
   const documents = getSavedDocuments();
   return documents.filter(doc => doc.caseId === caseId);
 };
+
+export const updateCase = (id: string, name: string): Case | null => {
+  const cases = getCases();
+  const index = cases.findIndex(c => c.id === id);
+  
+  if (index === -1) return null;
+  
+  cases[index] = {
+    ...cases[index],
+    name
+  };
+  
+  localStorage.setItem('cases', JSON.stringify(cases));
+  return cases[index];
+};
