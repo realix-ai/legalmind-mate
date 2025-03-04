@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from "sonner";
@@ -6,7 +5,6 @@ import Navigation from '@/components/Navigation';
 import QueryForm from '@/components/QueryForm';
 import QueryResponseDisplay from '@/components/QueryResponseDisplay';
 import CitationBox from '@/components/citation/CitationBox';
-import UserProfileButton from '@/components/profile/UserProfileButton';
 import CollaborationPanel from '@/components/collaboration/CollaborationPanel';
 import BatchProcessingPanel from '@/components/batch/BatchProcessingPanel';
 import { processLegalQuery, QueryType } from '@/services/legalQueryService';
@@ -123,13 +121,7 @@ const QueryAssistant = () => {
     <div className="min-h-screen pb-16 relative">
       <Navigation />
       
-      <div className="container max-w-7xl mx-auto pt-16 px-4">
-        <div className="flex justify-between items-center mb-8">
-          <UserProfileButton />
-        </div>
-      </div>
-      
-      <main className="container max-w-7xl mx-auto px-4">
+      <main className="container max-w-7xl mx-auto px-4 pt-16">
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)} className="mb-8">
           <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto">
             <TabsTrigger value="query">Single Query</TabsTrigger>

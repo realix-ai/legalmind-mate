@@ -52,7 +52,7 @@ const UserProfileButton = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   
   // Initialize state from localStorage
-  const [profile, setProfile] = useState<UserProfile>(loadProfile);
+  const [profile, setProfile] = useState<UserProfile>(() => loadProfile());
   const { name, role, specialization } = profile;
   
   const handleSaveProfile = () => {

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -9,6 +10,7 @@ import {
   Menu, 
   X
 } from 'lucide-react';
+import UserProfileButton from '@/components/profile/UserProfileButton';
 
 const Navigation = () => {
   const location = useLocation();
@@ -70,10 +72,11 @@ const Navigation = () => {
               ))}
             </div>
             
-            <div className="hidden md:flex items-center">
+            <div className="hidden md:flex items-center space-x-2">
               <button className="p-2 rounded-full hover:bg-secondary transition-all duration-200">
                 <Settings className="h-5 w-5 text-muted-foreground" />
               </button>
+              <UserProfileButton />
             </div>
             
             <button 
