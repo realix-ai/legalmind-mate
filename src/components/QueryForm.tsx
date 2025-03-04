@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import QueryOptions from '@/components/QueryOptions';
 import QueryTextarea from '@/components/QueryTextarea';
 import FilePreview from '@/components/FilePreview';
+import PromptManager from '@/components/PromptManager';
 import { QueryType } from '@/services/legalQueryService';
 import { isFileTypeSupported, getFileTypeInfo } from '@/services/fileProcessingService';
 
@@ -181,6 +182,10 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
     }
   };
 
+  const handleLoadPrompt = (promptText: string) => {
+    setQuery(promptText);
+  };
+
   return (
     <motion.div variants={itemVariants}>
       <form onSubmit={handleSubmit} className="mb-8">
@@ -193,6 +198,8 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
           fileError={fileError}
           onFileDrop={handleFileDrop}
         />
+        
+        <PromptManager onSelectPrompt={handleLoadPrompt} />
         
         <input
           ref={fileInputRef}

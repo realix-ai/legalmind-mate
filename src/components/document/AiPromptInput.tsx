@@ -1,5 +1,6 @@
 
 import { Button } from '@/components/ui/button';
+import { Sparkles } from 'lucide-react';
 
 interface AiPromptInputProps {
   aiPrompt: string;
@@ -28,7 +29,9 @@ const AiPromptInput = ({
         onClick={onSubmit}
         disabled={isAiProcessing || !aiPrompt.trim()}
         size="sm"
+        className="gap-1"
       >
+        <Sparkles className="h-3.5 w-3.5" />
         {isAiProcessing ? "Processing..." : "Generate"}
       </Button>
     </div>
