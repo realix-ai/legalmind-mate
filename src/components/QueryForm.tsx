@@ -31,28 +31,38 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
     if (!query.trim()) return;
     
     console.log("Submitting with file:", file);
-    await onSubmit(query.trim(), selectedOption, file);
+    try {
+      await onSubmit(query.trim(), selectedOption, file);
+    } catch (error) {
+      console.error("Error in form submission:", error);
+      toast.error("Error submitting query");
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      // Check file size (limit to 10MB)
-      if (selectedFile.size > 10 * 1024 * 1024) {
-        toast.error('File too large. Maximum size is 10MB');
-        return;
-      }
-      
-      console.log("File selected:", selectedFile);
-      setFile(selectedFile);
-      toast.success(`File "${selectedFile.name}" uploaded successfully`);
-      
-      // Optionally add file name to query text
-      if (!query.includes(selectedFile.name)) {
-        setQuery(prev => 
-          prev ? `${prev}\n\nAttached file: ${selectedFile.name}` : `Attached file: ${selectedFile.name}`
-        );
-      }
+    
+    if (!selectedFile) {
+      console.log("No file selected");
+      return;
+    }
+    
+    // Check file size (limit to 10MB)
+    if (selectedFile.size > 10 * 1024 * 1024) {
+      toast.error('File too large. Maximum size is 10MB');
+      e.target.value = ''; // Clear the input
+      return;
+    }
+    
+    console.log("File selected:", selectedFile.name, "Type:", selectedFile.type, "Size:", selectedFile.size);
+    setFile(selectedFile);
+    toast.success(`File "${selectedFile.name}" uploaded successfully`);
+    
+    // Optionally add file name to query text
+    if (!query.includes(selectedFile.name)) {
+      setQuery(prev => 
+        prev ? `${prev}\n\nAttached file: ${selectedFile.name}` : `Attached file: ${selectedFile.name}`
+      );
     }
   };
 
@@ -103,7 +113,7 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
         
         {file && (
           <div className="text-sm border rounded-md p-2 mb-4 bg-primary/5 flex justify-between items-center">
-            <span className="truncate">{file.name}</span>
+            <span className="truncate">{file.name} ({(file.size / 1024).toFixed(2)} KB)</span>
             <Button 
               variant="ghost" 
               size="sm" 
@@ -111,6 +121,9 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
                 setFile(null);
                 // Remove the file mention from the query if needed
                 setQuery(prev => prev.replace(`\n\nAttached file: ${file.name}`, '').replace(`Attached file: ${file.name}`, '').trim());
+                // Clear the file input
+                const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+                if (fileInput) fileInput.value = '';
               }}
               className="h-6 w-6 p-0"
             >

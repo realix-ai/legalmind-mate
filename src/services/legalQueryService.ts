@@ -58,28 +58,37 @@ async function processFileWithQuery(file: File, query: string, queryType: QueryT
   // Read the file content (for text files)
   let fileContent = '';
   
-  if (file.type.includes('text') || file.type.includes('document')) {
-    try {
+  try {
+    if (file.type.includes('text') || 
+        file.type.includes('document') ||
+        file.name.endsWith('.txt') || 
+        file.name.endsWith('.doc') || 
+        file.name.endsWith('.docx') || 
+        file.name.endsWith('.rtf')) {
       console.log("Reading text file content...");
       fileContent = await readFileAsText(file);
       console.log("File content preview:", fileContent.substring(0, 100) + "...");
-    } catch (error) {
-      console.error('Error reading file:', error);
-      fileContent = '[Error reading file content]';
+    } else if (file.type.includes('image') || 
+              file.name.endsWith('.jpg') || 
+              file.name.endsWith('.jpeg') || 
+              file.name.endsWith('.png')) {
+      console.log("Processing image file...");
+      fileContent = '[Image analysis would be performed here]';
+    } else if (file.type.includes('pdf') || 
+               file.name.endsWith('.pdf')) {
+      console.log("Processing PDF file...");
+      fileContent = '[PDF content extraction would be performed here]';
+    } else {
+      console.log("Unknown file type:", file.type);
+      fileContent = '[Unknown file type]';
     }
-  } else if (file.type.includes('image')) {
-    console.log("Processing image file...");
-    fileContent = '[Image analysis would be performed here]';
-  } else if (file.type.includes('pdf')) {
-    console.log("Processing PDF file...");
-    fileContent = '[PDF content extraction would be performed here]';
-  } else {
-    console.log("Unknown file type:", file.type);
-    fileContent = '[Unknown file type]';
+  } catch (error) {
+    console.error('Error processing file:', error);
+    fileContent = '[Error processing file]';
   }
   
   // Generate a response based on file type and query
-  const fileTypeResponse = getFileAnalysisResponse(file.type, queryType);
+  const fileTypeResponse = getFileAnalysisResponse(file.type || file.name, queryType);
   
   const finalResponse = `ANALYSIS OF UPLOADED FILE: ${file.name}\n\n${fileTypeResponse}\n\nRELATED TO QUERY: "${query}"\n\n${await simulateApiCall(query, queryType)}`;
   console.log("Generated file analysis response");
@@ -105,13 +114,21 @@ function readFileAsText(file: File): Promise<string> {
 }
 
 // Helper function to generate responses based on file type
-function getFileAnalysisResponse(fileType: string, queryType: QueryType): string {
-  console.log("Generating file analysis for type:", fileType);
-  if (fileType.includes('pdf')) {
+function getFileAnalysisResponse(fileTypeOrName: string, queryType: QueryType): string {
+  console.log("Generating file analysis for type/name:", fileTypeOrName);
+  
+  if (fileTypeOrName.includes('pdf') || fileTypeOrName.endsWith('.pdf')) {
     return 'PDF ANALYSIS: This document contains several legal clauses and provisions that relate to your query. The most relevant sections appear on pages 3-5 which discuss liability limitations and jurisdiction considerations.';
-  } else if (fileType.includes('image')) {
+  } else if (fileTypeOrName.includes('image') || 
+            fileTypeOrName.endsWith('.jpg') || 
+            fileTypeOrName.endsWith('.jpeg') || 
+            fileTypeOrName.endsWith('.png')) {
     return 'IMAGE ANALYSIS: The uploaded image appears to contain legal documentation. Visual analysis indicates this may be a contract or agreement with signature blocks visible in the lower section.';
-  } else if (fileType.includes('doc')) {
+  } else if (fileTypeOrName.includes('doc') || 
+            fileTypeOrName.endsWith('.doc') || 
+            fileTypeOrName.endsWith('.docx') || 
+            fileTypeOrName.endsWith('.txt') || 
+            fileTypeOrName.endsWith('.rtf')) {
     return 'DOCUMENT ANALYSIS: This appears to be a legal brief or memorandum with several citations to relevant case law. Key arguments are structured around precedent from Johnson v. Smith and Rogers Corp cases.';
   } else {
     return 'FILE ANALYSIS: The uploaded file has been processed and incorporated into the analysis below.';
