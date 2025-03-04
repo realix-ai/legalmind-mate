@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { CheckCircle2, AlertCircle, Clock, RefreshCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { StatusInfo } from './types';
