@@ -22,19 +22,21 @@ const QueryAssistant = () => {
   }, [userName]);
 
   return (
-    <div className="min-h-screen pb-16 relative">
+    <div className="flex flex-col min-h-screen w-full">
       <Navigation />
       
-      <main className="container max-w-7xl mx-auto px-4 pt-16">
-        <QueryTabs
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          isProcessing={isProcessing}
-          response={response}
-          handleSubmit={handleSubmit}
-          onShare={handleShareQuery}
-          citations={citations}
-        />
+      <main className="flex-1 w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 pb-16">
+        <div className="w-full">
+          <QueryTabs
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            isProcessing={isProcessing}
+            response={response}
+            handleSubmit={handleSubmit}
+            onShare={handleShareQuery}
+            citations={citations}
+          />
+        </div>
       </main>
 
       <UserWelcome userName={userName} />
