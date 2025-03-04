@@ -92,7 +92,9 @@ const DocumentDrafting = () => {
   return (
     <div className="container mx-auto p-6">
       {showTemplates ? (
-        <TemplateList onSelectTemplate={handleSelectTemplate} />
+        <TemplateList 
+          onSelectTemplate={handleSelectTemplate} 
+        />
       ) : (
         <div className="space-y-6">
           <DocumentToolbar 
@@ -101,7 +103,6 @@ const DocumentDrafting = () => {
             setShowAiPrompt={setShowAiPrompt}
             onSaveDocument={handleSaveDocument}
             documentTitle={documentTitle}
-            documentContent={documentContent}
             currentDocumentId={currentDocumentId}
             onDocumentSaved={handleDocumentSaved}
           />
@@ -117,8 +118,8 @@ const DocumentDrafting = () => {
               />
               
               <DocumentEditor
-                content={documentContent}
-                onContentChange={setDocumentContent}
+                initialContent={documentContent}
+                onChange={setDocumentContent}
               />
             </div>
             
@@ -129,7 +130,9 @@ const DocumentDrafting = () => {
                     <Sparkles className="h-5 w-5 text-primary" />
                     <h3 className="font-medium">AI Assistant</h3>
                   </div>
-                  <AiPromptInput onSubmit={handleAiPrompt} />
+                  <AiPromptInput 
+                    onSubmit={handleAiPrompt} 
+                  />
                 </div>
               )}
               

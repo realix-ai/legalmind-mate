@@ -1,51 +1,79 @@
 
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ChartBar, AlertCircle } from 'lucide-react';
+import Navigation from '@/components/Navigation';
 import { useCaseManagement } from '@/hooks/case-management';
-import CaseAnalyticsDashboard from '@/components/case-management/analytics/CaseAnalyticsDashboard';
 import CaseStatsCards from '@/components/case-management/analytics/CaseStatsCards';
+import CaseStatusChart from '@/components/case-management/analytics/CaseStatusChart';
+import CasePriorityChart from '@/components/case-management/analytics/CasePriorityChart';
+import DeadlineTimeline from '@/components/case-management/analytics/DeadlineTimeline';
 
 const CaseAnalytics = () => {
-  const { cases, isLoading, statistics, loadCases } = useCaseManagement();
+  const { loadCases, cases, statistics } = useCaseManagement();
   
   useEffect(() => {
     loadCases();
   }, [loadCases]);
   
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        delayChildren: 0.1,
+        staggerChildren: 0.05
+      }
+    }
+  };
+  
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { type: 'spring', stiffness: 100, damping: 15 }
+    }
+  };
+  
   return (
-    <div className="container mx-auto p-6">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center mb-6"
-      >
-        <ChartBar className="h-6 w-6 mr-2 text-primary" />
-        <h1 className="text-2xl font-bold">Case Analytics</h1>
-      </motion.div>
+    <div className="min-h-screen pb-16">
+      <Navigation />
       
-      {isLoading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        </div>
-      ) : cases.length === 0 ? (
+      <main className="container max-w-7xl mx-auto pt-24 px-4">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex flex-col items-center justify-center h-64 text-center"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
         >
-          <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
-          <h2 className="text-xl font-semibold mb-2">No cases found</h2>
-          <p className="text-muted-foreground mb-6">
-            Create some cases to see analytics data
-          </p>
+          <motion.div variants={itemVariants}>
+            <h1 className="text-3xl md:text-4xl font-semibold mb-2">Case Analytics</h1>
+            <p className="text-muted-foreground mb-8">Monitor your case workload and performance</p>
+          </motion.div>
+          
+          <motion.div variants={itemVariants} className="mb-8">
+            <CaseStatsCards statistics={statistics} />
+          </motion.div>
+          
+          <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <CaseStatusChart 
+              activeCases={statistics.activeCases}
+              pendingCases={statistics.pendingCases}
+              closedCases={statistics.closedCases}
+            />
+            <CasePriorityChart 
+              highPriority={statistics.highPriority}
+              mediumPriority={statistics.mediumPriority}
+              lowPriority={statistics.lowPriority}
+            />
+          </motion.div>
+          
+          <motion.div variants={itemVariants}>
+            <DeadlineTimeline 
+              upcomingDeadlines={statistics.upcomingDeadlines}
+            />
+          </motion.div>
         </motion.div>
-      ) : (
-        <div className="space-y-8">
-          <CaseStatsCards statistics={statistics} />
-          <CaseAnalyticsDashboard statistics={statistics} />
-        </div>
-      )}
+      </main>
     </div>
   );
 };

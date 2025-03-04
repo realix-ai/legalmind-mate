@@ -2,7 +2,9 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Navigation from '@/components/Navigation';
-import { useCaseManagement } from '@/hooks/useCaseManagement';
+import { useCaseManagement } from '@/hooks/case-management';
+import { useCaseFilters } from '@/hooks/case-management';
+import { useCaseDialog } from '@/hooks/case-management';
 import CaseHeader from '@/components/case-management/CaseHeader';
 import SearchAndFilters from '@/components/case-management/SearchAndFilters';
 import FiltersPanel from '@/components/case-management/FiltersPanel';
@@ -11,21 +13,40 @@ import EmptyCaseState from '@/components/case-management/EmptyCaseState';
 import CreateCaseDialog from '@/components/case-management/CreateCaseDialog';
 import EditCaseDialog from '@/components/case-management/EditCaseDialog';
 import { Dialog } from '@/components/ui/dialog';
+import { useEffect } from 'react';
 
 const CaseManagement = () => {
   const navigate = useNavigate();
+  
+  // Get case data and operations from hooks
   const {
     cases,
-    filteredCases,
     isLoading,
+    loadCases,
+    handleUpdateCase,
+    handleUpdateStatus,
+    handleUpdatePriority,
+    handleUpdateDeadline,
+    handleUpdateNotes,
+    handleCreateCase
+  } = useCaseManagement();
+  
+  // Get filtering functionality
+  const {
     searchQuery,
     setSearchQuery,
-    isFilterOpen,
-    setIsFilterOpen,
     statusFilter,
     setStatusFilter,
     priorityFilter,
     setPriorityFilter,
+    isFilterOpen,
+    setIsFilterOpen,
+    filteredCases,
+    resetFilters
+  } = useCaseFilters(cases);
+  
+  // Get dialog state management
+  const {
     newCaseName,
     setNewCaseName,
     isCreateCaseDialogOpen,
@@ -42,18 +63,37 @@ const CaseManagement = () => {
     setEditCaseDeadline,
     editCaseDescription,
     setEditCaseDescription,
-    handleCreateCase,
+    editingCaseId,
     handleEditCase,
-    handleSaveEditCase,
-    handleUpdateStatus,
-    handleUpdatePriority,
-    handleUpdateDeadline,
-    handleUpdateNotes,
-    resetFilters
-  } = useCaseManagement();
+    resetEditCaseForm
+  } = useCaseDialog();
 
+  // Load cases when component mounts
+  useEffect(() => {
+    loadCases();
+  }, [loadCases]);
+  
   const handleCaseClick = (caseId: string) => {
     navigate(`/case-chat/${caseId}`);
+  };
+  
+  const handleSaveEditCase = () => {
+    if (editingCaseId) {
+      handleUpdateCase(editingCaseId, {
+        name: editCaseName,
+        status: editCaseStatus,
+        priority: editCasePriority,
+        deadline: editCaseDeadline ? editCaseDeadline.getTime() : undefined,
+        notes: editCaseDescription
+      });
+      resetEditCaseForm();
+    }
+  };
+
+  const handleCreateNewCase = () => {
+    handleCreateCase(newCaseName);
+    setNewCaseName('');
+    setIsCreateCaseDialogOpen(false);
   };
   
   const containerVariants = {
@@ -128,7 +168,7 @@ const CaseManagement = () => {
         <CreateCaseDialog 
           newCaseName={newCaseName}
           setNewCaseName={setNewCaseName}
-          handleCreateCase={handleCreateCase}
+          handleCreateCase={handleCreateNewCase}
         />
       </Dialog>
 
