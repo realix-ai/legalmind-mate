@@ -31,7 +31,23 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Case as CaseType, getCases, createCase, getCase, getCaseDocuments } from '@/utils/documents';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Case as CaseType, getCases, createCase, getCase, getCaseDocuments, updateCaseDetails } from '@/utils/documents';
+import { format } from 'date-fns';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
 
 const CaseManagement = () => {
   const navigate = useNavigate();
@@ -43,9 +59,17 @@ const CaseManagement = () => {
   const [cases, setCases] = useState<CaseType[]>([]);
   const [newCaseName, setNewCaseName] = useState('');
   const [isCreateCaseDialogOpen, setIsCreateCaseDialogOpen] = useState(false);
+  const [isEditCaseDialogOpen, setIsEditCaseDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [caseData, setCaseData] = useState<any | null>(null);
   const [caseDocuments, setCaseDocuments] = useState<any[]>([]);
+  
+  const [editingCaseId, setEditingCaseId] = useState<string | null>(null);
+  const [editCaseName, setEditCaseName] = useState('');
+  const [editCaseStatus, setEditCaseStatus] = useState<'active' | 'pending' | 'closed'>('active');
+  const [editCasePriority, setEditCasePriority] = useState<'high' | 'medium' | 'low'>('medium');
+  const [editCaseDeadline, setEditCaseDeadline] = useState<Date | undefined>(undefined);
+  const [editCaseDescription, setEditCaseDescription] = useState('');
   
   // Initialize with cases from storage
   useEffect(() => {
@@ -74,10 +98,12 @@ const CaseManagement = () => {
           caseNumber: `CASE-${caseInfo.id.substring(5, 10)}`,
           clientName: 'Client Name', // This would be fetched from the database
           date: new Date(caseInfo.createdAt).toLocaleDateString(),
-          status: 'active',
-          priority: 'medium',
+          status: caseInfo.status || 'active',
+          priority: caseInfo.priority || 'medium',
           description: `Case details for ${caseInfo.name}`,
-          nextHearing: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+          nextHearing: caseInfo.deadline 
+            ? new Date(caseInfo.deadline).toLocaleDateString() 
+            : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
           assignedTo: ['Case Manager'],
         });
         
@@ -116,12 +142,59 @@ const CaseManagement = () => {
     navigate(`/case-chat/${caseId}`);
   };
   
+  const handleEditCase = (e: React.MouseEvent, caseId: string) => {
+    e.stopPropagation(); // Prevent navigating to the case
+    const caseToEdit = getCase(caseId);
+    if (caseToEdit) {
+      setEditingCaseId(caseId);
+      setEditCaseName(caseToEdit.name);
+      setEditCaseStatus(caseToEdit.status || 'active');
+      setEditCasePriority(caseToEdit.priority || 'medium');
+      setEditCaseDeadline(caseToEdit.deadline ? new Date(caseToEdit.deadline) : undefined);
+      setEditCaseDescription(''); // Add description if you have it in your case data
+      setIsEditCaseDialogOpen(true);
+    }
+  };
+
+  const handleSaveEditCase = () => {
+    if (!editingCaseId) return;
+    
+    try {
+      const updatedCase = updateCaseDetails(editingCaseId, {
+        name: editCaseName,
+        status: editCaseStatus,
+        priority: editCasePriority,
+        deadline: editCaseDeadline ? editCaseDeadline.getTime() : undefined
+      });
+      
+      if (updatedCase) {
+        // Update the cases list
+        setCases(prevCases => 
+          prevCases.map(c => 
+            c.id === editingCaseId ? updatedCase : c
+          )
+        );
+        setIsEditCaseDialogOpen(false);
+        toast.success('Case updated successfully');
+      }
+    } catch (error) {
+      console.error('Error updating case:', error);
+      toast.error('Failed to update case');
+    }
+  };
+  
   const filteredCases = cases.filter((caseItem) => {
     const matchesSearch = caseItem.name.toLowerCase().includes(searchQuery.toLowerCase());
     
-    // For demo purposes, we don't have real status/priority data, so we'll return all cases
-    // In a real app, you would filter based on case status and priority
-    return matchesSearch;
+    // Filter by status if status filters are applied
+    const matchesStatus = statusFilter.length === 0 || 
+      (caseItem.status && statusFilter.includes(caseItem.status));
+    
+    // Filter by priority if priority filters are applied
+    const matchesPriority = priorityFilter.length === 0 || 
+      (caseItem.priority && priorityFilter.includes(caseItem.priority));
+    
+    return matchesSearch && matchesStatus && matchesPriority;
   });
   
   const resetFilters = () => {
@@ -333,9 +406,10 @@ const CaseManagement = () => {
                     caseNumber={`CASE-${caseItem.id.substring(5, 10)}`}
                     clientName="Client"
                     date={new Date(caseItem.createdAt).toLocaleDateString()}
-                    status="active"
-                    priority="medium"
+                    status={caseItem.status || "active"}
+                    priority={caseItem.priority || "medium"}
                     onClick={() => handleCaseClick(caseItem.id)}
+                    onEdit={(e) => handleEditCase(e, caseItem.id)}
                   />
                 </motion.div>
               ))}
@@ -368,6 +442,120 @@ const CaseManagement = () => {
           )}
         </motion.div>
       </main>
+
+      {/* Edit Case Dialog */}
+      <Dialog open={isEditCaseDialogOpen} onOpenChange={setIsEditCaseDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Edit Case</DialogTitle>
+            <DialogDescription>
+              Update the case details below.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="editCaseName" className="text-right">
+                Case Name
+              </Label>
+              <Input
+                id="editCaseName"
+                value={editCaseName}
+                onChange={(e) => setEditCaseName(e.target.value)}
+                className="col-span-3"
+              />
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="editCaseStatus" className="text-right">
+                Status
+              </Label>
+              <Select
+                value={editCaseStatus}
+                onValueChange={(value) => setEditCaseStatus(value as 'active' | 'pending' | 'closed')}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="closed">Closed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="editCasePriority" className="text-right">
+                Priority
+              </Label>
+              <Select
+                value={editCasePriority}
+                onValueChange={(value) => setEditCasePriority(value as 'high' | 'medium' | 'low')}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="editCaseDeadline" className="text-right">
+                Deadline
+              </Label>
+              <div className="col-span-3">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {editCaseDeadline ? (
+                        format(editCaseDeadline, "PPP")
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={editCaseDeadline}
+                      onSelect={setEditCaseDeadline}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="editCaseDescription" className="text-right pt-2">
+                Description
+              </Label>
+              <Textarea
+                id="editCaseDescription"
+                value={editCaseDescription}
+                onChange={(e) => setEditCaseDescription(e.target.value)}
+                className="col-span-3"
+                placeholder="Add case description"
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditCaseDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveEditCase}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

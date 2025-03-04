@@ -1,6 +1,6 @@
 
 import { cn } from '@/lib/utils';
-import { Calendar, Clock, Users, MoreHorizontal, Star } from 'lucide-react';
+import { Calendar, Clock, Users, MoreHorizontal, Star, Edit } from 'lucide-react';
 import { useState } from 'react';
 
 interface CaseCardProps {
@@ -11,6 +11,7 @@ interface CaseCardProps {
   status: 'active' | 'closed' | 'pending';
   priority: 'high' | 'medium' | 'low';
   onClick: () => void;
+  onEdit?: (e: React.MouseEvent) => void;
 }
 
 const CaseCard = ({
@@ -20,7 +21,8 @@ const CaseCard = ({
   date,
   status,
   priority,
-  onClick
+  onClick,
+  onEdit
 }: CaseCardProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
   
@@ -77,6 +79,15 @@ const CaseCard = ({
             >
               <Star className="h-4 w-4" fill={isFavorite ? "currentColor" : "none"} />
             </button>
+            {onEdit && (
+              <button 
+                className="p-1.5 rounded-full text-muted-foreground hover:bg-muted transition-colors"
+                onClick={onEdit}
+                aria-label="Edit case"
+              >
+                <Edit className="h-4 w-4" />
+              </button>
+            )}
             <button 
               className="p-1.5 rounded-full text-muted-foreground hover:bg-muted transition-colors"
               aria-label="More options"

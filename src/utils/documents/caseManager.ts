@@ -9,7 +9,9 @@ export const createCase = (name: string): Case => {
   const newCase: Case = {
     id: `case-${Date.now()}`,
     name,
-    createdAt: Date.now()
+    createdAt: Date.now(),
+    status: 'active',
+    priority: 'medium'
   };
   
   cases.push(newCase);
@@ -61,6 +63,66 @@ export const updateCase = (id: string, name: string): Case | null => {
   cases[index] = {
     ...cases[index],
     name
+  };
+  
+  localStorage.setItem('cases', JSON.stringify(cases));
+  return cases[index];
+};
+
+export const updateCaseStatus = (id: string, status: 'active' | 'pending' | 'closed'): Case | null => {
+  const cases = getCases();
+  const index = cases.findIndex(c => c.id === id);
+  
+  if (index === -1) return null;
+  
+  cases[index] = {
+    ...cases[index],
+    status
+  };
+  
+  localStorage.setItem('cases', JSON.stringify(cases));
+  return cases[index];
+};
+
+export const updateCasePriority = (id: string, priority: 'high' | 'medium' | 'low'): Case | null => {
+  const cases = getCases();
+  const index = cases.findIndex(c => c.id === id);
+  
+  if (index === -1) return null;
+  
+  cases[index] = {
+    ...cases[index],
+    priority
+  };
+  
+  localStorage.setItem('cases', JSON.stringify(cases));
+  return cases[index];
+};
+
+export const updateCaseDeadline = (id: string, deadline: number): Case | null => {
+  const cases = getCases();
+  const index = cases.findIndex(c => c.id === id);
+  
+  if (index === -1) return null;
+  
+  cases[index] = {
+    ...cases[index],
+    deadline
+  };
+  
+  localStorage.setItem('cases', JSON.stringify(cases));
+  return cases[index];
+};
+
+export const updateCaseDetails = (id: string, updates: Partial<Omit<Case, 'id' | 'createdAt'>>): Case | null => {
+  const cases = getCases();
+  const index = cases.findIndex(c => c.id === id);
+  
+  if (index === -1) return null;
+  
+  cases[index] = {
+    ...cases[index],
+    ...updates
   };
   
   localStorage.setItem('cases', JSON.stringify(cases));

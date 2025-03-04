@@ -29,4 +29,8 @@ export interface Case {
   id: string;
   name: string;
   createdAt: number;
+  status?: 'active' | 'pending' | 'closed';
+  priority?: 'high' | 'medium' | 'low';
+  deadline?: number;
 }
+
