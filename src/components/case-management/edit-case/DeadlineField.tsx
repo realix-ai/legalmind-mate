@@ -18,11 +18,15 @@ interface DeadlineFieldProps {
 }
 
 const DeadlineField = ({ editCaseDeadline, setEditCaseDeadline }: DeadlineFieldProps) => {
-  // Fix: Add a click handler to stop propagation and prevent the dialog from closing
+  // Create a state to control the popover
+  const [isOpen, setIsOpen] = React.useState(false);
+
   const handleCalendarSelect = (date: Date | undefined) => {
     if (date) {
       console.log("Selected date:", date);
       setEditCaseDeadline(date);
+      // Close the popover after selection
+      setIsOpen(false);
     }
   };
 
@@ -31,13 +35,17 @@ const DeadlineField = ({ editCaseDeadline, setEditCaseDeadline }: DeadlineFieldP
     e.stopPropagation();
   };
 
+  const handlePopoverOpenChange = (open: boolean) => {
+    setIsOpen(open);
+  };
+
   return (
-    <div className="grid grid-cols-4 items-center gap-4">
+    <div className="grid grid-cols-4 items-center gap-4" onClick={(e) => e.stopPropagation()}>
       <Label htmlFor="editCaseDeadline" className="text-right">
         Deadline
       </Label>
       <div className="col-span-3">
-        <Popover>
+        <Popover open={isOpen} onOpenChange={handlePopoverOpenChange}>
           <PopoverTrigger asChild>
             <Button
               id="editCaseDeadline"
@@ -56,7 +64,11 @@ const DeadlineField = ({ editCaseDeadline, setEditCaseDeadline }: DeadlineFieldP
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start" onClick={(e) => e.stopPropagation()}>
+          <PopoverContent 
+            className="w-auto p-0" 
+            align="start" 
+            onClick={(e) => e.stopPropagation()}
+          >
             <Calendar
               mode="single"
               selected={editCaseDeadline}
