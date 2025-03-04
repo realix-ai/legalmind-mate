@@ -3,8 +3,7 @@ import { useState } from 'react';
 import { 
   Download, 
   FileText, 
-  FilePdf, 
-  FileWord, 
+  File, 
   Copy, 
   Mail, 
   Printer, 
@@ -75,12 +74,12 @@ const ExportOptions = ({ documentTitle, documentContent }: ExportOptionsProps) =
           <DropdownMenuSeparator />
           
           <DropdownMenuItem onClick={() => exportAsPdf(documentTitle, documentContent)}>
-            <FilePdf className="h-4 w-4 mr-2" />
+            <FileText className="h-4 w-4 mr-2" />
             Export as PDF
           </DropdownMenuItem>
           
           <DropdownMenuItem onClick={() => exportAsDocx(documentTitle, documentContent)}>
-            <FileWord className="h-4 w-4 mr-2" />
+            <File className="h-4 w-4 mr-2" />
             Export as DOCX
           </DropdownMenuItem>
           
