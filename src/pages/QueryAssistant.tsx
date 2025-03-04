@@ -95,14 +95,6 @@ const QueryAssistant = () => {
       
       <div className="container max-w-7xl mx-auto pt-16 px-4">
         <div className="flex justify-between items-center mb-8">
-          <motion.h1 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-3xl font-bold"
-          >
-            Legal Assistant
-          </motion.h1>
-          
           <UserProfileButton />
         </div>
       </div>
