@@ -7,6 +7,7 @@ import {
   BarChart,
   CheckCircle
 } from 'lucide-react';
+import { QueryType } from '@/services/legalQueryService';
 
 interface QueryOptionsProps {
   onSelect: (option: string) => void;
@@ -16,28 +17,28 @@ interface QueryOptionsProps {
 const QueryOptions = ({ onSelect, selectedOption }: QueryOptionsProps) => {
   const options = [
     {
-      id: 'legal-research',
+      id: 'legal-research' as QueryType,
       title: 'Legal Research',
       description: 'Find relevant cases, statutes, and legal principles',
       icon: <Search className="h-4 w-4" />,
       color: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400'
     },
     {
-      id: 'risk-analysis',
+      id: 'risk-analysis' as QueryType,
       title: 'Risk Analysis',
       description: 'Evaluate potential legal risks and liabilities',
       icon: <AlertTriangle className="h-4 w-4" />,
       color: 'bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400'
     },
     {
-      id: 'summarize',
+      id: 'summarize' as QueryType,
       title: 'Summarize',
       description: 'Create concise summaries of legal documents',
       icon: <FileText className="h-4 w-4" />,
       color: 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400'
     },
     {
-      id: 'data-analysis',
+      id: 'data-analysis' as QueryType,
       title: 'Data Analysis',
       description: 'Analyze patterns and insights in legal data',
       icon: <BarChart className="h-4 w-4" />,
