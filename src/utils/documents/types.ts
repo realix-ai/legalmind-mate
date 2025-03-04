@@ -33,4 +33,3 @@ export interface Case {
   priority?: 'high' | 'medium' | 'low';
   deadline?: number;
 }
-

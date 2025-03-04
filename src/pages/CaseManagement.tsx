@@ -153,6 +153,13 @@ const CaseManagement = () => {
     if (!editingCaseId) return;
     
     try {
+      console.log("Updating case with values:", {
+        name: editCaseName,
+        status: editCaseStatus,
+        priority: editCasePriority,
+        deadline: editCaseDeadline ? editCaseDeadline.getTime() : undefined
+      });
+
       const updatedCase = updateCaseDetails(editingCaseId, {
         name: editCaseName,
         status: editCaseStatus,

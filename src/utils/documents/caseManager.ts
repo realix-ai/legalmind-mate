@@ -120,11 +120,15 @@ export const updateCaseDetails = (id: string, updates: Partial<Omit<Case, 'id' |
   
   if (index === -1) return null;
   
+  console.log("Updating case in storage. Previous:", cases[index]);
+  console.log("Updates to apply:", updates);
+  
   cases[index] = {
     ...cases[index],
     ...updates
   };
   
+  console.log("Updated case:", cases[index]);
   localStorage.setItem('cases', JSON.stringify(cases));
   return cases[index];
 };
