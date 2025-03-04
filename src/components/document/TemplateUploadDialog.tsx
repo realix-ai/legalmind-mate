@@ -3,17 +3,14 @@ import { useState } from 'react';
 import { 
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { saveCustomTemplate } from '@/utils/documents';
 import { PlusCircle, FileUp, FileText } from 'lucide-react';
@@ -25,10 +22,7 @@ interface TemplateUploadDialogProps {
 
 const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) => {
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
   const [content, setContent] = useState('');
-  const [category, setCategory] = useState('Custom');
   const [importTab, setImportTab] = useState('upload');
   const [googleDocUrl, setGoogleDocUrl] = useState('');
   const [isImporting, setIsImporting] = useState(false);
@@ -36,18 +30,17 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!title.trim()) {
-      toast.error('Please enter a template title');
-      return;
-    }
-    
     if (!content.trim()) {
-      toast.error('Please enter template content');
+      toast.error('Please import content first');
       return;
     }
     
     try {
-      saveCustomTemplate(title, description, content, category);
+      // Generate default title from timestamp or file info
+      const title = `Imported Document ${new Date().toLocaleString()}`;
+      const description = 'Imported document';
+      
+      saveCustomTemplate(title, description, content, 'Custom');
       toast.success('Template uploaded successfully');
       onTemplateAdded();
       setOpen(false);
@@ -59,10 +52,7 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
   };
   
   const resetForm = () => {
-    setTitle('');
-    setDescription('');
     setContent('');
-    setCategory('Custom');
     setGoogleDocUrl('');
     setImportTab('upload');
   };
@@ -82,13 +72,6 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
       try {
         const content = event.target?.result as string;
         setContent(content);
-        
-        // Try to extract a title from the file name
-        if (!title && file.name) {
-          const fileName = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
-          setTitle(fileName);
-        }
-        
         toast.success(`File "${file.name}" loaded successfully`);
       } catch (error) {
         console.error('Error reading file:', error);
@@ -127,14 +110,6 @@ nisl nisl aliquam nisl, eget aliquam nisl nisl eget nisl. Nullam auctor, nisl eg
 nisl nisl aliquam nisl, eget aliquam nisl nisl eget nisl.`;
         
         setContent(mockDocContent);
-        
-        // Try to extract a title from the URL
-        if (!title) {
-          const urlParts = googleDocUrl.split('/');
-          const docId = urlParts[urlParts.length - 2] || 'Imported Document';
-          setTitle(`Google Doc - ${docId}`);
-        }
-        
         toast.success('Google Doc imported successfully');
         setIsImporting(false);
       }, 1500);
@@ -161,58 +136,10 @@ nisl nisl aliquam nisl, eget aliquam nisl nisl eget nisl.`;
       <DialogContent className="sm:max-w-[600px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Upload Custom Template</DialogTitle>
-            <DialogDescription>
-              Upload your own document template to use in future documents.
-            </DialogDescription>
+            <DialogTitle>Import Document</DialogTitle>
           </DialogHeader>
           
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="title" className="text-right">
-                Title
-              </Label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="col-span-3"
-                placeholder="Template title"
-                required
-              />
-            </div>
-            
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right">
-                Description
-              </Label>
-              <Input
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="col-span-3"
-                placeholder="Brief description"
-              />
-            </div>
-            
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="category" className="text-right">
-                Category
-              </Label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Custom">Custom</SelectItem>
-                  <SelectItem value="Contract">Contract</SelectItem>
-                  <SelectItem value="Litigation">Litigation</SelectItem>
-                  <SelectItem value="Corporate">Corporate</SelectItem>
-                  <SelectItem value="IP">IP</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
             <div className="grid grid-cols-4 items-start gap-4">
               <Label className="text-right mt-2">
                 Import Method
@@ -269,27 +196,13 @@ nisl nisl aliquam nisl, eget aliquam nisl nisl eget nisl.`;
                 </Tabs>
               </div>
             </div>
-            
-            <div className="grid grid-cols-4 items-start gap-4">
-              <Label htmlFor="content" className="text-right">
-                Content
-              </Label>
-              <Textarea
-                id="content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                className="col-span-3 min-h-[200px]"
-                placeholder="Enter template content or import from file/Google Docs"
-                required
-              />
-            </div>
           </div>
           
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit">Save Template</Button>
+            <Button type="submit" disabled={!content.trim()}>Import</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -298,4 +211,3 @@ nisl nisl aliquam nisl, eget aliquam nisl nisl eget nisl.`;
 };
 
 export default TemplateUploadDialog;
-
