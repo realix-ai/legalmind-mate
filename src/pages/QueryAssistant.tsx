@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -149,14 +148,14 @@ STRATEGIC RECOMMENDATIONS:
           
           <motion.p 
             variants={itemVariants}
-            className="text-muted-foreground text-center mb-10"
+            className="text-muted-foreground text-center mb-8"
           >
             Ask a legal question and select how you'd like the AI to process your query.
           </motion.p>
           
           <motion.div variants={itemVariants}>
-            <form onSubmit={handleSubmit} className="mb-10">
-              <div className="relative mb-8">
+            <form onSubmit={handleSubmit} className="mb-8">
+              <div className="relative mb-6">
                 <textarea
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
