@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -218,6 +219,20 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
   return (
     <motion.div variants={itemVariants}>
       <form onSubmit={handleSubmit} className="mb-8">
+        <div className="relative mb-2">
+          <Button 
+            type="button"
+            variant="outline" 
+            size="sm"
+            className="flex items-center gap-1 absolute right-0 top-0 z-10"
+            onClick={togglePromptManager}
+            data-prompt-button="true"
+          >
+            <List className="h-3.5 w-3.5" />
+            Load Prompts
+          </Button>
+        </div>
+        
         <QueryTextarea
           query={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -228,28 +243,14 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
           onFileDrop={handleFileDrop}
         />
         
-        <div className="mb-3 flex justify-start relative">
-          <Button 
-            type="button"
-            variant="outline" 
-            size="sm"
-            className="flex items-center gap-1"
-            onClick={togglePromptManager}
-            data-prompt-button="true"
+        {showPromptManager && (
+          <div 
+            ref={promptManagerRef}
+            className="relative z-10 w-72 shadow-md mb-4"
           >
-            <List className="h-3.5 w-3.5" />
-            Load Prompts
-          </Button>
-          
-          {showPromptManager && (
-            <div 
-              ref={promptManagerRef}
-              className="absolute top-full left-0 mt-1 z-10 w-72 shadow-md"
-            >
-              <PromptManager onSelectPrompt={handleLoadPrompt} />
-            </div>
-          )}
-        </div>
+            <PromptManager onSelectPrompt={handleLoadPrompt} />
+          </div>
+        )}
         
         <input
           ref={fileInputRef}
