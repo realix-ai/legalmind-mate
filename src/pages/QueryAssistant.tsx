@@ -18,8 +18,8 @@ const QueryAssistant = () => {
   } = useLegalQuery(setActiveTab);
 
   useEffect(() => {
-    console.log("QueryAssistant component mounted");
-  }, []);
+    console.log("QueryAssistant component mounted, userName:", userName);
+  }, [userName]);
 
   return (
     <div className="min-h-screen pb-16 relative">

@@ -46,6 +46,11 @@ const loadProfile = (): UserProfile => {
 // Save profile to localStorage
 const saveProfile = (profile: UserProfile): void => {
   localStorage.setItem('userProfile', JSON.stringify(profile));
+  
+  // Broadcast the change
+  const event = new CustomEvent('profileUpdated', { detail: profile });
+  window.dispatchEvent(event);
+  console.log('Profile saved and event dispatched:', profile);
 };
 
 const UserProfileButton = () => {
@@ -55,12 +60,28 @@ const UserProfileButton = () => {
   const [profile, setProfile] = useState<UserProfile>(() => loadProfile());
   const { name, role, specialization } = profile;
   
-  const handleSaveProfile = () => {
-    // Save to localStorage
-    saveProfile(profile);
+  // Re-load profile when component mounts to ensure consistency
+  useEffect(() => {
+    const savedProfile = loadProfile();
+    setProfile(savedProfile);
     
-    // Broadcast profile change event for other components to listen
-    window.dispatchEvent(new CustomEvent('profileUpdated', { detail: profile }));
+    // Listen for profile updates from other components
+    const handleProfileUpdate = (event: CustomEvent) => {
+      console.log('Profile updated event received in UserProfileButton:', event.detail);
+      if (event.detail) {
+        setProfile(event.detail);
+      }
+    };
+    
+    window.addEventListener('profileUpdated', handleProfileUpdate as EventListener);
+    return () => {
+      window.removeEventListener('profileUpdated', handleProfileUpdate as EventListener);
+    };
+  }, []);
+  
+  const handleSaveProfile = () => {
+    // Save to localStorage and broadcast event
+    saveProfile(profile);
     
     console.log('Saving profile:', profile);
     toast.success('Profile settings saved');
