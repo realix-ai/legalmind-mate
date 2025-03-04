@@ -13,7 +13,8 @@ import {
   MoreHorizontal, 
   CheckCircle2, 
   XCircle,
-  Timer
+  Timer,
+  Send
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -32,10 +33,18 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import Navigation from '@/components/Navigation';
+import { Avatar } from '@/components/ui/avatar';
 
 type CaseChatParams = {
   caseId: string;
 };
+
+interface ChatMessage {
+  id: string;
+  content: string;
+  sender: 'user' | 'ai';
+  timestamp: number;
+}
 
 const CaseChat = () => {
   const { caseId } = useParams<CaseChatParams>();
@@ -49,6 +58,11 @@ const CaseChat = () => {
   const [priority, setPriority] = useState<'high' | 'medium' | 'low'>('medium');
   const [notes, setNotes] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  
+  // Chat state
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [currentMessage, setCurrentMessage] = useState('');
+  const [isAiTyping, setIsAiTyping] = useState(false);
   
   useEffect(() => {
     if (!caseId) {
@@ -78,6 +92,16 @@ const CaseChat = () => {
             type: 'Document',
             date: new Date(doc.lastModified).toLocaleDateString()
           })));
+          
+          // Add initial welcome message from AI
+          setMessages([
+            {
+              id: `msg-${Date.now()}`,
+              content: `Welcome to case ${caseInfo.name}. How can I assist you with this case today?`,
+              sender: 'ai',
+              timestamp: Date.now()
+            }
+          ]);
         } else {
           toast.error('Case not found');
           navigate('/case-management');
@@ -132,6 +156,45 @@ const CaseChat = () => {
     navigate('/case-management');
   };
   
+  const handleSendMessage = () => {
+    if (!currentMessage.trim()) return;
+    
+    // Add user message
+    const userMessage: ChatMessage = {
+      id: `msg-${Date.now()}`,
+      content: currentMessage,
+      sender: 'user',
+      timestamp: Date.now()
+    };
+    
+    setMessages(prev => [...prev, userMessage]);
+    setCurrentMessage('');
+    
+    // Simulate AI thinking
+    setIsAiTyping(true);
+    
+    // Simulate AI response after a delay
+    setTimeout(() => {
+      const aiResponses = [
+        `I'll analyze the case details for "${caseData?.name}" right away.`,
+        `Looking at the documents for this case, I can provide some insights about ${caseData?.name}.`,
+        `Based on the case priority (${priority}) and status (${status}), I recommend focusing on the following aspects...`,
+        `The deadline for this case is ${deadline ? format(deadline, "PPP") : "not set"}. Would you like me to suggest a timeline for the remaining tasks?`,
+        `I've analyzed similar cases and can provide precedents that may be helpful for ${caseData?.name}.`
+      ];
+      
+      const aiResponse: ChatMessage = {
+        id: `msg-${Date.now()}`,
+        content: aiResponses[Math.floor(Math.random() * aiResponses.length)],
+        sender: 'ai',
+        timestamp: Date.now()
+      };
+      
+      setMessages(prev => [...prev, aiResponse]);
+      setIsAiTyping(false);
+    }, 1500);
+  };
+  
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -156,7 +219,7 @@ const CaseChat = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="lg:col-span-2 bg-card rounded-lg shadow p-6"
+            className="lg:col-span-1 bg-card rounded-lg shadow p-6"
           >
             <div className="flex justify-between items-start mb-6">
               <div>
@@ -178,7 +241,7 @@ const CaseChat = () => {
               </Button>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="space-y-4 mb-6">
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-2">Status</h3>
                 {isEditing ? (
@@ -302,44 +365,107 @@ const CaseChat = () => {
                 </Button>
               </div>
             )}
+            
+            <div className="mt-6">
+              <h2 className="text-lg font-semibold mb-4">Documents</h2>
+              
+              {caseDocuments.length > 0 ? (
+                <ul className="space-y-3">
+                  {caseDocuments.map((doc) => (
+                    <li key={doc.id} className="flex items-center justify-between p-3 rounded-md border">
+                      <div className="flex items-center">
+                        <FileText className="h-4 w-4 mr-3 text-muted-foreground" />
+                        <div>
+                          <h4 className="text-sm font-medium">{doc.name}</h4>
+                          <p className="text-xs text-muted-foreground">{doc.date}</p>
+                        </div>
+                      </div>
+                      <Button variant="ghost" size="icon">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <FileText className="h-12 w-12 text-muted-foreground mb-3" />
+                  <h3 className="text-lg font-medium mb-1">No documents yet</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Create a document and assign it to this case
+                  </p>
+                  <Button onClick={() => navigate('/document-drafting')}>
+                    Create Document
+                  </Button>
+                </div>
+              )}
+            </div>
           </motion.div>
           
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0, transition: { delay: 0.1 } }}
-            className="bg-card rounded-lg shadow p-6"
+            className="lg:col-span-2 bg-card rounded-lg shadow flex flex-col h-[700px]"
           >
-            <h2 className="text-lg font-semibold mb-4">Documents</h2>
+            <div className="p-4 border-b flex items-center">
+              <MessageSquare className="h-5 w-5 mr-2 text-primary" />
+              <h2 className="text-lg font-semibold">Case Assistant</h2>
+            </div>
             
-            {caseDocuments.length > 0 ? (
-              <ul className="space-y-3">
-                {caseDocuments.map((doc) => (
-                  <li key={doc.id} className="flex items-center justify-between p-3 rounded-md border">
-                    <div className="flex items-center">
-                      <FileText className="h-4 w-4 mr-3 text-muted-foreground" />
-                      <div>
-                        <h4 className="text-sm font-medium">{doc.name}</h4>
-                        <p className="text-xs text-muted-foreground">{doc.date}</p>
-                      </div>
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.map((message) => (
+                <div 
+                  key={message.id} 
+                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div 
+                    className={`max-w-[80%] rounded-lg p-3 ${
+                      message.sender === 'user' 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'bg-muted'
+                    }`}
+                  >
+                    <p className="text-sm">{message.content}</p>
+                    <p className="text-xs opacity-70 mt-1">
+                      {new Date(message.timestamp).toLocaleTimeString()}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              
+              {isAiTyping && (
+                <div className="flex justify-start">
+                  <div className="max-w-[80%] rounded-lg p-3 bg-muted">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '300ms' }}></div>
                     </div>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-8 text-center">
-                <FileText className="h-12 w-12 text-muted-foreground mb-3" />
-                <h3 className="text-lg font-medium mb-1">No documents yet</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Create a document and assign it to this case
-                </p>
-                <Button onClick={() => navigate('/document-drafting')}>
-                  Create Document
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="p-4 border-t">
+              <div className="flex gap-2">
+                <Input 
+                  value={currentMessage}
+                  onChange={(e) => setCurrentMessage(e.target.value)}
+                  placeholder="Ask about this case..."
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                />
+                <Button 
+                  onClick={handleSendMessage}
+                  disabled={!currentMessage.trim() || isAiTyping}
+                >
+                  <Send className="h-4 w-4" />
                 </Button>
               </div>
-            )}
+            </div>
           </motion.div>
         </div>
       </main>
