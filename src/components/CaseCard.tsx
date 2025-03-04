@@ -1,8 +1,6 @@
-
 import { cn } from '@/lib/utils';
-import { Calendar, Clock, Users, MoreHorizontal, Star, Edit, Check, X, CalendarIcon } from 'lucide-react';
+import { Calendar, Clock, Users, MoreHorizontal, Star, Edit, Check, X } from 'lucide-react';
 import { useState } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
@@ -121,7 +119,6 @@ const CaseCard = ({
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Only trigger the card click if we're not interacting with one of the editing controls
     if (
       !isEditingNotes && 
       !isStatusPopoverOpen && 
@@ -188,14 +185,12 @@ const CaseCard = ({
               </PopoverTrigger>
               {onUpdateDeadline && (
                 <PopoverContent className="w-auto p-0" align="start" onClick={(e) => e.stopPropagation()}>
-                  <div className="p-3">
-                    <CalendarComponent
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={handleDeadlineChange}
-                      initialFocus
-                    />
-                  </div>
+                  <CalendarComponent
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={handleDeadlineChange}
+                    initialFocus
+                  />
                 </PopoverContent>
               )}
             </Popover>
@@ -262,7 +257,6 @@ const CaseCard = ({
           </Popover>
         </div>
 
-        {/* Notes section */}
         {(notes || onUpdateNotes) && (
           <div className="mt-4 border-t pt-3">
             {isEditingNotes ? (

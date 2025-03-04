@@ -26,6 +26,7 @@ import {
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
+import { cn } from "@/lib/utils";
 
 interface EditCaseDialogProps {
   isEditCaseDialogOpen: boolean;
@@ -87,7 +88,7 @@ const EditCaseDialog = ({
             value={editCaseStatus}
             onValueChange={(value) => setEditCaseStatus(value as 'active' | 'pending' | 'closed')}
           >
-            <SelectTrigger className="col-span-3">
+            <SelectTrigger className="col-span-3" id="editCaseStatus">
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
             <SelectContent>
@@ -106,7 +107,7 @@ const EditCaseDialog = ({
             value={editCasePriority}
             onValueChange={(value) => setEditCasePriority(value as 'high' | 'medium' | 'low')}
           >
-            <SelectTrigger className="col-span-3">
+            <SelectTrigger className="col-span-3" id="editCasePriority">
               <SelectValue placeholder="Select priority" />
             </SelectTrigger>
             <SelectContent>
@@ -125,8 +126,12 @@ const EditCaseDialog = ({
             <Popover>
               <PopoverTrigger asChild>
                 <Button
+                  id="editCaseDeadline"
                   variant="outline"
-                  className="w-full justify-start text-left font-normal"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !editCaseDeadline && "text-muted-foreground"
+                  )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {editCaseDeadline ? (
@@ -140,7 +145,7 @@ const EditCaseDialog = ({
                 <Calendar
                   mode="single"
                   selected={editCaseDeadline}
-                  onSelect={(date) => setEditCaseDeadline(date)}
+                  onSelect={setEditCaseDeadline}
                   initialFocus
                 />
               </PopoverContent>
