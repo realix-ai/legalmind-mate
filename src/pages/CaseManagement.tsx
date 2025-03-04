@@ -43,7 +43,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Case as CaseType, getCases, createCase, getCase, getCaseDocuments, updateCaseDetails } from '@/utils/documents';
+import { Case as CaseType, getCases, createCase, getCase, getCaseDocuments, updateCaseDetails, updateCaseStatus, updateCasePriority, updateCaseDeadline, updateCaseNotes } from '@/utils/documents';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
 
@@ -68,7 +68,7 @@ const CaseManagement = () => {
   const [editCasePriority, setEditCasePriority] = useState<'high' | 'medium' | 'low'>('medium');
   const [editCaseDeadline, setEditCaseDeadline] = useState<Date | undefined>(undefined);
   const [editCaseDescription, setEditCaseDescription] = useState('');
-  
+
   useEffect(() => {
     const loadCases = () => {
       try {
@@ -144,7 +144,7 @@ const CaseManagement = () => {
       setEditCaseStatus(caseToEdit.status || 'active');
       setEditCasePriority(caseToEdit.priority || 'medium');
       setEditCaseDeadline(caseToEdit.deadline ? new Date(caseToEdit.deadline) : undefined);
-      setEditCaseDescription('');
+      setEditCaseDescription(caseToEdit.notes || '');
       setIsEditCaseDialogOpen(true);
     }
   };
@@ -157,14 +157,16 @@ const CaseManagement = () => {
         name: editCaseName,
         status: editCaseStatus,
         priority: editCasePriority,
-        deadline: editCaseDeadline ? editCaseDeadline.getTime() : undefined
+        deadline: editCaseDeadline ? editCaseDeadline.getTime() : undefined,
+        notes: editCaseDescription
       });
 
       const updatedCase = updateCaseDetails(editingCaseId, {
         name: editCaseName,
         status: editCaseStatus,
         priority: editCasePriority,
-        deadline: editCaseDeadline ? editCaseDeadline.getTime() : undefined
+        deadline: editCaseDeadline ? editCaseDeadline.getTime() : undefined,
+        notes: editCaseDescription
       });
       
       if (updatedCase) {
@@ -179,6 +181,71 @@ const CaseManagement = () => {
     } catch (error) {
       console.error('Error updating case:', error);
       toast.error('Failed to update case');
+    }
+  };
+
+  const handleUpdateStatus = (caseId: string, newStatus: 'active' | 'pending' | 'closed') => {
+    try {
+      const updatedCase = updateCaseStatus(caseId, newStatus);
+      if (updatedCase) {
+        setCases(prevCases => 
+          prevCases.map(c => 
+            c.id === caseId ? updatedCase : c
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error updating case status:', error);
+      toast.error('Failed to update case status');
+    }
+  };
+
+  const handleUpdatePriority = (caseId: string, newPriority: 'high' | 'medium' | 'low') => {
+    try {
+      const updatedCase = updateCasePriority(caseId, newPriority);
+      if (updatedCase) {
+        setCases(prevCases => 
+          prevCases.map(c => 
+            c.id === caseId ? updatedCase : c
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error updating case priority:', error);
+      toast.error('Failed to update case priority');
+    }
+  };
+
+  const handleUpdateDeadline = (caseId: string, newDeadline: Date | undefined) => {
+    try {
+      const deadlineTimestamp = newDeadline ? newDeadline.getTime() : undefined;
+      const updatedCase = updateCaseDeadline(caseId, deadlineTimestamp);
+      if (updatedCase) {
+        setCases(prevCases => 
+          prevCases.map(c => 
+            c.id === caseId ? updatedCase : c
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error updating case deadline:', error);
+      toast.error('Failed to update case deadline');
+    }
+  };
+
+  const handleUpdateNotes = (caseId: string, newNotes: string) => {
+    try {
+      const updatedCase = updateCaseNotes(caseId, newNotes);
+      if (updatedCase) {
+        setCases(prevCases => 
+          prevCases.map(c => 
+            c.id === caseId ? updatedCase : c
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error updating case notes:', error);
+      toast.error('Failed to update case notes');
     }
   };
   
@@ -401,12 +468,18 @@ const CaseManagement = () => {
                   <CaseCard
                     title={caseItem.name}
                     caseNumber={`CASE-${caseItem.id.substring(5, 10)}`}
-                    clientName="Client"
+                    clientName={caseItem.clientName || "Client"}
                     date={new Date(caseItem.createdAt).toLocaleDateString()}
                     status={caseItem.status || "active"}
                     priority={caseItem.priority || "medium"}
+                    notes={caseItem.notes}
+                    deadline={caseItem.deadline ? new Date(caseItem.deadline) : undefined}
                     onClick={() => handleCaseClick(caseItem.id)}
                     onEdit={(e) => handleEditCase(e, caseItem.id)}
+                    onUpdateStatus={(status) => handleUpdateStatus(caseItem.id, status)}
+                    onUpdatePriority={(priority) => handleUpdatePriority(caseItem.id, priority)}
+                    onUpdateDeadline={(deadline) => handleUpdateDeadline(caseItem.id, deadline)}
+                    onUpdateNotes={(notes) => handleUpdateNotes(caseItem.id, notes)}
                   />
                 </motion.div>
               ))}
@@ -532,7 +605,7 @@ const CaseManagement = () => {
             
             <div className="grid grid-cols-4 items-start gap-4">
               <Label htmlFor="editCaseDescription" className="text-right pt-2">
-                Description
+                Notes
               </Label>
               <Textarea
                 id="editCaseDescription"

@@ -33,4 +33,5 @@ export interface Case {
   priority?: 'high' | 'medium' | 'low';
   deadline?: number;
   notes?: string;
+  clientName?: string;
 }
