@@ -22,9 +22,11 @@ import {
   PlayCircle,
   PlusCircle,
   X,
-  RefreshCw
+  RefreshCw,
+  Trash2
 } from 'lucide-react';
 import { QueryType } from '@/services/legalQueryService';
+import { Badge } from '@/components/ui/badge';
 
 interface BatchQuery {
   id: string;
@@ -61,6 +63,7 @@ const BatchProcessingPanel = () => {
   
   const removeQueryFromBatch = (id: string) => {
     setBatchQueries(prev => prev.filter(query => query.id !== id));
+    toast.info('Query removed from batch');
   };
   
   const processBatch = async () => {
@@ -137,35 +140,63 @@ const BatchProcessingPanel = () => {
     setBatchQueries([]);
     setProgress(0);
     setIsProcessing(false);
+    toast.info('Batch queue cleared');
   };
   
-  // Get status icon based on query status
-  const getStatusIcon = (status: string) => {
+  // Get status icon and color based on query status
+  const getStatusInfo = (status: string) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle2 className="text-green-500 h-5 w-5" />;
+        return { 
+          icon: <CheckCircle2 className="text-green-500 h-5 w-5" />,
+          badge: <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">Completed</Badge>
+        };
       case 'failed':
-        return <AlertCircle className="text-red-500 h-5 w-5" />;
+        return { 
+          icon: <AlertCircle className="text-red-500 h-5 w-5" />,
+          badge: <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200">Failed</Badge>
+        };
       case 'processing':
-        return <RefreshCw className="text-blue-500 h-5 w-5 animate-spin" />;
+        return { 
+          icon: <RefreshCw className="text-blue-500 h-5 w-5 animate-spin" />,
+          badge: <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">Processing</Badge>
+        };
       default:
-        return <Clock className="text-gray-500 h-5 w-5" />;
+        return { 
+          icon: <Clock className="text-gray-500 h-5 w-5" />,
+          badge: <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-200">Pending</Badge>
+        };
+    }
+  };
+  
+  const getTypeLabel = (type: QueryType) => {
+    switch (type) {
+      case 'legal-research':
+        return 'Legal Research';
+      case 'risk-analysis':
+        return 'Risk Analysis';
+      case 'summarize':
+        return 'Summarize';
+      case 'data-analysis':
+        return 'Data Analysis';
+      default:
+        return type;
     }
   };
   
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <Card>
-        <CardHeader>
-          <CardTitle>Add Queries to Batch</CardTitle>
+      <Card className="shadow-sm">
+        <CardHeader className="bg-slate-50/50 border-b">
+          <CardTitle className="text-xl">Add Queries to Batch</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="space-y-4">
             <Textarea
               placeholder="Enter your legal query here..."
               value={queryText}
               onChange={(e) => setQueryText(e.target.value)}
-              className="min-h-32"
+              className="min-h-32 resize-none focus:border-primary focus:ring-primary"
               disabled={isProcessing}
             />
             
@@ -176,7 +207,7 @@ const BatchProcessingPanel = () => {
                   onValueChange={(value) => setQueryType(value as QueryType)}
                   disabled={isProcessing}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select query type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -191,7 +222,7 @@ const BatchProcessingPanel = () => {
               <Button 
                 onClick={addQueryToBatch} 
                 className="w-full sm:w-auto"
-                disabled={isProcessing}
+                disabled={isProcessing || !queryText.trim()}
               >
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Add to Batch
@@ -201,76 +232,89 @@ const BatchProcessingPanel = () => {
         </CardContent>
       </Card>
       
-      <Card>
-        <CardHeader>
-          <CardTitle>Batch Queue ({batchQueries.length})</CardTitle>
+      <Card className="shadow-sm">
+        <CardHeader className="bg-slate-50/50 border-b flex flex-row items-center justify-between">
+          <CardTitle className="text-xl">Batch Queue</CardTitle>
+          <Badge variant="outline" className="ml-2 text-sm font-normal">
+            {batchQueries.length} {batchQueries.length === 1 ? 'query' : 'queries'}
+          </Badge>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           {batchQueries.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              No queries in the batch. Add some queries above.
+            <div className="text-center py-10 px-4 border border-dashed rounded-md bg-slate-50/50">
+              <p className="text-muted-foreground">No queries in the batch. Add some queries above.</p>
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="max-h-[300px] overflow-y-auto border rounded-md">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12">Status</TableHead>
-                      <TableHead>Query</TableHead>
-                      <TableHead className="w-32">Type</TableHead>
-                      <TableHead className="w-12"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {batchQueries.map((query) => (
-                      <TableRow key={query.id}>
-                        <TableCell>{getStatusIcon(query.status)}</TableCell>
-                        <TableCell className="font-medium">
-                          <div className="truncate max-w-[400px]">{query.text}</div>
-                        </TableCell>
-                        <TableCell>{query.type.replace('-', ' ')}</TableCell>
-                        <TableCell>
-                          {query.status === 'pending' && !isProcessing && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => removeQueryFromBatch(query.id)}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </TableCell>
+              <div className="border rounded-md overflow-hidden">
+                <div className="max-h-[300px] overflow-y-auto">
+                  <Table>
+                    <TableHeader className="bg-slate-50/80 sticky top-0">
+                      <TableRow>
+                        <TableHead className="w-12">Status</TableHead>
+                        <TableHead>Query</TableHead>
+                        <TableHead className="w-32">Type</TableHead>
+                        <TableHead className="w-12 text-right"></TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {batchQueries.map((query) => (
+                        <TableRow key={query.id} className="group hover:bg-slate-50/50">
+                          <TableCell>{getStatusInfo(query.status).icon}</TableCell>
+                          <TableCell className="font-medium">
+                            <div className="truncate max-w-[400px]">{query.text}</div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="secondary" className="font-normal">
+                              {getTypeLabel(query.type)}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {query.status === 'pending' && !isProcessing && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => removeQueryFromBatch(query.id)}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </div>
               
               {isProcessing && (
-                <div className="space-y-2">
+                <div className="space-y-2 p-3 border rounded-md bg-slate-50/50">
                   <div className="flex justify-between text-sm">
-                    <span>Processing batch...</span>
+                    <span className="font-medium">Processing batch...</span>
                     <span>{progress}%</span>
                   </div>
-                  <Progress value={progress} />
+                  <Progress value={progress} className="h-2" />
                 </div>
               )}
               
-              <div className="flex justify-between">
+              <div className="flex justify-between pt-2">
                 <Button
                   variant="outline"
                   onClick={resetBatch}
                   disabled={isProcessing || batchQueries.length === 0}
+                  className="text-destructive hover:text-destructive"
                 >
+                  <Trash2 className="mr-2 h-4 w-4" />
                   Clear All
                 </Button>
                 
                 <Button
                   onClick={processBatch}
                   disabled={isProcessing || batchQueries.length === 0}
+                  className="gap-2"
                 >
-                  <PlayCircle className="mr-2 h-4 w-4" />
+                  <PlayCircle className="h-4 w-4" />
                   Process Batch
                 </Button>
               </div>
@@ -280,17 +324,20 @@ const BatchProcessingPanel = () => {
       </Card>
       
       {batchQueries.some(q => q.status === 'completed') && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Results</CardTitle>
+        <Card className="shadow-sm">
+          <CardHeader className="bg-slate-50/50 border-b">
+            <CardTitle className="text-xl">Results</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="space-y-4">
               {batchQueries
                 .filter(q => q.status === 'completed')
                 .map((query) => (
-                  <div key={`result-${query.id}`} className="border rounded-md p-4">
-                    <h3 className="font-medium text-sm mb-2">{query.text}</h3>
+                  <div key={`result-${query.id}`} className="border rounded-md p-4 bg-white hover:shadow-sm transition-shadow">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-medium">{query.text}</h3>
+                      {getStatusInfo(query.status).badge}
+                    </div>
                     <Separator className="my-2" />
                     <p className="text-sm">{query.result}</p>
                   </div>
