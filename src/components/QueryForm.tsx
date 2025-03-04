@@ -1,6 +1,9 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { List } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import QueryOptions from '@/components/QueryOptions';
 import QueryTextarea from '@/components/QueryTextarea';
 import FilePreview from '@/components/FilePreview';
@@ -31,6 +34,7 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [showPromptManager, setShowPromptManager] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -184,6 +188,11 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
 
   const handleLoadPrompt = (promptText: string) => {
     setQuery(promptText);
+    setShowPromptManager(false); // Hide prompt manager after selection
+  };
+
+  const togglePromptManager = () => {
+    setShowPromptManager(!showPromptManager);
   };
 
   return (
@@ -199,7 +208,22 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
           onFileDrop={handleFileDrop}
         />
         
-        <PromptManager onSelectPrompt={handleLoadPrompt} />
+        <div className="mb-3 flex justify-start">
+          <Button 
+            type="button"
+            variant="outline" 
+            size="sm"
+            className="flex items-center gap-1"
+            onClick={togglePromptManager}
+          >
+            <List className="h-3.5 w-3.5" />
+            Load Prompts
+          </Button>
+        </div>
+        
+        {showPromptManager && (
+          <PromptManager onSelectPrompt={handleLoadPrompt} />
+        )}
         
         <input
           ref={fileInputRef}
