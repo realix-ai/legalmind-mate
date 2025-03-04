@@ -1,4 +1,5 @@
 
+import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Prompt } from '@/types/prompt';
 
@@ -32,6 +33,15 @@ const PromptList = ({ prompts, onSelectPrompt, onDeletePrompt, selectedPromptId 
           >
             {prompt.text}
           </p>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-5 w-5 p-0 opacity-70 hover:opacity-100"
+            onClick={() => onDeletePrompt(prompt.id)}
+            title="Delete prompt"
+          >
+            <X className="h-3 w-3" />
+          </Button>
         </div>
       ))}
     </div>

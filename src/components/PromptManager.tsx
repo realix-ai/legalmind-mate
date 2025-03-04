@@ -30,15 +30,6 @@ const PromptManager = ({ onSelectPrompt }: PromptManagerProps) => {
     linkElement.click();
   };
 
-  const handleDeleteClick = () => {
-    if (selectedPromptId) {
-      deletePrompt(selectedPromptId);
-      setSelectedPromptId(null);
-    } else {
-      toast.error('Please select a prompt to delete');
-    }
-  };
-
   const handleSelectPrompt = (promptText: string, promptId: string) => {
     setSelectedPromptId(promptId);
     onSelectPrompt(promptText);
@@ -56,7 +47,6 @@ const PromptManager = ({ onSelectPrompt }: PromptManagerProps) => {
         <PromptToolbar 
           onAddClick={() => setShowAddPrompt(!showAddPrompt)} 
           onExportClick={handleExportClick}
-          onDeleteClick={handleDeleteClick}
         />
       </div>
 
