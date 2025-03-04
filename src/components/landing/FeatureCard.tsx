@@ -18,21 +18,21 @@ const FeatureCard = ({ icon: Icon, title, description, path, variants }: Feature
   
   return (
     <motion.div
-      className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-subtle border transition-all duration-300 hover:shadow-elevated hover:border-primary/30"
+      className="bg-white dark:bg-gray-900 rounded-xl p-8 shadow-lg border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-xl hover:border-primary/30 group"
       variants={variants}
     >
-      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-        <Icon className="h-6 w-6 text-primary" />
+      <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
+        <Icon className="h-7 w-7 text-primary" />
       </div>
-      <h3 className="text-xl font-medium mb-2">{title}</h3>
-      <p className="text-muted-foreground">{description}</p>
+      <h3 className="text-xl font-bold mb-3">{title}</h3>
+      <p className="text-muted-foreground mb-6">{description}</p>
       <Button 
         variant="ghost" 
-        className="mt-4 gap-2"
+        className="group-hover:bg-primary/10 gap-2"
         onClick={() => navigate(path)}
       >
         Try it now
-        <ArrowRight className="h-4 w-4" />
+        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
       </Button>
     </motion.div>
   );

@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Zap, Clock, ShieldCheck, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const HeroSection = () => {
