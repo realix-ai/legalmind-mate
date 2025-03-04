@@ -234,9 +234,9 @@ const Index = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center gap-2 mb-6 md:mb-0">
               <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
-                <span className="text-white font-medium text-lg">L</span>
+                <span className="text-white font-medium text-lg">R</span>
               </div>
-              <span className="font-medium text-xl">LegalMind</span>
+              <span className="font-medium text-xl">Realix.ai</span>
             </div>
             
             <div className="flex gap-8">
@@ -253,7 +253,7 @@ const Index = () => {
           </div>
           
           <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} LegalMind. All rights reserved.
+            &copy; {new Date().getFullYear()} Realix.ai. All rights reserved.
           </div>
         </div>
       </footer>

@@ -51,7 +51,7 @@ const Navigation = () => {
               <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-purple-700 flex items-center justify-center shadow-md">
                 <Scale className="h-5 w-5 text-white" />
               </div>
-              <span className="font-medium text-xl hidden sm:block">LegalMind</span>
+              <span className="font-medium text-xl hidden sm:block">Realix.ai</span>
             </Link>
             
             <div className="hidden md:flex items-center space-x-1">
@@ -97,7 +97,7 @@ const Navigation = () => {
                 <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-purple-700 flex items-center justify-center shadow-md">
                   <Scale className="h-5 w-5 text-white" />
                 </div>
-                <span className="font-medium text-xl">LegalMind</span>
+                <span className="font-medium text-xl">Realix.ai</span>
               </Link>
               <button 
                 className="p-2 rounded-full hover:bg-secondary transition-all duration-200"
