@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navigation from '@/components/Navigation';
@@ -12,7 +13,7 @@ import {
   getCustomTemplates,
   CustomTemplate,
   getCases
-} from '@/utils/documentTemplates';
+} from '@/utils/documents';
 import TemplateList from '@/components/document/TemplateList';
 import DocumentToolbar from '@/components/document/DocumentToolbar';
 import AiPromptInput from '@/components/document/AiPromptInput';

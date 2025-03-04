@@ -15,7 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { saveCustomTemplate } from '@/utils/documentTemplates';
+import { saveCustomTemplate } from '@/utils/documents';
 import { PlusCircle } from 'lucide-react';
 
 interface TemplateUploadDialogProps {

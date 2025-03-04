@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion';
 import DocumentTemplate from '@/components/DocumentTemplate';
 import { Button } from '@/components/ui/button';
-import { SavedDocument, CustomTemplate } from '@/utils/documentTemplates';
+import { SavedDocument, CustomTemplate } from '@/utils/documents';
 import TemplateUploadDialog from './TemplateUploadDialog';
 
 export interface Template {

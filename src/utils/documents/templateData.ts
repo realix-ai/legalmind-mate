@@ -1,33 +1,7 @@
-export interface Template {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-}
 
-export interface SavedDocument {
-  id: string;
-  title: string;
-  content: string;
-  lastModified: number;
-  caseId?: string;
-}
+import { Template } from './types';
 
-export interface CustomTemplate {
-  id: string;
-  title: string;
-  description: string;
-  content: string;
-  category: string;
-  createdAt: number;
-}
-
-export interface Case {
-  id: string;
-  name: string;
-  createdAt: number;
-}
-
+// Predefined templates
 export const templates: Template[] = [
   {
     id: 'contract-service',
@@ -67,13 +41,8 @@ export const templates: Template[] = [
   }
 ];
 
+// Template content repository
 export const getTemplateContent = (id: string): string => {
-  const customTemplates = getCustomTemplates();
-  const customTemplate = customTemplates.find(template => template.id === id);
-  if (customTemplate) {
-    return customTemplate.content;
-  }
-
   const templateContents: Record<string, string> = {
     'contract-service': `SERVICE AGREEMENT
 
@@ -215,141 +184,4 @@ Dated: [DATE]                   Respectfully submitted,
   };
   
   return templateContents[id] || `[Template content for ${id}]`;
-};
-
-// Case management functions
-export const createCase = (name: string): Case => {
-  const cases = getCases();
-  
-  const newCase: Case = {
-    id: `case-${Date.now()}`,
-    name,
-    createdAt: Date.now()
-  };
-  
-  cases.push(newCase);
-  localStorage.setItem('cases', JSON.stringify(cases));
-  return newCase;
-};
-
-export const getCases = (): Case[] => {
-  const saved = localStorage.getItem('cases');
-  if (!saved) return [];
-  try {
-    return JSON.parse(saved);
-  } catch (e) {
-    console.error('Error parsing cases', e);
-    return [];
-  }
-};
-
-export const getCase = (id: string): Case | null => {
-  const cases = getCases();
-  return cases.find(c => c.id === id) || null;
-};
-
-export const deleteCase = (id: string): void => {
-  const cases = getCases();
-  const filtered = cases.filter(c => c.id !== id);
-  localStorage.setItem('cases', JSON.stringify(filtered));
-  
-  // Also remove case association from documents
-  const documents = getSavedDocuments();
-  const updatedDocuments = documents.map(doc => {
-    if (doc.caseId === id) {
-      return { ...doc, caseId: undefined };
-    }
-    return doc;
-  });
-  localStorage.setItem('savedDocuments', JSON.stringify(updatedDocuments));
-};
-
-export const getCaseDocuments = (caseId: string): SavedDocument[] => {
-  const documents = getSavedDocuments();
-  return documents.filter(doc => doc.caseId === caseId);
-};
-
-// Custom templates storage functions
-export const saveCustomTemplate = (title: string, description: string, content: string, category: string = "Custom"): CustomTemplate => {
-  const customTemplates = getCustomTemplates();
-  
-  const newTemplate: CustomTemplate = {
-    id: `custom-${Date.now()}`,
-    title,
-    description,
-    content,
-    category,
-    createdAt: Date.now()
-  };
-  
-  customTemplates.push(newTemplate);
-  localStorage.setItem('customTemplates', JSON.stringify(customTemplates));
-  return newTemplate;
-};
-
-export const getCustomTemplates = (): CustomTemplate[] => {
-  const saved = localStorage.getItem('customTemplates');
-  if (!saved) return [];
-  try {
-    return JSON.parse(saved);
-  } catch (e) {
-    console.error('Error parsing custom templates', e);
-    return [];
-  }
-};
-
-export const deleteCustomTemplate = (id: string): void => {
-  const customTemplates = getCustomTemplates();
-  const filtered = customTemplates.filter(template => template.id !== id);
-  localStorage.setItem('customTemplates', JSON.stringify(filtered));
-};
-
-// Document storage functions
-export const saveDocument = (title: string, content: string, id?: string | null, caseId?: string): SavedDocument => {
-  const savedDocuments = getSavedDocuments();
-  
-  const newDocument: SavedDocument = {
-    id: id || `doc-${Date.now()}`,
-    title,
-    content,
-    lastModified: Date.now(),
-    caseId
-  };
-  
-  const existingIndex = id ? savedDocuments.findIndex(doc => doc.id === id) : -1;
-  
-  if (existingIndex >= 0) {
-    // Preserve the existing caseId if not explicitly changing it
-    if (!caseId && savedDocuments[existingIndex].caseId) {
-      newDocument.caseId = savedDocuments[existingIndex].caseId;
-    }
-    savedDocuments[existingIndex] = newDocument;
-  } else {
-    savedDocuments.push(newDocument);
-  }
-  
-  localStorage.setItem('savedDocuments', JSON.stringify(savedDocuments));
-  return newDocument;
-};
-
-export const getSavedDocuments = (): SavedDocument[] => {
-  const saved = localStorage.getItem('savedDocuments');
-  if (!saved) return [];
-  try {
-    return JSON.parse(saved);
-  } catch (e) {
-    console.error('Error parsing saved documents', e);
-    return [];
-  }
-};
-
-export const getSavedDocument = (id: string): SavedDocument | null => {
-  const documents = getSavedDocuments();
-  return documents.find(doc => doc.id === id) || null;
-};
-
-export const deleteDocument = (id: string): void => {
-  const documents = getSavedDocuments();
-  const filtered = documents.filter(doc => doc.id !== id);
-  localStorage.setItem('savedDocuments', JSON.stringify(filtered));
 };
