@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from "sonner";
 import Navigation from '@/components/Navigation';
@@ -11,18 +11,31 @@ const QueryAssistant = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
 
+  // Log when component mounts
+  useEffect(() => {
+    console.log("QueryAssistant component mounted");
+  }, []);
+
   const handleSubmit = async (query: string, selectedOption: QueryType, file: File | null) => {
     setIsProcessing(true);
     setResponse(null);
     
     try {
       console.log("QueryAssistant: Starting to process query:", query);
+      console.log("QueryAssistant: Selected option:", selectedOption);
       console.log("QueryAssistant: File information:", file ? {
         name: file.name,
         size: `${(file.size / 1024).toFixed(2)} KB`,
         type: file.type,
         lastModified: new Date(file.lastModified).toISOString()
       } : "No file");
+      
+      // Explicit check and log for file
+      if (file) {
+        console.log("QueryAssistant: File is present, proceeding with file processing");
+      } else {
+        console.log("QueryAssistant: No file attached, proceeding with text-only query");
+      }
       
       const result = await processLegalQuery(query, selectedOption, file);
       console.log("QueryAssistant: Received result:", result);

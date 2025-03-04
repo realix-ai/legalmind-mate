@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Send, Loader2, FileUp } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -25,6 +25,7 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
   const [query, setQuery] = useState('');
   const [selectedOption, setSelectedOption] = useState<QueryType>('legal-research');
   const [file, setFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,9 +79,16 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
     // Remove the file mention from the query if needed
     setQuery(prev => prev.replace(/\n\nAttached file:.*$/g, '').replace(/^Attached file:.*$/g, '').trim());
     // Clear the file input
-    const fileInput = document.getElementById('file-upload') as HTMLInputElement;
-    if (fileInput) fileInput.value = '';
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
     console.log("File cleared");
+  };
+
+  const triggerFileUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
   return (
@@ -95,25 +103,25 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
             disabled={isProcessing}
           />
           <div className="absolute bottom-3 right-3 flex space-x-2">
-            <label htmlFor="file-upload" className="cursor-pointer">
-              <Button 
-                type="button"
-                size="icon"
-                variant="ghost"
-                disabled={isProcessing}
-                className="hover:bg-primary/10"
-              >
-                <FileUp className="h-5 w-5" />
-              </Button>
-              <input
-                id="file-upload"
-                type="file"
-                accept=".pdf,.doc,.docx,.txt,.rtf,.jpg,.jpeg,.png"
-                className="hidden"
-                onChange={handleFileChange}
-                disabled={isProcessing}
-              />
-            </label>
+            <Button 
+              type="button"
+              size="icon"
+              variant="ghost"
+              disabled={isProcessing}
+              className="hover:bg-primary/10"
+              onClick={triggerFileUpload}
+            >
+              <FileUp className="h-5 w-5" />
+            </Button>
+            <input
+              ref={fileInputRef}
+              id="file-upload"
+              type="file"
+              accept=".pdf,.doc,.docx,.txt,.rtf,.jpg,.jpeg,.png"
+              className="hidden"
+              onChange={handleFileChange}
+              disabled={isProcessing}
+            />
             <Button
               type="submit"
               size="icon"

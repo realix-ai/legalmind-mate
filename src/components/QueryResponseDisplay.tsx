@@ -8,7 +8,13 @@ interface QueryResponseDisplayProps {
 }
 
 const QueryResponseDisplay = ({ isProcessing, response }: QueryResponseDisplayProps) => {
-  if (!isProcessing && !response) return null;
+  // Don't show anything if we're not processing and have no response
+  if (!isProcessing && !response) {
+    console.log("QueryResponseDisplay: No processing or response, not rendering");
+    return null;
+  }
+  
+  console.log("QueryResponseDisplay: Rendering with isProcessing =", isProcessing, "response =", response ? "present" : "none");
   
   return (
     <motion.div
