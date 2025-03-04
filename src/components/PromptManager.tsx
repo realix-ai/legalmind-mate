@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Plus, Minus, Upload, Save } from 'lucide-react';
+import { Plus, Minus, Upload, Save, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
@@ -17,6 +17,7 @@ const PromptManager = ({ onSelectPrompt }: PromptManagerProps) => {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [showAddPrompt, setShowAddPrompt] = useState(false);
   const [newPromptText, setNewPromptText] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Load prompts from localStorage on component mount
   useEffect(() => {
@@ -107,8 +108,13 @@ const PromptManager = ({ onSelectPrompt }: PromptManagerProps) => {
     toast.success('Prompts exported successfully');
   };
 
+  // Filter prompts based on search query
+  const filteredPrompts = prompts.filter(prompt => 
+    prompt.text.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="mt-2">
+    <div className="mt-2 p-3 border rounded-md shadow-sm bg-background">
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-sm font-medium">Saved Prompts</h3>
         <div className="flex gap-1">
@@ -149,6 +155,20 @@ const PromptManager = ({ onSelectPrompt }: PromptManagerProps) => {
         </div>
       </div>
 
+      {/* Search input */}
+      <div className="mb-2">
+        <div className="relative">
+          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search prompts..."
+            className="w-full pl-8 pr-3 py-1 text-xs rounded-md border"
+          />
+        </div>
+      </div>
+
       {showAddPrompt && (
         <div className="mb-3 flex gap-2">
           <input
@@ -168,9 +188,9 @@ const PromptManager = ({ onSelectPrompt }: PromptManagerProps) => {
         </div>
       )}
 
-      {prompts.length > 0 ? (
+      {filteredPrompts.length > 0 ? (
         <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
-          {prompts.map((prompt) => (
+          {filteredPrompts.map((prompt) => (
             <div 
               key={prompt.id}
               className="flex group items-center text-sm border rounded-md p-2 hover:bg-accent transition-colors"

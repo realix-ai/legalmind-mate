@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -36,6 +35,7 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showPromptManager, setShowPromptManager] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const promptManagerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     return () => {
@@ -44,6 +44,26 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
       }
     };
   }, [previewUrl]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        promptManagerRef.current && 
+        !promptManagerRef.current.contains(event.target as Node) &&
+        !(event.target as Element).closest('[data-prompt-button="true"]')
+      ) {
+        setShowPromptManager(false);
+      }
+    };
+
+    if (showPromptManager) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showPromptManager]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -208,22 +228,28 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
           onFileDrop={handleFileDrop}
         />
         
-        <div className="mb-3 flex justify-start">
+        <div className="mb-3 flex justify-start relative">
           <Button 
             type="button"
             variant="outline" 
             size="sm"
             className="flex items-center gap-1"
             onClick={togglePromptManager}
+            data-prompt-button="true"
           >
             <List className="h-3.5 w-3.5" />
             Load Prompts
           </Button>
+          
+          {showPromptManager && (
+            <div 
+              ref={promptManagerRef}
+              className="absolute top-full left-0 mt-1 z-10 w-72 shadow-md"
+            >
+              <PromptManager onSelectPrompt={handleLoadPrompt} />
+            </div>
+          )}
         </div>
-        
-        {showPromptManager && (
-          <PromptManager onSelectPrompt={handleLoadPrompt} />
-        )}
         
         <input
           ref={fileInputRef}
