@@ -32,4 +32,5 @@ export interface Case {
   status?: 'active' | 'pending' | 'closed';
   priority?: 'high' | 'medium' | 'low';
   deadline?: number;
+  notes?: string;
 }

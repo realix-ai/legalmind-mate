@@ -1,231 +1,346 @@
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import Navigation from '@/components/Navigation';
 import { 
-  Send, 
-  ArrowLeft,
+  ArrowLeft, 
+  MessageSquare, 
   FileText,
-  Upload,
-  Bot,
-  User
+  Calendar as CalendarIcon, 
+  Clock, 
+  User, 
+  AlertTriangle, 
+  MoreHorizontal, 
+  CheckCircle2, 
+  XCircle,
+  Timer
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { getCase, getCaseDocuments } from '@/utils/documents';
-import { processLegalQuery } from '@/services/legalQueryService';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { format } from 'date-fns';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { getCase, updateCaseDetails, getCaseDocuments } from '@/utils/documents';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import Navigation from '@/components/Navigation';
+
+type CaseChatParams = {
+  caseId: string;
+};
 
 const CaseChat = () => {
-  const { caseId } = useParams<{ caseId: string }>();
+  const { caseId } = useParams<CaseChatParams>();
   const navigate = useNavigate();
-  const [caseData, setCaseData] = useState<any | null>(null);
-  const [messages, setMessages] = useState<{ sender: 'user' | 'bot', text: string }[]>([]);
-  const [input, setInput] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [caseDocuments, setCaseDocuments] = useState<any[]>([]);
   
-  // Initialize with case data
+  const [caseData, setCaseData] = useState<any | null>(null);
+  const [caseDocuments, setCaseDocuments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [deadline, setDeadline] = useState<Date | undefined>(undefined);
+  const [status, setStatus] = useState<'active' | 'pending' | 'closed'>('active');
+  const [priority, setPriority] = useState<'high' | 'medium' | 'low'>('medium');
+  const [notes, setNotes] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  
   useEffect(() => {
     if (!caseId) {
       navigate('/case-management');
       return;
     }
     
-    const currentCase = getCase(caseId);
-    if (!currentCase) {
-      toast.error('Case not found');
-      navigate('/case-management');
-      return;
-    }
+    const loadCase = () => {
+      try {
+        const caseInfo = getCase(caseId);
+        if (caseInfo) {
+          setCaseData({
+            ...caseInfo,
+            caseNumber: `CASE-${caseInfo.id.substring(5, 10)}`,
+            clientName: 'Client Name'
+          });
+          
+          setStatus(caseInfo.status || 'active');
+          setPriority(caseInfo.priority || 'medium');
+          setDeadline(caseInfo.deadline ? new Date(caseInfo.deadline) : undefined);
+          setNotes(caseInfo.notes || '');
+          
+          const docs = getCaseDocuments(caseId);
+          setCaseDocuments(docs.map(doc => ({
+            id: doc.id,
+            name: doc.title,
+            type: 'Document',
+            date: new Date(doc.lastModified).toLocaleDateString()
+          })));
+        } else {
+          toast.error('Case not found');
+          navigate('/case-management');
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error('Error loading case:', error);
+        toast.error('Failed to load case');
+        navigate('/case-management');
+      }
+    };
     
-    setCaseData(currentCase);
-    setCaseDocuments(getCaseDocuments(caseId));
-    
-    // Add welcome message
-    setMessages([{
-      sender: 'bot',
-      text: `Welcome to ${currentCase.name} assistant. How can I help you with this case today?`
-    }]);
+    loadCase();
   }, [caseId, navigate]);
   
-  // Scroll to bottom on new messages
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!input.trim() || isProcessing) return;
-    
-    const userMessage = input.trim();
-    setMessages(prev => [...prev, { sender: 'user', text: userMessage }]);
-    setInput('');
-    setIsProcessing(true);
+  const handleUpdateCase = () => {
+    if (!caseId || !caseData) return;
     
     try {
-      // Process the query using the legal query service
-      const response = await processLegalQuery(
-        userMessage, 
-        'legal-research',
-        null
-      );
+      console.log("Updating case with values:", {
+        status,
+        priority,
+        deadline: deadline ? deadline.getTime() : undefined,
+        notes
+      });
       
-      if (response.status === 'success') {
-        setMessages(prev => [...prev, { sender: 'bot', text: response.content }]);
+      const updatedCase = updateCaseDetails(caseId, {
+        status,
+        priority,
+        deadline: deadline ? deadline.getTime() : undefined,
+        notes
+      });
+      
+      if (updatedCase) {
+        setCaseData({
+          ...updatedCase,
+          caseNumber: `CASE-${updatedCase.id.substring(5, 10)}`,
+          clientName: 'Client Name'
+        });
+        toast.success('Case updated successfully');
+        setIsEditing(false);
       } else {
-        setMessages(prev => [...prev, { sender: 'bot', text: 'I apologize, but I encountered an error processing your request.' }]);
-        toast.error('Error processing query');
+        toast.error('Failed to update case');
       }
     } catch (error) {
-      console.error('Error processing message:', error);
-      setMessages(prev => [...prev, { sender: 'bot', text: 'I apologize, but I encountered an error processing your request.' }]);
-      toast.error('Error processing message');
-    } finally {
-      setIsProcessing(false);
+      console.error('Error updating case:', error);
+      toast.error('Failed to update case');
     }
   };
   
-  if (!caseData) {
+  const handleBack = () => {
+    navigate('/case-management');
+  };
+  
+  if (loading) {
     return (
-      <div className="min-h-screen">
-        <Navigation />
-        <div className="container max-w-7xl mx-auto pt-24 px-4 flex justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
   
   return (
-    <div className="min-h-screen pb-16 flex flex-col">
+    <div className="min-h-screen pb-16">
       <Navigation />
       
-      <main className="container max-w-7xl mx-auto pt-24 px-4 flex-1 flex flex-col">
-        <div className="mb-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="gap-2 mb-4"
-            onClick={() => navigate('/case-management')}
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Cases
+      <main className="container max-w-7xl mx-auto pt-24 px-4">
+        <div className="flex items-center gap-2 mb-4">
+          <Button variant="ghost" size="icon" onClick={handleBack}>
+            <ArrowLeft className="h-5 w-5" />
           </Button>
-          
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-semibold">{caseData.name}</h1>
-              <p className="text-muted-foreground">Case Assistant</p>
-            </div>
-          </div>
+          <h1 className="text-2xl font-semibold">Case: {caseData?.name}</h1>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 flex-1">
-          {/* Documents Sidebar */}
-          <div className="md:col-span-1">
-            <div className="border rounded-xl overflow-hidden h-full flex flex-col">
-              <div className="bg-muted p-4 flex items-center justify-between">
-                <h3 className="font-medium">Case Documents</h3>
-                <Button variant="ghost" size="sm" className="gap-1">
-                  <Upload className="h-4 w-4" />
-                </Button>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="lg:col-span-2 bg-card rounded-lg shadow p-6"
+          >
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h2 className="text-xl font-semibold">{caseData?.name}</h2>
+                <p className="text-muted-foreground">{caseData?.caseNumber}</p>
               </div>
               
-              <div className="p-2 flex-1 overflow-y-auto">
-                {caseDocuments.length > 0 ? (
-                  <div className="space-y-2">
-                    {caseDocuments.map((doc) => (
-                      <div key={doc.id} className="p-2 rounded-md hover:bg-muted/50 cursor-pointer">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
-                            <FileText className="h-4 w-4 text-primary" />
-                          </div>
-                          <div className="overflow-hidden">
-                            <h4 className="font-medium text-sm truncate">{doc.name}</h4>
-                            <p className="text-xs text-muted-foreground">Document</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+              <Button
+                variant={isEditing ? "default" : "outline"}
+                onClick={() => {
+                  if (isEditing) {
+                    handleUpdateCase();
+                  } else {
+                    setIsEditing(true);
+                  }
+                }}
+              >
+                {isEditing ? "Save Changes" : "Edit Case"}
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">Status</h3>
+                {isEditing ? (
+                  <Select 
+                    value={status} 
+                    onValueChange={(value) => setStatus(value as 'active' | 'pending' | 'closed')}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="closed">Closed</SelectItem>
+                    </SelectContent>
+                  </Select>
                 ) : (
-                  <div className="flex items-center justify-center h-full text-center p-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-2">No documents in this case yet</p>
-                      <Button variant="outline" size="sm" className="gap-1">
-                        <Upload className="h-4 w-4" />
-                        Add Document
-                      </Button>
-                    </div>
+                  <div className="flex items-center">
+                    <div className={`w-3 h-3 rounded-full mr-2 ${
+                      status === 'active' ? 'bg-green-500' : 
+                      status === 'pending' ? 'bg-yellow-500' : 'bg-gray-500'
+                    }`}></div>
+                    <span className="capitalize">{status}</span>
                   </div>
                 )}
               </div>
-            </div>
-          </div>
-          
-          {/* Chat Area */}
-          <div className="md:col-span-3 flex flex-col h-full">
-            <div className="border rounded-xl overflow-hidden flex-1 flex flex-col">
-              <div className="bg-muted p-4">
-                <h3 className="font-medium">Chat with Case Assistant</h3>
+              
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">Priority</h3>
+                {isEditing ? (
+                  <Select 
+                    value={priority} 
+                    onValueChange={(value) => setPriority(value as 'high' | 'medium' | 'low')}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="high">High</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="low">Low</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <div className="flex items-center">
+                    <div className={`w-3 h-3 rounded-full mr-2 ${
+                      priority === 'high' ? 'bg-red-500' : 
+                      priority === 'medium' ? 'bg-blue-500' : 'bg-green-500'
+                    }`}></div>
+                    <span className="capitalize">{priority}</span>
+                  </div>
+                )}
               </div>
               
-              <div className="p-4 flex-1 overflow-y-auto">
-                <div className="space-y-4">
-                  {messages.map((message, index) => (
-                    <motion.div 
-                      key={index}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div className={`max-w-[80%] px-4 py-3 rounded-lg ${
-                        message.sender === 'user' 
-                          ? 'bg-primary text-primary-foreground' 
-                          : 'bg-muted'
-                      }`}>
-                        <div className="flex items-center gap-2 mb-1">
-                          {message.sender === 'bot' ? (
-                            <Bot className="h-4 w-4" />
-                          ) : (
-                            <User className="h-4 w-4" />
-                          )}
-                          <span className="text-xs font-medium">
-                            {message.sender === 'user' ? 'You' : 'Case Assistant'}
-                          </span>
-                        </div>
-                        <p className="text-sm whitespace-pre-wrap">{message.text}</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                  <div ref={messagesEndRef} />
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">Deadline</h3>
+                {isEditing ? (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-left font-normal"
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {deadline ? (
+                          format(deadline, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={deadline}
+                        onSelect={(date) => setDeadline(date)}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                ) : (
+                  <div className="flex items-center">
+                    <CalendarIcon className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <span>{deadline ? format(deadline, "PPP") : "No deadline set"}</span>
+                  </div>
+                )}
+              </div>
+              
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">Created</h3>
+                <div className="flex items-center">
+                  <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
+                  <span>{new Date(caseData?.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
-              
-              <div className="p-4 border-t">
-                <form onSubmit={handleSubmit} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Ask anything about this case..."
-                    className="flex-1 px-4 py-2 rounded-md border border-input bg-background"
-                    disabled={isProcessing}
-                  />
-                  <Button type="submit" disabled={isProcessing || !input.trim()}>
-                    {isProcessing ? (
-                      <div className="h-5 w-5 animate-spin rounded-full border-b-2 border-current"></div>
-                    ) : (
-                      <Send className="h-4 w-4" />
-                    )}
-                  </Button>
-                </form>
-              </div>
             </div>
-          </div>
+            
+            <div className="mb-6">
+              <h3 className="text-sm font-medium text-muted-foreground mb-2">Notes</h3>
+              {isEditing ? (
+                <Textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Add notes about this case"
+                  className="min-h-[100px]"
+                />
+              ) : (
+                <p className="text-sm bg-muted p-3 rounded-md min-h-[100px]">
+                  {notes || "No notes added yet."}
+                </p>
+              )}
+            </div>
+            
+            {isEditing && (
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setIsEditing(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleUpdateCase}>
+                  Save Changes
+                </Button>
+              </div>
+            )}
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0, transition: { delay: 0.1 } }}
+            className="bg-card rounded-lg shadow p-6"
+          >
+            <h2 className="text-lg font-semibold mb-4">Documents</h2>
+            
+            {caseDocuments.length > 0 ? (
+              <ul className="space-y-3">
+                {caseDocuments.map((doc) => (
+                  <li key={doc.id} className="flex items-center justify-between p-3 rounded-md border">
+                    <div className="flex items-center">
+                      <FileText className="h-4 w-4 mr-3 text-muted-foreground" />
+                      <div>
+                        <h4 className="text-sm font-medium">{doc.name}</h4>
+                        <p className="text-xs text-muted-foreground">{doc.date}</p>
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="icon">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <FileText className="h-12 w-12 text-muted-foreground mb-3" />
+                <h3 className="text-lg font-medium mb-1">No documents yet</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Create a document and assign it to this case
+                </p>
+                <Button onClick={() => navigate('/document-drafting')}>
+                  Create Document
+                </Button>
+              </div>
+            )}
+          </motion.div>
         </div>
       </main>
     </div>

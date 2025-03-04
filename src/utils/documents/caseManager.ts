@@ -55,63 +55,23 @@ export const getCaseDocuments = (caseId: string): SavedDocument[] => {
 };
 
 export const updateCase = (id: string, name: string): Case | null => {
-  const cases = getCases();
-  const index = cases.findIndex(c => c.id === id);
-  
-  if (index === -1) return null;
-  
-  cases[index] = {
-    ...cases[index],
-    name
-  };
-  
-  localStorage.setItem('cases', JSON.stringify(cases));
-  return cases[index];
+  return updateCaseDetails(id, { name });
 };
 
 export const updateCaseStatus = (id: string, status: 'active' | 'pending' | 'closed'): Case | null => {
-  const cases = getCases();
-  const index = cases.findIndex(c => c.id === id);
-  
-  if (index === -1) return null;
-  
-  cases[index] = {
-    ...cases[index],
-    status
-  };
-  
-  localStorage.setItem('cases', JSON.stringify(cases));
-  return cases[index];
+  return updateCaseDetails(id, { status });
 };
 
 export const updateCasePriority = (id: string, priority: 'high' | 'medium' | 'low'): Case | null => {
-  const cases = getCases();
-  const index = cases.findIndex(c => c.id === id);
-  
-  if (index === -1) return null;
-  
-  cases[index] = {
-    ...cases[index],
-    priority
-  };
-  
-  localStorage.setItem('cases', JSON.stringify(cases));
-  return cases[index];
+  return updateCaseDetails(id, { priority });
 };
 
-export const updateCaseDeadline = (id: string, deadline: number): Case | null => {
-  const cases = getCases();
-  const index = cases.findIndex(c => c.id === id);
-  
-  if (index === -1) return null;
-  
-  cases[index] = {
-    ...cases[index],
-    deadline
-  };
-  
-  localStorage.setItem('cases', JSON.stringify(cases));
-  return cases[index];
+export const updateCaseDeadline = (id: string, deadline: number | undefined): Case | null => {
+  return updateCaseDetails(id, { deadline });
+};
+
+export const updateCaseNotes = (id: string, notes: string): Case | null => {
+  return updateCaseDetails(id, { notes });
 };
 
 export const updateCaseDetails = (id: string, updates: Partial<Omit<Case, 'id' | 'createdAt'>>): Case | null => {
