@@ -8,25 +8,13 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from '@/components/ui/calendar';
-import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
-import { cn } from "@/lib/utils";
+
+// Import our new form field components
+import CaseNameField from './edit-case/CaseNameField';
+import StatusField from './edit-case/StatusField';
+import PriorityField from './edit-case/PriorityField';
+import DeadlineField from './edit-case/DeadlineField';
+import NotesField from './edit-case/NotesField';
 
 interface EditCaseDialogProps {
   isEditCaseDialogOpen: boolean;
@@ -68,104 +56,30 @@ const EditCaseDialog = ({
         </DialogDescription>
       </DialogHeader>
       <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="editCaseName" className="text-right">
-            Case Name
-          </Label>
-          <Input
-            id="editCaseName"
-            value={editCaseName}
-            onChange={(e) => setEditCaseName(e.target.value)}
-            className="col-span-3"
-          />
-        </div>
+        <CaseNameField 
+          editCaseName={editCaseName}
+          setEditCaseName={setEditCaseName}
+        />
         
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="editCaseStatus" className="text-right">
-            Status
-          </Label>
-          <Select
-            value={editCaseStatus}
-            onValueChange={(value) => setEditCaseStatus(value as 'active' | 'pending' | 'closed')}
-          >
-            <SelectTrigger className="col-span-3" id="editCaseStatus">
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="closed">Closed</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <StatusField 
+          editCaseStatus={editCaseStatus}
+          setEditCaseStatus={setEditCaseStatus}
+        />
         
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="editCasePriority" className="text-right">
-            Priority
-          </Label>
-          <Select
-            value={editCasePriority}
-            onValueChange={(value) => setEditCasePriority(value as 'high' | 'medium' | 'low')}
-          >
-            <SelectTrigger className="col-span-3" id="editCasePriority">
-              <SelectValue placeholder="Select priority" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="high">High</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="low">Low</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <PriorityField 
+          editCasePriority={editCasePriority}
+          setEditCasePriority={setEditCasePriority}
+        />
         
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="editCaseDeadline" className="text-right">
-            Deadline
-          </Label>
-          <div className="col-span-3">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  id="editCaseDeadline"
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !editCaseDeadline && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {editCaseDeadline ? (
-                    format(editCaseDeadline, "PPP")
-                  ) : (
-                    <span>Pick a date</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={editCaseDeadline}
-                  onSelect={setEditCaseDeadline}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-        </div>
+        <DeadlineField 
+          editCaseDeadline={editCaseDeadline}
+          setEditCaseDeadline={setEditCaseDeadline}
+        />
         
-        <div className="grid grid-cols-4 items-start gap-4">
-          <Label htmlFor="editCaseDescription" className="text-right pt-2">
-            Notes
-          </Label>
-          <Textarea
-            id="editCaseDescription"
-            value={editCaseDescription}
-            onChange={(e) => setEditCaseDescription(e.target.value)}
-            className="col-span-3"
-            placeholder="Add case description"
-            rows={3}
-          />
-        </div>
+        <NotesField 
+          editCaseDescription={editCaseDescription}
+          setEditCaseDescription={setEditCaseDescription}
+        />
       </div>
       <DialogFooter>
         <Button variant="outline" onClick={() => setIsEditCaseDialogOpen(false)}>
