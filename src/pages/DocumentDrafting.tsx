@@ -19,6 +19,8 @@ const DocumentDrafting = () => {
   const [documentContent, setDocumentContent] = useState('');
   const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(documentId || null);
   const [showAiPrompt, setShowAiPrompt] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [isAiProcessing, setIsAiProcessing] = useState(false);
   
   useEffect(() => {
     if (documentId) {
@@ -59,20 +61,29 @@ const DocumentDrafting = () => {
     }
   };
   
-  const handleSelectTemplate = (templateTitle: string, templateContent: string) => {
-    setDocumentTitle(templateTitle);
-    setDocumentContent(templateContent);
-    setShowTemplates(false);
+  const handleSelectTemplate = (id: string) => {
+    // Get template or document by ID and set title/content
+    const document = getSavedDocument(id);
+    if (document) {
+      setDocumentTitle(document.title);
+      setDocumentContent(document.content);
+      setShowTemplates(false);
+    }
   };
   
-  const handleAiPrompt = (prompt: string) => {
+  const handleAiPromptSubmit = () => {
+    if (!aiPrompt.trim()) return;
+    
+    setIsAiProcessing(true);
     toast.loading('Generating content...');
     
     // Simulate AI processing
     setTimeout(() => {
       // Add AI-generated content at the end of the current content
-      const aiContent = generateAiResponse(prompt);
+      const aiContent = generateAiResponse(aiPrompt);
       setDocumentContent(prev => prev + '\n\n' + aiContent);
+      setIsAiProcessing(false);
+      setAiPrompt('');
       toast.dismiss();
       toast.success('Content generated successfully');
     }, 1500);
@@ -93,7 +104,7 @@ const DocumentDrafting = () => {
     <div className="container mx-auto p-6">
       {showTemplates ? (
         <TemplateList 
-          onSelectTemplate={handleSelectTemplate} 
+          onSelectTemplate={handleSelectTemplate}
         />
       ) : (
         <div className="space-y-6">
@@ -103,6 +114,7 @@ const DocumentDrafting = () => {
             setShowAiPrompt={setShowAiPrompt}
             onSaveDocument={handleSaveDocument}
             documentTitle={documentTitle}
+            documentContent={documentContent}
             currentDocumentId={currentDocumentId}
             onDocumentSaved={handleDocumentSaved}
           />
@@ -118,8 +130,10 @@ const DocumentDrafting = () => {
               />
               
               <DocumentEditor
-                initialContent={documentContent}
-                onChange={setDocumentContent}
+                documentTitle={documentTitle}
+                setDocumentTitle={setDocumentTitle}
+                documentContent={documentContent}
+                setDocumentContent={setDocumentContent}
               />
             </div>
             
@@ -131,7 +145,10 @@ const DocumentDrafting = () => {
                     <h3 className="font-medium">AI Assistant</h3>
                   </div>
                   <AiPromptInput 
-                    onSubmit={handleAiPrompt} 
+                    aiPrompt={aiPrompt}
+                    setAiPrompt={setAiPrompt}
+                    isAiProcessing={isAiProcessing}
+                    onSubmit={handleAiPromptSubmit}
                   />
                 </div>
               )}

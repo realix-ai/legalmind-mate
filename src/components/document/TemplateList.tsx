@@ -2,33 +2,53 @@
 import { motion } from 'framer-motion';
 import DocumentTemplate from '@/components/DocumentTemplate';
 import { Button } from '@/components/ui/button';
-import { SavedDocument, CustomTemplate } from '@/utils/documents';
 import TemplateUploadDialog from './TemplateUploadDialog';
-
-export interface Template {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-}
+import { getSavedDocuments } from '@/utils/documents';
+import { useEffect, useState } from 'react';
+import { SavedDocument, CustomTemplate } from '@/utils/documents/types';
 
 interface TemplateListProps {
-  templates: Template[];
-  customTemplates: CustomTemplate[];
-  savedDocuments?: SavedDocument[];
   onSelectTemplate: (id: string) => void;
-  onCreateBlank: () => void;
-  onTemplateAdded: () => void;
 }
 
-const TemplateList = ({ 
-  templates, 
-  customTemplates,
-  savedDocuments = [], 
-  onSelectTemplate, 
-  onCreateBlank,
-  onTemplateAdded
-}: TemplateListProps) => {
+const TemplateList = ({ onSelectTemplate }: TemplateListProps) => {
+  const [savedDocuments, setSavedDocuments] = useState<SavedDocument[]>([]);
+  const [customTemplates, setCustomTemplates] = useState<CustomTemplate[]>([]);
+  
+  useEffect(() => {
+    // Load saved documents
+    setSavedDocuments(getSavedDocuments());
+    
+    // Load custom templates (mock data for now)
+    setCustomTemplates([
+      {
+        id: 'template-1',
+        title: 'Legal Memorandum',
+        description: 'Standard legal memorandum template',
+        content: 'MEMORANDUM\n\nTO: [Recipient]\nFROM: [Sender]\nDATE: [Date]\nSUBJECT: [Subject]\n\n1. ISSUE\n\n2. BRIEF ANSWER\n\n3. FACTS\n\n4. DISCUSSION\n\n5. CONCLUSION',
+        category: 'Legal Writing',
+        createdAt: Date.now()
+      },
+      {
+        id: 'template-2',
+        title: 'Contract Agreement',
+        description: 'Basic contract template',
+        content: 'CONTRACT AGREEMENT\n\nThis Agreement is made and entered into on [DATE] by and between:\n\n[PARTY A], with address at [ADDRESS], referred to as "Party A"\n\nand\n\n[PARTY B], with address at [ADDRESS], referred to as "Party B"\n\n1. SCOPE OF WORK\n\n2. PAYMENT\n\n3. TERM AND TERMINATION\n\n4. CONFIDENTIALITY\n\n5. GOVERNING LAW',
+        category: 'Contracts',
+        createdAt: Date.now()
+      }
+    ]);
+  }, []);
+  
+  const handleCreateBlank = () => {
+    onSelectTemplate('new');
+  };
+  
+  const handleTemplateAdded = () => {
+    // Refresh templates
+    // This would normally call an API or load from storage
+  };
+  
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -48,6 +68,34 @@ const TemplateList = ({
       transition: { type: 'spring', stiffness: 100, damping: 15 }
     }
   };
+
+  // Mock template data
+  const templates = [
+    {
+      id: 'template-3',
+      title: 'Motion to Dismiss',
+      description: 'Standard motion to dismiss template',
+      category: 'Litigation'
+    },
+    {
+      id: 'template-4',
+      title: 'Settlement Agreement',
+      description: 'Comprehensive settlement template',
+      category: 'Dispute Resolution'
+    },
+    {
+      id: 'template-5',
+      title: 'Legal Brief',
+      description: 'Template for court briefs',
+      category: 'Legal Writing'
+    },
+    {
+      id: 'template-6',
+      title: 'Client Intake Form',
+      description: 'New client information form',
+      category: 'Client Management'
+    }
+  ];
 
   return (
     <motion.div
@@ -72,12 +120,12 @@ const TemplateList = ({
       <motion.div variants={itemVariants} className="mb-8 flex gap-4 justify-center">
         <Button 
           size="lg" 
-          onClick={onCreateBlank}
+          onClick={handleCreateBlank}
         >
           Create Blank Document
         </Button>
         
-        <TemplateUploadDialog onTemplateAdded={onTemplateAdded} />
+        <TemplateUploadDialog onTemplateAdded={handleTemplateAdded} />
       </motion.div>
 
       {savedDocuments.length > 0 && (
