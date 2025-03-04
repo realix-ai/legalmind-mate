@@ -26,9 +26,11 @@ export async function processLegalQuery(
     
     if (file) {
       // Process the file
+      console.log("Processing file...");
       response = await processFileWithQuery(file, queryText, queryType);
     } else {
       // Just process the query without file
+      console.log("Processing query without file...");
       response = await simulateApiCall(queryText, queryType);
     }
     
@@ -48,6 +50,8 @@ export async function processLegalQuery(
 
 // Process file and query together
 async function processFileWithQuery(file: File, query: string, queryType: QueryType): Promise<string> {
+  console.log("Inside processFileWithQuery function");
+  
   // Simulate file processing delay
   await new Promise(resolve => setTimeout(resolve, 2500));
   
@@ -56,35 +60,53 @@ async function processFileWithQuery(file: File, query: string, queryType: QueryT
   
   if (file.type.includes('text') || file.type.includes('document')) {
     try {
+      console.log("Reading text file content...");
       fileContent = await readFileAsText(file);
+      console.log("File content preview:", fileContent.substring(0, 100) + "...");
     } catch (error) {
       console.error('Error reading file:', error);
       fileContent = '[Error reading file content]';
     }
   } else if (file.type.includes('image')) {
+    console.log("Processing image file...");
     fileContent = '[Image analysis would be performed here]';
   } else if (file.type.includes('pdf')) {
+    console.log("Processing PDF file...");
     fileContent = '[PDF content extraction would be performed here]';
+  } else {
+    console.log("Unknown file type:", file.type);
+    fileContent = '[Unknown file type]';
   }
   
   // Generate a response based on file type and query
   const fileTypeResponse = getFileAnalysisResponse(file.type, queryType);
   
-  return `ANALYSIS OF UPLOADED FILE: ${file.name}\n\n${fileTypeResponse}\n\nRELATED TO QUERY: "${query}"\n\n${await simulateApiCall(query, queryType)}`;
+  const finalResponse = `ANALYSIS OF UPLOADED FILE: ${file.name}\n\n${fileTypeResponse}\n\nRELATED TO QUERY: "${query}"\n\n${await simulateApiCall(query, queryType)}`;
+  console.log("Generated file analysis response");
+  
+  return finalResponse;
 }
 
 // Helper function to read text files
 function readFileAsText(file: File): Promise<string> {
+  console.log("Reading file as text:", file.name);
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.onload = () => {
+      console.log("File read successfully");
+      resolve(reader.result as string);
+    };
+    reader.onerror = (error) => {
+      console.error("FileReader error:", error);
+      reject(new Error('Failed to read file'));
+    };
     reader.readAsText(file);
   });
 }
 
 // Helper function to generate responses based on file type
 function getFileAnalysisResponse(fileType: string, queryType: QueryType): string {
+  console.log("Generating file analysis for type:", fileType);
   if (fileType.includes('pdf')) {
     return 'PDF ANALYSIS: This document contains several legal clauses and provisions that relate to your query. The most relevant sections appear on pages 3-5 which discuss liability limitations and jurisdiction considerations.';
   } else if (fileType.includes('image')) {

@@ -29,6 +29,8 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
+    
+    console.log("Submitting with file:", file);
     await onSubmit(query.trim(), selectedOption, file);
   };
 
@@ -41,6 +43,7 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
         return;
       }
       
+      console.log("File selected:", selectedFile);
       setFile(selectedFile);
       toast.success(`File "${selectedFile.name}" uploaded successfully`);
       

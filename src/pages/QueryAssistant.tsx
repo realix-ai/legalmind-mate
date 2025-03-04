@@ -16,6 +16,7 @@ const QueryAssistant = () => {
     setResponse(null);
     
     try {
+      console.log("Processing query with file:", file?.name);
       const result = await processLegalQuery(query, selectedOption, file);
       
       if (result.status === 'success') {
