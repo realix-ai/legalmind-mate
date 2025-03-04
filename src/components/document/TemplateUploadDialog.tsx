@@ -100,9 +100,13 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full gap-2">
+        <Button 
+          size="lg"
+          variant="outline"
+          className="gap-2"
+        >
           <PlusCircle className="h-4 w-4" />
-          Upload Template
+          Upload Files
         </Button>
       </DialogTrigger>
       
