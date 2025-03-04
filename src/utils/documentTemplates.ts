@@ -10,6 +10,7 @@ export interface SavedDocument {
   title: string;
   content: string;
   lastModified: number;
+  caseId?: string;
 }
 
 export interface CustomTemplate {
@@ -18,6 +19,12 @@ export interface CustomTemplate {
   description: string;
   content: string;
   category: string;
+  createdAt: number;
+}
+
+export interface Case {
+  id: string;
+  name: string;
   createdAt: number;
 }
 
@@ -210,6 +217,58 @@ Dated: [DATE]                   Respectfully submitted,
   return templateContents[id] || `[Template content for ${id}]`;
 };
 
+// Case management functions
+export const createCase = (name: string): Case => {
+  const cases = getCases();
+  
+  const newCase: Case = {
+    id: `case-${Date.now()}`,
+    name,
+    createdAt: Date.now()
+  };
+  
+  cases.push(newCase);
+  localStorage.setItem('cases', JSON.stringify(cases));
+  return newCase;
+};
+
+export const getCases = (): Case[] => {
+  const saved = localStorage.getItem('cases');
+  if (!saved) return [];
+  try {
+    return JSON.parse(saved);
+  } catch (e) {
+    console.error('Error parsing cases', e);
+    return [];
+  }
+};
+
+export const getCase = (id: string): Case | null => {
+  const cases = getCases();
+  return cases.find(c => c.id === id) || null;
+};
+
+export const deleteCase = (id: string): void => {
+  const cases = getCases();
+  const filtered = cases.filter(c => c.id !== id);
+  localStorage.setItem('cases', JSON.stringify(filtered));
+  
+  // Also remove case association from documents
+  const documents = getSavedDocuments();
+  const updatedDocuments = documents.map(doc => {
+    if (doc.caseId === id) {
+      return { ...doc, caseId: undefined };
+    }
+    return doc;
+  });
+  localStorage.setItem('savedDocuments', JSON.stringify(updatedDocuments));
+};
+
+export const getCaseDocuments = (caseId: string): SavedDocument[] => {
+  const documents = getSavedDocuments();
+  return documents.filter(doc => doc.caseId === caseId);
+};
+
 // Custom templates storage functions
 export const saveCustomTemplate = (title: string, description: string, content: string, category: string = "Custom"): CustomTemplate => {
   const customTemplates = getCustomTemplates();
@@ -246,19 +305,24 @@ export const deleteCustomTemplate = (id: string): void => {
 };
 
 // Document storage functions
-export const saveDocument = (title: string, content: string, id?: string): SavedDocument => {
+export const saveDocument = (title: string, content: string, id?: string | null, caseId?: string): SavedDocument => {
   const savedDocuments = getSavedDocuments();
   
   const newDocument: SavedDocument = {
     id: id || `doc-${Date.now()}`,
     title,
     content,
-    lastModified: Date.now()
+    lastModified: Date.now(),
+    caseId
   };
   
   const existingIndex = id ? savedDocuments.findIndex(doc => doc.id === id) : -1;
   
   if (existingIndex >= 0) {
+    // Preserve the existing caseId if not explicitly changing it
+    if (!caseId && savedDocuments[existingIndex].caseId) {
+      newDocument.caseId = savedDocuments[existingIndex].caseId;
+    }
     savedDocuments[existingIndex] = newDocument;
   } else {
     savedDocuments.push(newDocument);

@@ -8,19 +8,28 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import SaveToCaseDialog from './SaveToCaseDialog';
 
 interface DocumentToolbarProps {
   onBack: () => void;
   showAiPrompt: boolean;
   setShowAiPrompt: (show: boolean) => void;
   onSaveDocument: () => void;
+  documentTitle: string;
+  documentContent: string;
+  currentDocumentId: string | null;
+  onDocumentSaved: (id: string) => void;
 }
 
 const DocumentToolbar = ({ 
   onBack, 
   showAiPrompt, 
   setShowAiPrompt,
-  onSaveDocument
+  onSaveDocument,
+  documentTitle,
+  documentContent,
+  currentDocumentId,
+  onDocumentSaved
 }: DocumentToolbarProps) => {
   return (
     <div className="flex items-center justify-between mb-4">
@@ -44,6 +53,14 @@ const DocumentToolbar = ({
           <Save className="h-3 w-3" />
           Save
         </Button>
+        
+        <SaveToCaseDialog 
+          documentTitle={documentTitle}
+          documentContent={documentContent}
+          currentDocumentId={currentDocumentId}
+          onSaved={onDocumentSaved}
+        />
+        
         <Button
           variant="outline"
           size="sm"

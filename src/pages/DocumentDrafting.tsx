@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navigation from '@/components/Navigation';
@@ -11,7 +10,8 @@ import {
   getSavedDocument, 
   SavedDocument,
   getCustomTemplates,
-  CustomTemplate
+  CustomTemplate,
+  getCases
 } from '@/utils/documentTemplates';
 import TemplateList from '@/components/document/TemplateList';
 import DocumentToolbar from '@/components/document/DocumentToolbar';
@@ -28,11 +28,13 @@ const DocumentDrafting = () => {
   const [showAiPrompt, setShowAiPrompt] = useState(false);
   const [savedDocuments, setSavedDocuments] = useState<SavedDocument[]>([]);
   const [customTemplates, setCustomTemplates] = useState<CustomTemplate[]>([]);
+  const [cases, setCases] = useState<{id: string, name: string}[]>([]);
   
   // Load saved documents and custom templates on mount
   useEffect(() => {
     setSavedDocuments(getSavedDocuments());
     setCustomTemplates(getCustomTemplates());
+    setCases(getCases());
   }, []);
   
   const handleSelectTemplate = (id: string) => {
@@ -123,6 +125,12 @@ const DocumentDrafting = () => {
     }, 2000);
   };
 
+  const handleDocumentSaved = (documentId: string) => {
+    setCurrentDocumentId(documentId);
+    setSavedDocuments(getSavedDocuments());
+    setCases(getCases());
+  };
+
   return (
     <div className="min-h-screen pb-16">
       <Navigation />
@@ -148,6 +156,10 @@ const DocumentDrafting = () => {
               showAiPrompt={showAiPrompt}
               setShowAiPrompt={setShowAiPrompt}
               onSaveDocument={handleSaveDocument}
+              documentTitle={documentTitle}
+              documentContent={documentContent}
+              currentDocumentId={currentDocumentId}
+              onDocumentSaved={handleDocumentSaved}
             />
             
             {showAiPrompt && (
