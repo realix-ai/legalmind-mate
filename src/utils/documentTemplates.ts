@@ -6,6 +6,13 @@ export interface Template {
   category: string;
 }
 
+export interface SavedDocument {
+  id: string;
+  title: string;
+  content: string;
+  lastModified: number;
+}
+
 export const templates: Template[] = [
   {
     id: 'contract-service',
@@ -187,4 +194,49 @@ Dated: [DATE]                   Respectfully submitted,
   };
   
   return templateContents[id] || `[Template content for ${id}]`;
+};
+
+// Document storage functions
+export const saveDocument = (title: string, content: string, id?: string): SavedDocument => {
+  const savedDocuments = getSavedDocuments();
+  
+  const newDocument: SavedDocument = {
+    id: id || `doc-${Date.now()}`,
+    title,
+    content,
+    lastModified: Date.now()
+  };
+  
+  const existingIndex = id ? savedDocuments.findIndex(doc => doc.id === id) : -1;
+  
+  if (existingIndex >= 0) {
+    savedDocuments[existingIndex] = newDocument;
+  } else {
+    savedDocuments.push(newDocument);
+  }
+  
+  localStorage.setItem('savedDocuments', JSON.stringify(savedDocuments));
+  return newDocument;
+};
+
+export const getSavedDocuments = (): SavedDocument[] => {
+  const saved = localStorage.getItem('savedDocuments');
+  if (!saved) return [];
+  try {
+    return JSON.parse(saved);
+  } catch (e) {
+    console.error('Error parsing saved documents', e);
+    return [];
+  }
+};
+
+export const getSavedDocument = (id: string): SavedDocument | null => {
+  const documents = getSavedDocuments();
+  return documents.find(doc => doc.id === id) || null;
+};
+
+export const deleteDocument = (id: string): void => {
+  const documents = getSavedDocuments();
+  const filtered = documents.filter(doc => doc.id !== id);
+  localStorage.setItem('savedDocuments', JSON.stringify(filtered));
 };

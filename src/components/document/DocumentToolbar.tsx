@@ -13,12 +13,14 @@ interface DocumentToolbarProps {
   onBack: () => void;
   showAiPrompt: boolean;
   setShowAiPrompt: (show: boolean) => void;
+  onSaveDocument: () => void;
 }
 
 const DocumentToolbar = ({ 
   onBack, 
   showAiPrompt, 
-  setShowAiPrompt 
+  setShowAiPrompt,
+  onSaveDocument
 }: DocumentToolbarProps) => {
   return (
     <div className="flex items-center justify-between mb-4">
@@ -37,6 +39,7 @@ const DocumentToolbar = ({
           variant="outline"
           size="sm"
           className="gap-1 text-xs"
+          onClick={onSaveDocument}
         >
           <Save className="h-3 w-3" />
           Save

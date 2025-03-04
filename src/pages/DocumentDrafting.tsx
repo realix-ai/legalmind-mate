@@ -1,9 +1,9 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navigation from '@/components/Navigation';
 import { toast } from '@/components/ui/use-toast';
-import { templates, getTemplateContent } from '@/utils/documentTemplates';
+import { templates, getTemplateContent, saveDocument, getSavedDocuments, getSavedDocument, SavedDocument } from '@/utils/documentTemplates';
 import TemplateList from '@/components/document/TemplateList';
 import DocumentToolbar from '@/components/document/DocumentToolbar';
 import AiPromptInput from '@/components/document/AiPromptInput';
@@ -11,21 +11,63 @@ import DocumentEditor from '@/components/document/DocumentEditor';
 
 const DocumentDrafting = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(null);
   const [documentTitle, setDocumentTitle] = useState('Untitled Document');
   const [documentContent, setDocumentContent] = useState('');
   const [isAiProcessing, setIsAiProcessing] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
   const [showAiPrompt, setShowAiPrompt] = useState(false);
+  const [savedDocuments, setSavedDocuments] = useState<SavedDocument[]>([]);
+  
+  // Load saved documents on mount
+  useEffect(() => {
+    setSavedDocuments(getSavedDocuments());
+  }, []);
   
   const handleSelectTemplate = (id: string) => {
-    setSelectedTemplate(id);
-    setDocumentContent(getTemplateContent(id));
+    if (id.startsWith('doc-')) {
+      // This is a saved document, not a template
+      const savedDoc = getSavedDocument(id);
+      if (savedDoc) {
+        setCurrentDocumentId(savedDoc.id);
+        setDocumentTitle(savedDoc.title);
+        setDocumentContent(savedDoc.content);
+        setSelectedTemplate('saved');
+      }
+    } else {
+      // This is a template
+      setCurrentDocumentId(null);
+      setSelectedTemplate(id);
+      setDocumentContent(getTemplateContent(id));
+      setDocumentTitle(id === 'new' ? 'Untitled Document' : templates.find(t => t.id === id)?.title || 'Untitled Document');
+    }
   };
   
   const handleNewDocument = () => {
     setSelectedTemplate(null);
+    setCurrentDocumentId(null);
     setDocumentTitle('Untitled Document');
     setDocumentContent('');
+  };
+  
+  const handleSaveDocument = () => {
+    try {
+      const saved = saveDocument(documentTitle, documentContent, currentDocumentId);
+      setCurrentDocumentId(saved.id);
+      setSavedDocuments(getSavedDocuments());
+      
+      toast({
+        title: "Document saved",
+        description: "Your document has been saved successfully.",
+      });
+    } catch (error) {
+      console.error("Error saving document:", error);
+      toast({
+        title: "Save failed",
+        description: "There was an error saving your document.",
+        variant: "destructive"
+      });
+    }
   };
   
   const handleAiAssist = () => {
@@ -65,6 +107,7 @@ const DocumentDrafting = () => {
         {!selectedTemplate ? (
           <TemplateList 
             templates={templates}
+            savedDocuments={savedDocuments}
             onSelectTemplate={handleSelectTemplate}
             onCreateBlank={() => handleSelectTemplate('new')}
           />
@@ -78,6 +121,7 @@ const DocumentDrafting = () => {
               onBack={handleNewDocument}
               showAiPrompt={showAiPrompt}
               setShowAiPrompt={setShowAiPrompt}
+              onSaveDocument={handleSaveDocument}
             />
             
             {showAiPrompt && (
@@ -97,7 +141,12 @@ const DocumentDrafting = () => {
             />
             
             <div className="text-center text-sm text-muted-foreground">
-              {isAiProcessing ? "AI is generating content..." : "All changes are automatically saved as you type."}
+              {isAiProcessing ? 
+                "AI is generating content..." : 
+                currentDocumentId ? 
+                  "All changes are saved automatically when you click Save." : 
+                  "Remember to save your document to access it later."
+              }
             </div>
           </motion.div>
         )}

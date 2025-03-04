@@ -2,6 +2,7 @@
 import { motion } from 'framer-motion';
 import DocumentTemplate from '@/components/DocumentTemplate';
 import { Button } from '@/components/ui/button';
+import { SavedDocument } from '@/utils/documentTemplates';
 
 export interface Template {
   id: string;
@@ -12,11 +13,12 @@ export interface Template {
 
 interface TemplateListProps {
   templates: Template[];
+  savedDocuments?: SavedDocument[];
   onSelectTemplate: (id: string) => void;
   onCreateBlank: () => void;
 }
 
-const TemplateList = ({ templates, onSelectTemplate, onCreateBlank }: TemplateListProps) => {
+const TemplateList = ({ templates, savedDocuments = [], onSelectTemplate, onCreateBlank }: TemplateListProps) => {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -66,6 +68,24 @@ const TemplateList = ({ templates, onSelectTemplate, onCreateBlank }: TemplateLi
           Create Blank Document
         </Button>
       </motion.div>
+
+      {savedDocuments.length > 0 && (
+        <motion.div variants={itemVariants} className="mb-8">
+          <h2 className="text-xl font-medium mb-4">Your Documents</h2>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {savedDocuments.map((doc) => (
+              <DocumentTemplate
+                key={doc.id}
+                title={doc.title}
+                description={`Last modified: ${new Date(doc.lastModified).toLocaleDateString()}`}
+                category="Your Document"
+                onClick={() => onSelectTemplate(doc.id)}
+              />
+            ))}
+          </div>
+        </motion.div>
+      )}
       
       <motion.div variants={itemVariants}>
         <h2 className="text-xl font-medium mb-4">Templates</h2>
