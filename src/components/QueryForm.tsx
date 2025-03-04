@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -125,6 +124,43 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
     }
   };
 
+  const handleFileDrop = (files: FileList) => {
+    if (files.length > 0) {
+      const droppedFile = files[0]; // Only process the first file if multiple are dropped
+      
+      setFileError(null);
+      
+      if (droppedFile.size > MAX_FILE_SIZE) {
+        const errorMsg = `File too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB`;
+        setFileError(errorMsg);
+        toast.error(errorMsg);
+        setPreviewUrl(null);
+        setFile(null);
+        return;
+      }
+      
+      if (!isFileTypeSupported(droppedFile)) {
+        const errorMsg = "Unsupported file type. Please upload a PDF, image, or text document.";
+        setFileError(errorMsg);
+        toast.error(errorMsg);
+        setPreviewUrl(null);
+        setFile(null);
+        return;
+      }
+      
+      console.log("File dropped:", droppedFile.name, "Type:", droppedFile.type, "Size:", droppedFile.size);
+      setFile(droppedFile);
+      generatePreview(droppedFile);
+      toast.success(`File "${droppedFile.name}" uploaded successfully`);
+      
+      if (!query.includes(droppedFile.name)) {
+        setQuery(prev => 
+          prev ? `${prev}\n\nAttached file: ${droppedFile.name}` : `Attached file: ${droppedFile.name}`
+        );
+      }
+    }
+  };
+
   const clearFile = () => {
     setFile(null);
     setFileError(null);
@@ -155,6 +191,7 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
           isProcessing={isProcessing}
           hasFile={!!file}
           fileError={fileError}
+          onFileDrop={handleFileDrop}
         />
         
         <input
