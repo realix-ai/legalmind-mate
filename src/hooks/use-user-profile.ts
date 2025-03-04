@@ -7,17 +7,21 @@ interface UserProfile {
   specialization: string;
 }
 
-// Load complete user profile from localStorage
+// Load complete user profile from localStorage with better error handling
 const loadUserProfile = (): UserProfile => {
-  const savedProfile = localStorage.getItem('userProfile');
-  if (savedProfile) {
-    try {
+  try {
+    const savedProfile = localStorage.getItem('userProfile');
+    if (savedProfile) {
       const profile = JSON.parse(savedProfile);
-      return profile;
-    } catch (e) {
-      console.error('Error parsing profile data:', e);
+      if (profile && typeof profile === 'object' && 'name' in profile) {
+        return profile as UserProfile;
+      }
     }
+  } catch (e) {
+    console.error('Error parsing profile data:', e);
   }
+  
+  // Default profile if nothing in localStorage or parse error
   return {
     name: 'John Doe',
     role: 'attorney',
@@ -26,18 +30,18 @@ const loadUserProfile = (): UserProfile => {
 };
 
 export const useUserProfile = () => {
-  // Store the complete profile, not just the name
+  // Store the complete profile
   const [userProfile, setUserProfile] = useState<UserProfile>(loadUserProfile());
   
   useEffect(() => {
     // Listen for profile updates
     const handleProfileUpdate = (event: CustomEvent) => {
       console.log('Profile updated event received:', event.detail);
-      if (event.detail) {
+      if (event.detail && typeof event.detail === 'object' && 'name' in event.detail) {
         // Update the entire profile object
-        setUserProfile(event.detail);
+        setUserProfile(event.detail as UserProfile);
         
-        // Save to localStorage as a backup
+        // Save to localStorage
         localStorage.setItem('userProfile', JSON.stringify(event.detail));
       }
     };

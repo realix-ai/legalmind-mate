@@ -24,15 +24,18 @@ interface UserProfile {
   specialization: string;
 }
 
-// Load profile from localStorage
+// Load profile from localStorage with better error handling
 const loadProfile = (): UserProfile => {
-  const savedProfile = localStorage.getItem('userProfile');
-  if (savedProfile) {
-    try {
-      return JSON.parse(savedProfile);
-    } catch (e) {
-      console.error('Error parsing profile data:', e);
+  try {
+    const savedProfile = localStorage.getItem('userProfile');
+    if (savedProfile) {
+      const profile = JSON.parse(savedProfile);
+      if (profile && typeof profile === 'object' && 'name' in profile) {
+        return profile as UserProfile;
+      }
     }
+  } catch (e) {
+    console.error('Error parsing profile data:', e);
   }
   
   // Default profile
@@ -45,12 +48,17 @@ const loadProfile = (): UserProfile => {
 
 // Save profile to localStorage
 const saveProfile = (profile: UserProfile): void => {
-  localStorage.setItem('userProfile', JSON.stringify(profile));
-  
-  // Broadcast the change
-  const event = new CustomEvent('profileUpdated', { detail: profile });
-  window.dispatchEvent(event);
-  console.log('Profile saved and event dispatched:', profile);
+  try {
+    localStorage.setItem('userProfile', JSON.stringify(profile));
+    
+    // Broadcast the change
+    const event = new CustomEvent('profileUpdated', { detail: profile });
+    window.dispatchEvent(event);
+    console.log('Profile saved and event dispatched:', profile);
+  } catch (e) {
+    console.error('Error saving profile:', e);
+    toast.error('Failed to save profile');
+  }
 };
 
 const UserProfileButton = () => {
@@ -68,8 +76,8 @@ const UserProfileButton = () => {
     // Listen for profile updates from other components
     const handleProfileUpdate = (event: CustomEvent) => {
       console.log('Profile updated event received in UserProfileButton:', event.detail);
-      if (event.detail) {
-        setProfile(event.detail);
+      if (event.detail && typeof event.detail === 'object' && 'name' in event.detail) {
+        setProfile(event.detail as UserProfile);
       }
     };
     
@@ -80,6 +88,12 @@ const UserProfileButton = () => {
   }, []);
   
   const handleSaveProfile = () => {
+    // Validate profile data
+    if (!profile.name.trim()) {
+      toast.error('Name cannot be empty');
+      return;
+    }
+    
     // Save to localStorage and broadcast event
     saveProfile(profile);
     
