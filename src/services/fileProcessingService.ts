@@ -2,17 +2,45 @@
 import { QueryType } from "./legalQueryService";
 import { getFileAnalysisResponse } from "./responseGenerationService";
 import { simulateApiCall } from "./queryProcessingService";
+import { toast } from "sonner";
+
+// Maximum file size in bytes (10MB)
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+// Supported file types
+const SUPPORTED_FILE_TYPES = {
+  pdf: ['application/pdf'],
+  image: ['image/jpeg', 'image/png', 'image/jpg'],
+  text: ['text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/rtf']
+};
 
 // Process file and query together
 export async function processFileWithQuery(file: File, query: string, queryType: QueryType): Promise<string> {
   console.log("FileProcessingService: Inside processFileWithQuery function");
   
-  // Simulate file processing delay
+  // Validate file size
+  if (file.size > MAX_FILE_SIZE) {
+    const errorMessage = `File size exceeds the limit of ${MAX_FILE_SIZE / (1024 * 1024)}MB`;
+    console.error("FileProcessingService:", errorMessage);
+    toast.error(errorMessage);
+    throw new Error(errorMessage);
+  }
+  
+  // Validate file type
+  const fileTypeInfo = getFileTypeInfo(file);
+  if (!fileTypeInfo.isPdf && !fileTypeInfo.isImage && !fileTypeInfo.isText) {
+    const errorMessage = "Unsupported file type. Please upload a PDF, image, or text document.";
+    console.error("FileProcessingService:", errorMessage);
+    toast.error(errorMessage);
+    throw new Error(errorMessage);
+  }
+  
+  // Simulate file processing delay with progress feedback
+  toast.info("Processing your file...");
   await new Promise(resolve => setTimeout(resolve, 1500));
   
   // Read the file content (for text files)
   let fileContent = '';
-  const fileTypeInfo = getFileTypeInfo(file);
   console.log("FileProcessingService: Detected file type:", fileTypeInfo);
   
   try {
@@ -23,24 +51,30 @@ export async function processFileWithQuery(file: File, query: string, queryType:
         fileContent.substring(0, 100) + (fileContent.length > 100 ? "..." : ""));
     } else if (fileTypeInfo.isImage) {
       console.log("FileProcessingService: Processing image file...");
+      toast.info("Analyzing image content...");
       fileContent = '[Image analysis would be performed here]';
     } else if (fileTypeInfo.isPdf) {
       console.log("FileProcessingService: Processing PDF file...");
+      toast.info("Extracting PDF content...");
       fileContent = '[PDF content extraction would be performed here]';
     } else {
       console.log("FileProcessingService: Unknown file type:", file.type);
       fileContent = '[Unknown file type]';
     }
   } catch (error) {
-    console.error('FileProcessingService: Error processing file:', error);
-    throw new Error(`Error processing file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    const errorMessage = `Error processing file: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    console.error('FileProcessingService:', errorMessage);
+    toast.error(errorMessage);
+    throw new Error(errorMessage);
   }
   
   // Generate a response based on file type and query
+  toast.info("Generating analysis...");
   const fileTypeResponse = getFileAnalysisResponse(file.type || file.name, queryType);
   
   const finalResponse = `ANALYSIS OF UPLOADED FILE: ${file.name}\n\n${fileTypeResponse}\n\nRELATED TO QUERY: "${query}"\n\n${await simulateApiCall(query, queryType)}`;
   console.log("FileProcessingService: Generated file analysis response");
+  toast.success("Analysis complete!");
   
   return finalResponse;
 }
@@ -83,6 +117,31 @@ export function readFileAsText(file: File): Promise<string> {
       reject(new Error('Failed to read file'));
     };
     
+    // Add progress tracking
+    reader.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percentLoaded = Math.round((event.loaded / event.total) * 100);
+        console.log(`FileProcessingService: Loading file - ${percentLoaded}% complete`);
+      }
+    };
+    
     reader.readAsText(file);
   });
+}
+
+// Helper function to check if a file type is supported
+export function isFileTypeSupported(file: File): boolean {
+  const { isPdf, isImage, isText } = getFileTypeInfo(file);
+  return isPdf || isImage || isText;
+}
+
+// Helper function to get readable file size
+export function getReadableFileSize(size: number): string {
+  if (size < 1024) {
+    return `${size} B`;
+  } else if (size < 1024 * 1024) {
+    return `${(size / 1024).toFixed(2)} KB`;
+  } else {
+    return `${(size / (1024 * 1024)).toFixed(2)} MB`;
+  }
 }
