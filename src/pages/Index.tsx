@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -6,8 +5,7 @@ import {
   Search,
   FileText,
   Briefcase,
-  ArrowRight,
-  Cpu
+  ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -234,8 +232,8 @@ const Index = () => {
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center gap-2 mb-6 md:mb-0">
-              <div className="w-8 h-8 rounded-md bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                <Cpu className="text-white h-4 w-4" />
+              <div className="w-8 h-8 rounded-md bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                <span className="text-white font-semibold text-base">R</span>
               </div>
               <span className="font-medium text-xl">Realix.ai</span>
             </div>
