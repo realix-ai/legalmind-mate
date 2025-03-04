@@ -14,35 +14,43 @@ export async function processLegalQuery(
   queryType: QueryType,
   file: File | null
 ): Promise<QueryResponse> {
-  console.log(`Processing ${queryType} query: ${queryText}`);
-  
-  if (file) {
-    console.log(`With file: ${file.name}, size: ${(file.size / 1024).toFixed(2)}KB, type: ${file.type}`);
-  }
+  console.log(`LegalQueryService: Processing ${queryType} query: ${queryText}`);
   
   try {
-    // In a real implementation, this would call an actual API
-    let response;
-    
     if (file) {
+      console.log(`LegalQueryService: File details:`, {
+        name: file.name,
+        type: file.type,
+        size: `${(file.size / 1024).toFixed(2)} KB`,
+        lastModified: new Date(file.lastModified).toISOString()
+      });
+      
       // Process the file
-      console.log("Processing file...");
-      response = await processFileWithQuery(file, queryText, queryType);
+      console.log("LegalQueryService: Starting file processing...");
+      const response = await processFileWithQuery(file, queryText, queryType);
+      console.log("LegalQueryService: File processing complete");
+      
+      return {
+        content: response,
+        status: 'success'
+      };
     } else {
       // Just process the query without file
-      console.log("Processing query without file...");
-      response = await simulateApiCall(queryText, queryType);
+      console.log("LegalQueryService: Processing query without file...");
+      const response = await simulateApiCall(queryText, queryType);
+      console.log("LegalQueryService: Query processing complete");
+      
+      return {
+        content: response,
+        status: 'success'
+      };
     }
-    
-    return {
-      content: response,
-      status: 'success'
-    };
   } catch (error) {
-    console.error('Error processing query:', error);
-    toast.error('Failed to process your legal query. Please try again.');
+    console.error('LegalQueryService: Error processing query:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    toast.error(`Failed to process your legal query: ${errorMessage}`);
     return {
-      content: 'An error occurred while processing your query. Please try again.',
+      content: `An error occurred while processing your query: ${errorMessage}`,
       status: 'error'
     };
   }
@@ -50,72 +58,91 @@ export async function processLegalQuery(
 
 // Process file and query together
 async function processFileWithQuery(file: File, query: string, queryType: QueryType): Promise<string> {
-  console.log("Inside processFileWithQuery function");
+  console.log("LegalQueryService: Inside processFileWithQuery function");
   
   // Simulate file processing delay
-  await new Promise(resolve => setTimeout(resolve, 2500));
+  await new Promise(resolve => setTimeout(resolve, 1500));
   
   // Read the file content (for text files)
   let fileContent = '';
+  const fileTypeInfo = getFileTypeInfo(file);
+  console.log("LegalQueryService: Detected file type:", fileTypeInfo);
   
   try {
-    if (file.type.includes('text') || 
-        file.type.includes('document') ||
-        file.name.endsWith('.txt') || 
-        file.name.endsWith('.doc') || 
-        file.name.endsWith('.docx') || 
-        file.name.endsWith('.rtf')) {
-      console.log("Reading text file content...");
+    if (fileTypeInfo.isText) {
+      console.log("LegalQueryService: Reading text file content...");
       fileContent = await readFileAsText(file);
-      console.log("File content preview:", fileContent.substring(0, 100) + "...");
-    } else if (file.type.includes('image') || 
-              file.name.endsWith('.jpg') || 
-              file.name.endsWith('.jpeg') || 
-              file.name.endsWith('.png')) {
-      console.log("Processing image file...");
+      console.log("LegalQueryService: File content preview:", 
+        fileContent.substring(0, 100) + (fileContent.length > 100 ? "..." : ""));
+    } else if (fileTypeInfo.isImage) {
+      console.log("LegalQueryService: Processing image file...");
       fileContent = '[Image analysis would be performed here]';
-    } else if (file.type.includes('pdf') || 
-               file.name.endsWith('.pdf')) {
-      console.log("Processing PDF file...");
+    } else if (fileTypeInfo.isPdf) {
+      console.log("LegalQueryService: Processing PDF file...");
       fileContent = '[PDF content extraction would be performed here]';
     } else {
-      console.log("Unknown file type:", file.type);
+      console.log("LegalQueryService: Unknown file type:", file.type);
       fileContent = '[Unknown file type]';
     }
   } catch (error) {
-    console.error('Error processing file:', error);
-    fileContent = '[Error processing file]';
+    console.error('LegalQueryService: Error processing file:', error);
+    throw new Error(`Error processing file: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
   
   // Generate a response based on file type and query
   const fileTypeResponse = getFileAnalysisResponse(file.type || file.name, queryType);
   
   const finalResponse = `ANALYSIS OF UPLOADED FILE: ${file.name}\n\n${fileTypeResponse}\n\nRELATED TO QUERY: "${query}"\n\n${await simulateApiCall(query, queryType)}`;
-  console.log("Generated file analysis response");
+  console.log("LegalQueryService: Generated file analysis response");
   
   return finalResponse;
 }
 
+// Helper function to determine file type
+function getFileTypeInfo(file: File): {isPdf: boolean, isImage: boolean, isText: boolean} {
+  const fileName = file.name.toLowerCase();
+  const mimeType = file.type.toLowerCase();
+  
+  console.log("LegalQueryService: Analyzing file type:", { fileName, mimeType });
+  
+  return {
+    isPdf: mimeType.includes('pdf') || fileName.endsWith('.pdf'),
+    isImage: mimeType.includes('image') || 
+             fileName.endsWith('.jpg') || 
+             fileName.endsWith('.jpeg') || 
+             fileName.endsWith('.png'),
+    isText: mimeType.includes('text') || 
+            mimeType.includes('document') ||
+            fileName.endsWith('.txt') || 
+            fileName.endsWith('.doc') || 
+            fileName.endsWith('.docx') || 
+            fileName.endsWith('.rtf')
+  };
+}
+
 // Helper function to read text files
 function readFileAsText(file: File): Promise<string> {
-  console.log("Reading file as text:", file.name);
+  console.log("LegalQueryService: Reading file as text:", file.name);
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
+    
     reader.onload = () => {
-      console.log("File read successfully");
+      console.log("LegalQueryService: File read successfully");
       resolve(reader.result as string);
     };
+    
     reader.onerror = (error) => {
-      console.error("FileReader error:", error);
+      console.error("LegalQueryService: FileReader error:", error);
       reject(new Error('Failed to read file'));
     };
+    
     reader.readAsText(file);
   });
 }
 
 // Helper function to generate responses based on file type
 function getFileAnalysisResponse(fileTypeOrName: string, queryType: QueryType): string {
-  console.log("Generating file analysis for type/name:", fileTypeOrName);
+  console.log("LegalQueryService: Generating file analysis for type/name:", fileTypeOrName);
   
   if (fileTypeOrName.includes('pdf') || fileTypeOrName.endsWith('.pdf')) {
     return 'PDF ANALYSIS: This document contains several legal clauses and provisions that relate to your query. The most relevant sections appear on pages 3-5 which discuss liability limitations and jurisdiction considerations.';

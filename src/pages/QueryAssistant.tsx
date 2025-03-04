@@ -16,15 +16,22 @@ const QueryAssistant = () => {
     setResponse(null);
     
     try {
-      console.log("Processing query with file:", file?.name, file ? `(${file.type})` : "");
+      console.log("QueryAssistant: Starting to process query:", query);
+      console.log("QueryAssistant: File information:", file ? {
+        name: file.name,
+        size: `${(file.size / 1024).toFixed(2)} KB`,
+        type: file.type,
+        lastModified: new Date(file.lastModified).toISOString()
+      } : "No file");
       
       const result = await processLegalQuery(query, selectedOption, file);
+      console.log("QueryAssistant: Received result:", result);
       
       if (result.status === 'success') {
         setResponse(result.content);
         toast.success('Query processed successfully');
       } else {
-        toast.error('Failed to process query');
+        toast.error('Failed to process query: ' + (result.content || 'Unknown error'));
       }
     } catch (error) {
       console.error('Error processing query:', error);

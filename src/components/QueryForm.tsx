@@ -28,11 +28,18 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query.trim()) return;
     
-    console.log("Submitting with file:", file);
+    if (!query.trim()) {
+      toast.error("Please enter a query");
+      return;
+    }
+    
+    console.log("Submitting form with query:", query);
+    console.log("Selected file:", file ? `${file.name} (${file.type})` : "No file selected");
+    
     try {
       await onSubmit(query.trim(), selectedOption, file);
+      console.log("Form submission completed");
     } catch (error) {
       console.error("Error in form submission:", error);
       toast.error("Error submitting query");
@@ -64,6 +71,16 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
         prev ? `${prev}\n\nAttached file: ${selectedFile.name}` : `Attached file: ${selectedFile.name}`
       );
     }
+  };
+
+  const clearFile = () => {
+    setFile(null);
+    // Remove the file mention from the query if needed
+    setQuery(prev => prev.replace(/\n\nAttached file:.*$/g, '').replace(/^Attached file:.*$/g, '').trim());
+    // Clear the file input
+    const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+    console.log("File cleared");
   };
 
   return (
@@ -117,14 +134,7 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
             <Button 
               variant="ghost" 
               size="sm" 
-              onClick={() => {
-                setFile(null);
-                // Remove the file mention from the query if needed
-                setQuery(prev => prev.replace(`\n\nAttached file: ${file.name}`, '').replace(`Attached file: ${file.name}`, '').trim());
-                // Clear the file input
-                const fileInput = document.getElementById('file-upload') as HTMLInputElement;
-                if (fileInput) fileInput.value = '';
-              }}
+              onClick={clearFile}
               className="h-6 w-6 p-0"
             >
               ✕
