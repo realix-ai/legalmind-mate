@@ -81,13 +81,6 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
   return (
     <motion.div variants={itemVariants}>
       <form onSubmit={handleSubmit} className="mb-8">
-        <PromptManagerSection 
-          showPromptManager={showPromptManager}
-          promptManagerRef={promptManagerRef}
-          togglePromptManager={togglePromptManager}
-          onLoadPrompt={handleLoadPrompt}
-        />
-        
         <QueryTextarea
           query={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -97,6 +90,15 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
           fileError={fileError}
           onFileDrop={handleFileDrop}
         />
+        
+        <div className="relative">
+          <PromptManagerSection 
+            showPromptManager={showPromptManager}
+            promptManagerRef={promptManagerRef}
+            togglePromptManager={togglePromptManager}
+            onLoadPrompt={handleLoadPrompt}
+          />
+        </div>
         
         <FileUploadSection 
           file={file}

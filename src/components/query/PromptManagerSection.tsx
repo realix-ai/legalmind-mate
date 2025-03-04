@@ -24,7 +24,7 @@ const PromptManagerSection = ({
           type="button"
           variant="outline" 
           size="sm"
-          className="flex items-center gap-1 absolute right-0 top-0 z-10"
+          className="flex items-center gap-1 absolute right-0 -bottom-10 z-10"
           onClick={togglePromptManager}
           data-prompt-button="true"
         >
@@ -36,7 +36,7 @@ const PromptManagerSection = ({
       {showPromptManager && (
         <div 
           ref={promptManagerRef}
-          className="relative z-10 w-72 shadow-md mb-4"
+          className="relative z-10 w-72 shadow-md mb-4 mt-14"
         >
           <PromptManager onSelectPrompt={onLoadPrompt} />
         </div>
