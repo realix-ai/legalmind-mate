@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { 
@@ -119,15 +118,22 @@ export const useCaseCrud = () => {
   const handleUpdateDeadline = (caseId: string, newDeadline: Date | undefined) => {
     try {
       const deadlineTimestamp = newDeadline ? newDeadline.getTime() : undefined;
+      console.log(`Updating case ${caseId} deadline to:`, newDeadline);
+      console.log("Converting to timestamp:", deadlineTimestamp);
+      
       const updatedCase = updateCaseDeadline(caseId, deadlineTimestamp);
+      
       if (updatedCase) {
+        console.log("Case successfully updated with new deadline:", updatedCase);
         setCases(prevCases => 
           prevCases.map(c => 
             c.id === caseId ? updatedCase : c
           )
         );
+        toast.success(`Deadline updated to ${newDeadline ? format(newDeadline, 'PPP') : 'none'}`);
         return updatedCase;
       }
+      console.error("Failed to update case deadline - no case returned");
       return null;
     } catch (error) {
       console.error('Error updating case deadline:', error);

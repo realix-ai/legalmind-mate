@@ -76,7 +76,10 @@ export const updateCasePriority = (id: string, priority: 'high' | 'medium' | 'lo
 };
 
 export const updateCaseDeadline = (id: string, deadline: number | undefined): Case | null => {
-  return updateCaseDetails(id, { deadline });
+  console.log(`Updating case ${id} deadline to timestamp:`, deadline);
+  const result = updateCaseDetails(id, { deadline });
+  console.log("Case after deadline update:", result);
+  return result;
 };
 
 export const updateCaseNotes = (id: string, notes: string): Case | null => {

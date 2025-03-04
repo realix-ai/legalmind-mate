@@ -26,15 +26,25 @@ interface DeadlineFieldProps {
 const DeadlineField = ({ editCaseDeadline, setEditCaseDeadline }: DeadlineFieldProps) => {
   const [open, setOpen] = React.useState(false);
   
+  // Handle date selection
   const handleSelect = (date: Date | undefined) => {
-    console.log("Date selected:", date);
+    console.log("Date selected in calendar:", date);
+    
+    // Set the deadline and close the popover
     setEditCaseDeadline(date);
     setOpen(false);
   };
   
-  const handleOpenChange = (open: boolean) => {
-    console.log("Popover open state changing to:", open);
-    setOpen(open);
+  // Create separate handler for calendar day clicks to ensure proper propagation
+  const handleCalendarDayClick = (e: React.MouseEvent) => {
+    // Prevent the event from bubbling up to parent components
+    e.stopPropagation();
+  };
+  
+  // Handle popover open state changes
+  const handleOpenChange = (isOpen: boolean) => {
+    console.log("Calendar popover open state changing to:", isOpen);
+    setOpen(isOpen);
   };
 
   return (
@@ -55,6 +65,10 @@ const DeadlineField = ({ editCaseDeadline, setEditCaseDeadline }: DeadlineFieldP
                       "w-full justify-start text-left font-normal",
                       !editCaseDeadline && "text-muted-foreground"
                     )}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpen(true);
+                    }}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {editCaseDeadline ? (
@@ -64,13 +78,23 @@ const DeadlineField = ({ editCaseDeadline, setEditCaseDeadline }: DeadlineFieldP
                     )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start" side="bottom">
-                  <Calendar
-                    mode="single"
-                    selected={editCaseDeadline}
-                    onSelect={handleSelect}
-                    initialFocus
-                  />
+                <PopoverContent 
+                  className="w-auto p-0" 
+                  align="start" 
+                  side="bottom"
+                  onClick={handleCalendarDayClick}
+                >
+                  <div 
+                    className="calendar-wrapper"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Calendar
+                      mode="single"
+                      selected={editCaseDeadline}
+                      onSelect={handleSelect}
+                      initialFocus
+                    />
+                  </div>
                 </PopoverContent>
               </Popover>
             </TooltipTrigger>
