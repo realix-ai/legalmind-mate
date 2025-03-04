@@ -11,6 +11,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from '@/components/ui/calendar';
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface DeadlineFieldProps {
   editCaseDeadline: Date | undefined;
@@ -18,65 +24,70 @@ interface DeadlineFieldProps {
 }
 
 const DeadlineField = ({ editCaseDeadline, setEditCaseDeadline }: DeadlineFieldProps) => {
-  // Create a state to control the popover
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  const handleCalendarSelect = (date: Date | undefined) => {
-    if (date) {
-      console.log("Selected date:", date);
-      setEditCaseDeadline(date);
-      // Close the popover after selection
-      setIsOpen(false);
-    }
+  // Reference to prevent bubbling
+  const calendarRef = React.useRef<HTMLDivElement>(null);
+  
+  const handleSelect = (date: Date | undefined) => {
+    setEditCaseDeadline(date);
+    // No need to manually close anything - the Calendar component will handle this
   };
-
-  const handleButtonClick = (e: React.MouseEvent) => {
-    // Prevent the click from bubbling up to parent elements
+  
+  // This ensures the event stays contained within our component and dialog remains open
+  const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
-  };
-
-  const handlePopoverOpenChange = (open: boolean) => {
-    setIsOpen(open);
+    e.preventDefault();
   };
 
   return (
-    <div className="grid grid-cols-4 items-center gap-4" onClick={(e) => e.stopPropagation()}>
-      <Label htmlFor="editCaseDeadline" className="text-right">
+    <div className="grid grid-cols-4 items-center gap-4">
+      <Label htmlFor="deadline" className="text-right">
         Deadline
       </Label>
       <div className="col-span-3">
-        <Popover open={isOpen} onOpenChange={handlePopoverOpenChange}>
-          <PopoverTrigger asChild>
-            <Button
-              id="editCaseDeadline"
-              variant="outline"
-              className={cn(
-                "w-full justify-start text-left font-normal",
-                !editCaseDeadline && "text-muted-foreground"
-              )}
-              onClick={handleButtonClick}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {editCaseDeadline ? (
-                format(editCaseDeadline, "PPP")
-              ) : (
-                <span>Pick a date</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent 
-            className="w-auto p-0" 
-            align="start" 
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Calendar
-              mode="single"
-              selected={editCaseDeadline}
-              onSelect={handleCalendarSelect}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    id="deadline"
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !editCaseDeadline && "text-muted-foreground"
+                    )}
+                    onClick={stopPropagation}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {editCaseDeadline ? (
+                      format(editCaseDeadline, "PPP")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <div 
+                    ref={calendarRef} 
+                    onClick={stopPropagation}
+                    onMouseDown={stopPropagation}
+                    className="calendar-container"
+                  >
+                    <Calendar
+                      mode="single"
+                      selected={editCaseDeadline}
+                      onSelect={handleSelect}
+                      initialFocus
+                    />
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Select a deadline date</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     </div>
   );
