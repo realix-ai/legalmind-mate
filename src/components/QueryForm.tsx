@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -7,8 +8,10 @@ import QueryTextarea from '@/components/QueryTextarea';
 import { QueryType } from '@/services/legalQueryService';
 import { useFileUpload } from '@/hooks/use-file-upload';
 import { usePromptManager } from '@/hooks/use-prompt-manager';
+import { useQueryHistory } from '@/hooks/use-query-history';
 import FileUploadSection from '@/components/query/FileUploadSection';
 import PromptManagerSection from '@/components/query/PromptManagerSection';
+import QueryHistory from '@/components/query/QueryHistory';
 
 interface QueryFormProps {
   onSubmit: (query: string, queryType: QueryType, file: File | null) => Promise<void>;
@@ -45,6 +48,16 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
     togglePromptManager,
     setShowPromptManager
   } = usePromptManager();
+  
+  const {
+    queryHistory,
+    showHistory,
+    historyRef,
+    toggleHistory,
+    setShowHistory,
+    addToHistory,
+    clearHistory
+  } = useQueryHistory();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +76,9 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
     console.log("Selected file:", file ? `${file.name} (${file.type})` : "No file selected");
     
     try {
+      // Add query to history
+      addToHistory(query);
+      
       await onSubmit(query.trim(), selectedOption, file);
       console.log("Form submission completed");
     } catch (error) {
@@ -74,6 +90,11 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
   const handleLoadPrompt = (promptText: string) => {
     setQuery(promptText);
     setShowPromptManager(false); // Hide prompt manager after selection
+  };
+  
+  const handleSelectHistory = (historyText: string) => {
+    setQuery(historyText);
+    setShowHistory(false); // Hide history after selection
   };
 
   return (
@@ -94,7 +115,21 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
           promptManagerRef={promptManagerRef}
           togglePromptManager={togglePromptManager}
           onLoadPrompt={handleLoadPrompt}
+          onHistoryClick={toggleHistory}
         />
+        
+        {showHistory && (
+          <div 
+            ref={historyRef}
+            className="relative z-10 w-72 shadow-md mb-4"
+          >
+            <QueryHistory 
+              history={queryHistory} 
+              onSelectQuery={handleSelectHistory} 
+              onClearHistory={clearHistory}
+            />
+          </div>
+        )}
         
         <FileUploadSection 
           file={file}
