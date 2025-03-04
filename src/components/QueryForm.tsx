@@ -38,7 +38,7 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Describe your legal question or issue..."
-            className="w-full min-h-[120px] p-4 pr-12 rounded-xl border border-input bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all duration-200 resize-y"
+            className="w-full min-h-[80px] p-4 pr-12 rounded-xl border border-input bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all duration-200 resize-y"
             disabled={isProcessing}
           />
           <Button
