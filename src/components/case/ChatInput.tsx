@@ -4,16 +4,16 @@ import { Send, List, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { usePrompts } from '@/hooks/use-prompts';
-import { useQueryHistory } from '@/hooks/use-query-history';
 import PromptManagerSection from '@/components/query/PromptManagerSection';
-import QueryHistory from '@/components/query/QueryHistory';
+import { ChatMessageProps } from '@/components/case/ChatMessage';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   isDisabled: boolean;
+  messages: ChatMessageProps[]; // Add messages prop to access chat history
 }
 
-const ChatInput = ({ onSendMessage, isDisabled }: ChatInputProps) => {
+const ChatInput = ({ onSendMessage, isDisabled, messages }: ChatInputProps) => {
   const [currentMessage, setCurrentMessage] = useState('');
   
   // Prompt manager state and hooks
@@ -23,21 +23,37 @@ const ChatInput = ({ onSendMessage, isDisabled }: ChatInputProps) => {
     togglePromptManager 
   } = usePromptManager();
   
-  // Query history state and hooks
-  const {
-    queryHistory,
-    showHistory,
-    historyRef,
-    toggleHistory,
-    addToHistory,
-    clearHistory
-  } = useQueryHistory();
+  // Chat history state and hooks
+  const [showHistory, setShowHistory] = useState(false);
+  const historyRef = useRef<HTMLDivElement>(null);
+
+  // Handle clicking outside of history popup
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        historyRef.current && 
+        !historyRef.current.contains(event.target as Node) &&
+        !(event.target as Element).closest('[data-history-button="true"]')
+      ) {
+        setShowHistory(false);
+      }
+    };
+
+    if (showHistory) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showHistory]);
+
+  const toggleHistory = () => {
+    setShowHistory(!showHistory);
+  };
 
   const handleSendMessage = () => {
     if (!currentMessage.trim()) return;
-    
-    // Add to history
-    addToHistory(currentMessage);
     
     // Send message
     onSendMessage(currentMessage);
@@ -49,8 +65,8 @@ const ChatInput = ({ onSendMessage, isDisabled }: ChatInputProps) => {
     togglePromptManager();
   };
   
-  const handleSelectHistoryQuery = (queryText: string) => {
-    setCurrentMessage(queryText);
+  const handleSelectHistoryMessage = (messageText: string) => {
+    setCurrentMessage(messageText);
     toggleHistory();
   };
 
@@ -76,10 +92,9 @@ const ChatInput = ({ onSendMessage, isDisabled }: ChatInputProps) => {
       
       {showHistory && (
         <div ref={historyRef} className="relative z-10 w-72 shadow-md mb-4">
-          <QueryHistory 
-            history={queryHistory}
-            onSelectQuery={handleSelectHistoryQuery}
-            onClearHistory={clearHistory}
+          <ChatHistory 
+            messages={messages}
+            onSelectMessage={handleSelectHistoryMessage}
           />
         </div>
       )}

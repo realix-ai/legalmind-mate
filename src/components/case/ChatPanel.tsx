@@ -47,7 +47,11 @@ const ChatPanel = ({ messages, isAiTyping, onSendMessage }: ChatPanelProps) => {
         <div ref={messagesEndRef} />
       </div>
       
-      <ChatInput onSendMessage={onSendMessage} isDisabled={isAiTyping} />
+      <ChatInput 
+        onSendMessage={onSendMessage} 
+        isDisabled={isAiTyping} 
+        messages={messages} 
+      />
     </motion.div>
   );
 };
