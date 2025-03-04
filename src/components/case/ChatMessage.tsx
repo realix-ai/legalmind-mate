@@ -15,7 +15,7 @@ const ChatMessage = ({ content, sender, timestamp }: ChatMessageProps) => {
   return (
     <div className={`flex ${sender === 'user' ? 'justify-end' : 'justify-start'} group animate-fade-in`}>
       {sender === 'ai' && (
-        <Avatar className="h-8 w-8 mr-2 mt-1 shrink-0 border shadow-sm">
+        <Avatar className="h-8 w-8 mr-2 shrink-0">
           <AvatarFallback className="bg-primary/10 text-primary">
             <Bot className="h-4 w-4" />
           </AvatarFallback>
@@ -24,21 +24,21 @@ const ChatMessage = ({ content, sender, timestamp }: ChatMessageProps) => {
       
       <div 
         className={cn(
-          "max-w-[85%] rounded-2xl p-3 shadow-sm transition-all duration-200", 
+          "max-w-[85%] rounded-lg p-3", 
           sender === 'user' 
-            ? 'bg-gradient-to-r from-primary to-primary/90 text-primary-foreground rounded-tr-none' 
-            : 'bg-secondary/70 dark:bg-secondary/40 backdrop-blur-sm rounded-tl-none'
+            ? 'bg-primary text-primary-foreground' 
+            : 'bg-card border border-border/50'
         )}
       >
-        <p className="text-sm whitespace-pre-wrap leading-relaxed">{content}</p>
+        <p className="text-sm whitespace-pre-wrap">{content}</p>
         <p className="text-[10px] opacity-70 mt-1 text-right">
           {new Date(timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
         </p>
       </div>
       
       {sender === 'user' && (
-        <Avatar className="h-8 w-8 ml-2 mt-1 shrink-0 border shadow-sm">
-          <AvatarFallback className="bg-secondary text-foreground">
+        <Avatar className="h-8 w-8 ml-2 shrink-0">
+          <AvatarFallback className="bg-secondary">
             <User className="h-4 w-4" />
           </AvatarFallback>
         </Avatar>
