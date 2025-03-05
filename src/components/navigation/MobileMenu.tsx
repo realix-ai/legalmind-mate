@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { X, Settings } from 'lucide-react';
+import SettingsDialog from '../settings/SettingsDialog';
 
 type MobileMenuProps = {
   navItems: {
@@ -15,6 +16,7 @@ type MobileMenuProps = {
 
 const MobileMenu = ({ navItems, onClose }: MobileMenuProps) => {
   const location = useLocation();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   
   return (
     <div className="fixed inset-0 z-50 bg-background">
@@ -55,12 +57,20 @@ const MobileMenu = ({ navItems, onClose }: MobileMenuProps) => {
         </div>
         
         <div className="p-4 border-t">
-          <button className="w-full p-3 rounded-lg flex items-center gap-3 hover:bg-secondary transition-all duration-200">
+          <button 
+            className="w-full p-3 rounded-lg flex items-center gap-3 hover:bg-secondary transition-all duration-200"
+            onClick={() => setIsSettingsOpen(true)}
+          >
             <Settings className="h-5 w-5" />
             <span className="font-medium">Settings</span>
           </button>
         </div>
       </div>
+
+      <SettingsDialog 
+        open={isSettingsOpen}
+        onOpenChange={setIsSettingsOpen}
+      />
     </div>
   );
 };

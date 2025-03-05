@@ -1,9 +1,11 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Menu, Settings } from 'lucide-react';
 import NavItems from './NavItems';
+import SettingsDialog from '../settings/SettingsDialog';
+import { Button } from '@/components/ui/button';
 
 type NavBarProps = {
   isScrolled: boolean;
@@ -22,6 +24,8 @@ const NavBar = ({
   navItems, 
   onOpenMobileMenu
 }: NavBarProps) => {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  
   return (
     <nav 
       className={cn(
@@ -48,9 +52,14 @@ const NavBar = ({
           
           <div className="hidden md:flex items-center space-x-2">
             {!isLandingPage && (
-              <button className="p-2 rounded-full hover:bg-secondary transition-all duration-200">
-                <Settings className="h-5 w-5 text-muted-foreground" />
-              </button>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => setIsSettingsOpen(true)}
+                className="text-muted-foreground"
+              >
+                <Settings className="h-5 w-5" />
+              </Button>
             )}
           </div>
           
@@ -62,6 +71,11 @@ const NavBar = ({
           </button>
         </div>
       </div>
+
+      <SettingsDialog 
+        open={isSettingsOpen}
+        onOpenChange={setIsSettingsOpen}
+      />
     </nav>
   );
 };
