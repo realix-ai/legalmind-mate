@@ -134,16 +134,16 @@ const DocumentUploadButton = ({ caseId, onDocumentUploaded }: DocumentUploadButt
             type="button"
             size="sm"
             variant="outline"
-            className="flex items-center gap-2"
+            className="flex items-center gap-1 h-8 px-2 text-xs"
             onClick={handleButtonClick}
             disabled={isUploading || !caseId}
           >
             {isUploading ? (
-              <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <div className="h-3 w-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             ) : (
-              <Upload className="h-4 w-4" />
+              <Upload className="h-3 w-3" />
             )}
-            Upload Document
+            Upload
           </Button>
         </TooltipTrigger>
         <TooltipContent>

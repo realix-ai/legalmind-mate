@@ -1,11 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FileText, MoreHorizontal, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import DocumentUploadButton from '@/components/case-chat/DocumentUploadButton';
+import { getCaseDocuments } from '@/utils/documents';
 
 interface Document {
   id: string;
@@ -20,9 +21,25 @@ interface DocumentsPanelProps {
   documents: Document[];
 }
 
-const DocumentsPanel = ({ caseNumber, caseName, documents }: DocumentsPanelProps) => {
+const DocumentsPanel = ({ caseNumber, caseName, documents: initialDocuments }: DocumentsPanelProps) => {
   const navigate = useNavigate();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [documents, setDocuments] = useState<Document[]>(initialDocuments);
+  
+  useEffect(() => {
+    // Only run this effect when refreshTrigger changes
+    if (caseNumber) {
+      const caseId = caseNumber.replace('CASE-', '');
+      const docs = getCaseDocuments(caseId);
+      
+      setDocuments(docs.map(doc => ({
+        id: doc.id,
+        name: doc.title,
+        type: 'Document',
+        date: new Date(doc.lastModified).toLocaleDateString()
+      })));
+    }
+  }, [refreshTrigger, caseNumber]);
   
   const handleDocumentUploaded = () => {
     // Trigger a refresh of the documents list
@@ -35,16 +52,13 @@ const DocumentsPanel = ({ caseNumber, caseName, documents }: DocumentsPanelProps
       animate={{ opacity: 1, y: 0 }}
       className="lg:col-span-1 bg-card rounded-lg shadow-md p-6 max-h-[calc(100vh-160px)] overflow-auto"
     >
-      <div className="flex justify-between items-start mb-6">
+      <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-xl font-semibold">Documents</h2>
           <p className="text-muted-foreground text-sm">Case: {caseNumber}</p>
         </div>
-      </div>
-      
-      <div className="mb-4">
         <DocumentUploadButton 
-          caseId={caseNumber} 
+          caseId={caseNumber.replace('CASE-', '')} 
           onDocumentUploaded={handleDocumentUploaded} 
         />
       </div>
