@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { getSavedDocument, saveDocument } from '@/utils/documents';
+import { getTemplateContent } from '@/utils/documents/templateData';
+import { getCustomTemplate } from '@/utils/documents/templateManager';
 
 export function useDocumentState(documentId: string | undefined) {
   const navigate = useNavigate();
@@ -59,12 +61,39 @@ export function useDocumentState(documentId: string | undefined) {
       return;
     }
     
-    // Get template or document by ID and set title/content
+    // First check if it's a saved document
     const document = getSavedDocument(id);
     if (document) {
       setDocumentTitle(document.title);
       setDocumentContent(document.content);
       setShowTemplates(false);
+      return;
+    }
+    
+    // Then check if it's a custom template
+    const customTemplate = getCustomTemplate(id);
+    if (customTemplate) {
+      setDocumentTitle(customTemplate.title);
+      setDocumentContent(customTemplate.content);
+      setShowTemplates(false);
+      return;
+    }
+    
+    // Finally check if it's a predefined template
+    const templateContent = getTemplateContent(id);
+    if (templateContent) {
+      // Extract title from id (e.g., "contract-nda" -> "Non-Disclosure Agreement")
+      const idParts = id.split('-');
+      const defaultTitle = idParts.map(part => 
+        part.charAt(0).toUpperCase() + part.slice(1)
+      ).join(' ');
+      
+      setDocumentTitle(defaultTitle);
+      setDocumentContent(templateContent);
+      setShowTemplates(false);
+      toast.success(`Template loaded: ${defaultTitle}`);
+    } else {
+      toast.error('Template not found');
     }
   };
 

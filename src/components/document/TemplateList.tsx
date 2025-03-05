@@ -1,3 +1,4 @@
+
 import { motion } from 'framer-motion';
 import DocumentTemplate from '@/components/DocumentTemplate';
 import { Button } from '@/components/ui/button';
@@ -5,6 +6,8 @@ import TemplateUploadDialog from './TemplateUploadDialog';
 import { getSavedDocuments } from '@/utils/documents';
 import { useEffect, useState } from 'react';
 import { SavedDocument, CustomTemplate } from '@/utils/documents/types';
+import { templates } from '@/utils/documents/templateData';
+import { getCustomTemplates } from '@/utils/documents/templateManager';
 
 interface TemplateListProps {
   onSelectTemplate: (id: string) => void;
@@ -18,37 +21,18 @@ const TemplateList = ({ onSelectTemplate }: TemplateListProps) => {
     // Load saved documents
     setSavedDocuments(getSavedDocuments());
     
-    // Load custom templates (mock data for now)
-    setCustomTemplates([
-      {
-        id: 'template-1',
-        title: 'Legal Memorandum',
-        description: 'Standard legal memorandum template',
-        content: 'MEMORANDUM\n\nTO: [Recipient]\nFROM: [Sender]\nDATE: [Date]\nSUBJECT: [Subject]\n\n1. ISSUE\n\n2. BRIEF ANSWER\n\n3. FACTS\n\n4. DISCUSSION\n\n5. CONCLUSION',
-        category: 'Legal Writing',
-        createdAt: Date.now()
-      },
-      {
-        id: 'template-2',
-        title: 'Contract Agreement',
-        description: 'Basic contract template',
-        content: 'CONTRACT AGREEMENT\n\nThis Agreement is made and entered into on [DATE] by and between:\n\n[PARTY A], with address at [ADDRESS], referred to as "Party A"\n\nand\n\n[PARTY B], with address at [ADDRESS], referred to as "Party B"\n\n1. SCOPE OF WORK\n\n2. PAYMENT\n\n3. TERM AND TERMINATION\n\n4. CONFIDENTIALITY\n\n5. GOVERNING LAW',
-        category: 'Contracts',
-        createdAt: Date.now()
-      }
-    ]);
+    // Load custom templates
+    setCustomTemplates(getCustomTemplates());
   }, []);
   
   const handleCreateBlank = () => {
     // Create a blank document with default title and empty content
-    const blankDocTitle = "Untitled Document";
-    const blankDocContent = "";
     onSelectTemplate('blank');
   };
   
   const handleTemplateAdded = () => {
     // Refresh templates
-    // This would normally call an API or load from storage
+    setCustomTemplates(getCustomTemplates());
   };
   
   const containerVariants = {
@@ -70,34 +54,6 @@ const TemplateList = ({ onSelectTemplate }: TemplateListProps) => {
       transition: { type: 'spring', stiffness: 100, damping: 15 }
     }
   };
-
-  // Mock template data
-  const templates = [
-    {
-      id: 'template-3',
-      title: 'Motion to Dismiss',
-      description: 'Standard motion to dismiss template',
-      category: 'Litigation'
-    },
-    {
-      id: 'template-4',
-      title: 'Settlement Agreement',
-      description: 'Comprehensive settlement template',
-      category: 'Dispute Resolution'
-    },
-    {
-      id: 'template-5',
-      title: 'Legal Brief',
-      description: 'Template for court briefs',
-      category: 'Legal Writing'
-    },
-    {
-      id: 'template-6',
-      title: 'Client Intake Form',
-      description: 'New client information form',
-      category: 'Client Management'
-    }
-  ];
 
   return (
     <motion.div

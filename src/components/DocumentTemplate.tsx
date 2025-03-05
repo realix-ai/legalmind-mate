@@ -2,6 +2,7 @@
 import { cn } from '@/lib/utils';
 import { FileText, Copy, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface DocumentTemplateProps {
   title: string;
@@ -16,8 +17,16 @@ const DocumentTemplate = ({ title, description, category, onClick }: DocumentTem
   
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
+    // Copy template name to clipboard
+    navigator.clipboard.writeText(title)
+      .then(() => {
+        setIsCopied(true);
+        toast.success('Template name copied to clipboard');
+        setTimeout(() => setIsCopied(false), 2000);
+      })
+      .catch(() => {
+        toast.error('Failed to copy template name');
+      });
   };
   
   const getCategoryColor = (category: string) => {
