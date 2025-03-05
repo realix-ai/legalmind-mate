@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Dialog,
@@ -140,27 +139,21 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onOpenChange }) =
         </DialogHeader>
         
         <div className="py-4 space-y-6">
-          <div className="flex justify-center mb-4">
-            <TabsList className="grid w-[300px] grid-cols-2">
-              <TabsTrigger 
-                value="monthly" 
-                onClick={() => setViewMode('monthly')}
-                className={viewMode === 'monthly' ? 'data-[state=active]' : ''}
-              >
-                Monthly Billing
-              </TabsTrigger>
-              <TabsTrigger 
-                value="yearly" 
-                onClick={() => setViewMode('yearly')}
-                className={viewMode === 'yearly' ? 'data-[state=active]' : ''}
-              >
-                Yearly Billing
-                <Badge variant="outline" className="ml-2 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
-                  Save 17%
-                </Badge>
-              </TabsTrigger>
-            </TabsList>
-          </div>
+          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'monthly' | 'yearly')}>
+            <div className="flex justify-center mb-4">
+              <TabsList className="grid w-[300px] grid-cols-2">
+                <TabsTrigger value="monthly">
+                  Monthly Billing
+                </TabsTrigger>
+                <TabsTrigger value="yearly">
+                  Yearly Billing
+                  <Badge variant="outline" className="ml-2 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+                    Save 17%
+                  </Badge>
+                </TabsTrigger>
+              </TabsList>
+            </div>
+          </Tabs>
           
           <div className="grid gap-6 md:grid-cols-3">
             {subscriptionPlans.map((plan) => (
