@@ -1,4 +1,3 @@
-
 import { Case, SavedDocument } from './types';
 import { getSavedDocuments, updateDocumentCaseId, normalizeCaseId } from './documentManager';
 
@@ -33,14 +32,15 @@ export const getCases = (): Case[] => {
 
 export const getCase = (id: string): Case | null => {
   const cases = getCases();
-  // Use normalized case ID for comparison
+  // Always normalize the case ID before comparison
   const normalizedId = normalizeCaseId(id);
+  console.log("Getting case with normalized ID:", normalizedId);
   return cases.find(c => c.id === normalizedId) || null;
 };
 
 export const deleteCase = (id: string): void => {
   const cases = getCases();
-  // Use normalized case ID for comparison
+  // Always normalize the case ID before comparison
   const normalizedId = normalizeCaseId(id);
   const filtered = cases.filter(c => c.id !== normalizedId);
   localStorage.setItem('cases', JSON.stringify(filtered));
@@ -56,9 +56,22 @@ export const deleteCase = (id: string): void => {
 
 export const getCaseDocuments = (caseId: string): SavedDocument[] => {
   const documents = getSavedDocuments();
-  // Use normalized case ID for comparison
+  // Always normalize the case ID before comparison
   const normalizedId = normalizeCaseId(caseId);
-  return documents.filter(doc => doc.caseId === normalizedId);
+  console.log("Getting documents for normalized case ID:", normalizedId);
+  console.log("All documents:", documents);
+  
+  const filteredDocs = documents.filter(doc => {
+    const docCaseMatch = doc.caseId === normalizedId;
+    // Debug logging for document case matching
+    if (doc.caseId) {
+      console.log(`Comparing document.caseId ${doc.caseId} with normalizedId ${normalizedId}: ${docCaseMatch}`);
+    }
+    return docCaseMatch;
+  });
+  
+  console.log("Filtered documents:", filteredDocs);
+  return filteredDocs;
 };
 
 export const getCaseDocumentsContent = (caseId: string): Array<{id: string, title: string, content: string}> => {

@@ -30,14 +30,18 @@ const DocumentsPanel = ({ caseNumber, caseName, documents: initialDocuments }: D
     if (caseNumber) {
       // Extract case ID from the displayed case number (e.g., "CASE-12345")
       let caseIdFromNumber = '';
+      
+      // Handle different case number formats
       if (caseNumber.startsWith('CASE-')) {
         caseIdFromNumber = `case-${caseNumber.substring(5)}`;
       } else {
+        // If it's already a case ID format, just normalize it
         caseIdFromNumber = normalizeCaseId(caseNumber);
       }
       
-      console.log("Loading documents for case ID:", caseIdFromNumber);
+      console.log("Loading documents for normalized case ID:", caseIdFromNumber);
       
+      // Get documents using the normalized case ID
       const docs = getCaseDocuments(caseIdFromNumber);
       console.log("Retrieved documents:", docs);
       

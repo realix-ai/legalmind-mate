@@ -2,14 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { getCase, getCaseDocuments } from '@/utils/documents';
-
-// Helper function to normalize case IDs
-const normalizeCaseId = (caseId: string): string => {
-  if (!caseId) return '';
-  // Ensure the ID starts with 'case-'
-  return caseId.startsWith('case-') ? caseId : `case-${caseId.replace(/^case-/, '')}`;
-};
+import { getCase, getCaseDocuments, normalizeCaseId } from '@/utils/documents';
 
 export function useCaseData(caseId: string | undefined) {
   const navigate = useNavigate();
@@ -25,6 +18,7 @@ export function useCaseData(caseId: string | undefined) {
     
     const loadCase = () => {
       try {
+        // Always normalize the case ID consistently
         const normalizedCaseId = normalizeCaseId(caseId);
         console.log("Loading case with normalized ID:", normalizedCaseId);
         
@@ -36,7 +30,7 @@ export function useCaseData(caseId: string | undefined) {
             caseNumber: `CASE-${caseInfo.id.substring(5, 10)}`
           });
           
-          // Use the normalized caseId for getting documents
+          // Use the normalized case ID for getting documents
           const docs = getCaseDocuments(normalizedCaseId);
           console.log(`Found ${docs.length} documents for case:`, normalizedCaseId);
           

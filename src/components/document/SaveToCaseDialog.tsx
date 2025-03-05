@@ -69,10 +69,18 @@ const SaveToCaseDialog = ({
         caseId = newCase.id;
       }
       
-      // The caseId will be normalized in the saveDocument function
-      const saved = saveDocument(documentTitle, documentContent, currentDocumentId, caseId);
+      // Debug output
+      console.log("Saving document to case ID:", caseId);
+      
+      // Normalize the case ID before saving
+      const normalizedCaseId = normalizeCaseId(caseId);
+      console.log("Normalized case ID:", normalizedCaseId);
+      
+      // Save document with normalized case ID
+      const saved = saveDocument(documentTitle, documentContent, currentDocumentId, normalizedCaseId);
       
       toast.success(`Document saved to ${isCreatingCase ? `new case "${newCaseName}"` : 'the selected case'}`);
+      console.log("Document saved with case ID:", saved.caseId);
       
       setOpen(false);
       onSaved(saved.id);
