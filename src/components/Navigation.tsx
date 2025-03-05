@@ -1,16 +1,9 @@
 
 import { useState, useEffect } from 'react';
-import { useLocation, Link } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { 
-  Search, 
-  FileText, 
-  Briefcase, 
-  Settings, 
-  Menu, 
-  X
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useLocation } from 'react-router-dom';
+import { Search, FileText, Briefcase, Settings } from 'lucide-react';
+import NavBar from './navigation/NavBar';
+import MobileMenu from './navigation/MobileMenu';
 
 const Navigation = () => {
   const location = useLocation();
@@ -39,111 +32,18 @@ const Navigation = () => {
 
   return (
     <>
-      {/* Desktop Navigation */}
-      <nav 
-        className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
-          isScrolled 
-            ? "py-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg shadow-sm" 
-            : isLandingPage 
-              ? "py-5 bg-transparent" 
-              : "py-5 bg-white dark:bg-gray-900"
-        )}
-      >
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md">
-                <span className="text-white font-semibold text-xl">R</span>
-              </div>
-              <span className="font-medium text-xl hidden sm:block">Realix.ai</span>
-            </Link>
-            
-            {!isLandingPage && (
-              <div className="hidden md:flex items-center space-x-1">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={cn(
-                      "px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition-all duration-200",
-                      location.pathname === item.path
-                        ? "bg-primary text-white"
-                        : "text-muted-foreground hover:bg-secondary"
-                    )}
-                  >
-                    {item.icon}
-                    <span>{item.name}</span>
-                  </Link>
-                ))}
-              </div>
-            )}
-            
-            <div className="hidden md:flex items-center space-x-2">
-              {!isLandingPage && (
-                <button className="p-2 rounded-full hover:bg-secondary transition-all duration-200">
-                  <Settings className="h-5 w-5 text-muted-foreground" />
-                </button>
-              )}
-            </div>
-            
-            <button 
-              className="md:hidden p-2 rounded-full hover:bg-secondary transition-all duration-200"
-              onClick={() => setIsMobileMenuOpen(true)}
-            >
-              <Menu className="h-6 w-6" />
-            </button>
-          </div>
-        </div>
-      </nav>
+      <NavBar 
+        isScrolled={isScrolled}
+        isLandingPage={isLandingPage}
+        navItems={navItems}
+        onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
+      />
       
-      {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-background">
-          <div className="flex flex-col h-full">
-            <div className="p-4 flex justify-between items-center border-b">
-              <Link to="/" className="flex items-center gap-2">
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md">
-                  <span className="text-white font-semibold text-xl">R</span>
-                </div>
-                <span className="font-medium text-xl">Realix.ai</span>
-              </Link>
-              <button 
-                className="p-2 rounded-full hover:bg-secondary transition-all duration-200"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-            
-            <div className="flex-1 overflow-auto p-4">
-              <div className="space-y-2">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={cn(
-                      "p-3 rounded-lg flex items-center gap-3 transition-all duration-200",
-                      location.pathname === item.path
-                        ? "bg-primary text-white"
-                        : "text-foreground hover:bg-secondary"
-                    )}
-                  >
-                    {item.icon}
-                    <span className="font-medium">{item.name}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-            
-            <div className="p-4 border-t">
-              <button className="w-full p-3 rounded-lg flex items-center gap-3 hover:bg-secondary transition-all duration-200">
-                <Settings className="h-5 w-5" />
-                <span className="font-medium">Settings</span>
-              </button>
-            </div>
-          </div>
-        </div>
+        <MobileMenu 
+          navItems={navItems}
+          onClose={() => setIsMobileMenuOpen(false)}
+        />
       )}
     </>
   );
