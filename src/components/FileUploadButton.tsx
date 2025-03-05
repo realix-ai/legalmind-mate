@@ -40,7 +40,7 @@ const FileUploadButton = ({ onClick, isProcessing, hasFiles }: FileUploadButtonP
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Upload documents</p>
+          <p>Upload documents or drag files here</p>
         </TooltipContent>
       </Tooltip>
       <input
