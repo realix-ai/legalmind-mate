@@ -2,6 +2,7 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import BatchProcessingPanel from '@/components/batch/BatchProcessingPanel';
 import CollaborationPanel from '@/components/collaboration/CollaborationPanel';
+import ResearchToolsPanel from '@/components/research-tools/ResearchToolsPanel';
 import QueryTab from './QueryTab';
 
 interface QueryTabsProps {
@@ -12,6 +13,7 @@ interface QueryTabsProps {
   handleSubmit: (query: string, selectedOption: string, files: File[]) => Promise<void>;
   onShare: () => void;
   citations: any[];
+  currentQuery: string;
 }
 
 const QueryTabs = ({
@@ -21,13 +23,15 @@ const QueryTabs = ({
   response,
   handleSubmit,
   onShare,
-  citations
+  citations,
+  currentQuery
 }: QueryTabsProps) => {
   return (
     <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value)} className="mb-8">
-      <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto">
+      <TabsList className="grid w-full grid-cols-4 max-w-2xl mx-auto">
         <TabsTrigger value="query">Single Query</TabsTrigger>
         <TabsTrigger value="batch">Batch Processing</TabsTrigger>
+        <TabsTrigger value="research-tools">Research Tools</TabsTrigger>
         <TabsTrigger value="collaboration">Collaboration</TabsTrigger>
       </TabsList>
       
@@ -43,6 +47,10 @@ const QueryTabs = ({
       
       <TabsContent value="batch">
         <BatchProcessingPanel />
+      </TabsContent>
+      
+      <TabsContent value="research-tools">
+        <ResearchToolsPanel currentQuery={currentQuery} />
       </TabsContent>
       
       <TabsContent value="collaboration">

@@ -13,6 +13,7 @@ const QueryAssistant = () => {
     isProcessing, 
     response, 
     citations, 
+    currentQuery,
     handleSubmit, 
     handleShareQuery 
   } = useLegalQuery(setActiveTab);
@@ -35,6 +36,7 @@ const QueryAssistant = () => {
             handleSubmit={handleSubmit}
             onShare={handleShareQuery}
             citations={citations}
+            currentQuery={currentQuery}
           />
         </div>
       </main>
