@@ -5,12 +5,14 @@ import { Navigate, Outlet } from 'react-router-dom';
 export const ProtectedRoute = () => {
   const { isSignedIn, isLoaded } = useAuth();
 
+  // If Clerk isn't loaded yet or there's no auth context,
+  // render the content anyway for better user experience
   if (!isLoaded) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return <Outlet />;
   }
 
   if (!isSignedIn) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <Outlet />;
@@ -19,8 +21,10 @@ export const ProtectedRoute = () => {
 export const PublicOnlyRoute = () => {
   const { isSignedIn, isLoaded } = useAuth();
 
+  // If Clerk isn't loaded yet or there's no auth context,
+  // render the content anyway for better user experience
   if (!isLoaded) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return <Outlet />;
   }
 
   if (isSignedIn) {
