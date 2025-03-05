@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { ChatMessageProps } from '@/components/case/ChatMessage';
+import { ChatMessageProps, ChatFileAttachment } from '@/components/case/ChatMessage';
 import { 
   getChatMessages, 
   saveChatMessages, 
@@ -51,15 +51,26 @@ export function useChatMessages(caseId: string | undefined, caseName: string | u
     }
   }, [caseId, caseName]);
 
-  const handleSendMessage = async (currentMessage: string) => {
+  const handleSendMessage = async (currentMessage: string, files?: File[]) => {
     if (!caseId || !caseName) return;
+    
+    // Convert files to file attachments for the message
+    const fileAttachments: ChatFileAttachment[] = files?.map(file => ({
+      name: file.name,
+      type: file.type,
+      size: file.size
+    })) || [];
+    
+    // Create message content
+    let messageContent = currentMessage.trim();
     
     // Add user message
     const userMessage: ChatMessageProps = {
       id: `msg-${Date.now()}`,
-      content: currentMessage,
+      content: messageContent,
       sender: 'user',
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      files: fileAttachments.length > 0 ? fileAttachments : undefined
     };
     
     const updatedMessages = [...messages, userMessage];
@@ -74,7 +85,8 @@ export function useChatMessages(caseId: string | undefined, caseName: string | u
       const aiResponse = await generateAIResponse(
         caseId,
         caseName,
-        updatedMessages
+        updatedMessages,
+        files
       );
       
       const messagesWithAiResponse = [...updatedMessages, aiResponse];

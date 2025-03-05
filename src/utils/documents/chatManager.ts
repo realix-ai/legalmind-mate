@@ -1,4 +1,5 @@
-import { ChatMessageProps } from '@/components/case/ChatMessage';
+
+import { ChatMessageProps, ChatFileAttachment } from '@/components/case/ChatMessage';
 import { getCaseDocumentsContent } from './caseManager';
 
 // Maximum number of messages to keep in conversation context
@@ -120,7 +121,14 @@ export const getConversationContext = (messages: ChatMessageProps[]): string => 
   // Format them into a single string for context
   return contextMessages.map(msg => {
     const role = msg.sender === 'user' ? 'User' : 'Assistant';
-    return `${role}: ${msg.content}`;
+    let message = `${role}: ${msg.content}`;
+    
+    // Add file information if present
+    if (msg.files && msg.files.length > 0) {
+      message += `\n[Attached ${msg.files.length} file(s): ${msg.files.map(f => f.name).join(', ')}]`;
+    }
+    
+    return message;
   }).join('\n\n');
 };
 
@@ -128,7 +136,8 @@ export const getConversationContext = (messages: ChatMessageProps[]): string => 
 export const generateAIResponse = async (
   caseId: string,
   caseName: string,
-  messages: ChatMessageProps[]
+  messages: ChatMessageProps[],
+  uploadedFiles?: File[]
 ): Promise<ChatMessageProps> => {
   // Get conversation context
   const context = getConversationContext(messages);
@@ -138,21 +147,71 @@ export const generateAIResponse = async (
   console.log(`Found ${caseDocuments.length} documents for case ${caseId}`);
   
   // Extract the last user message
-  const lastUserMessage = messages.filter(m => m.sender === 'user').pop()?.content || '';
+  const lastUserMessage = messages.filter(m => m.sender === 'user').pop();
+  const lastUserContent = lastUserMessage?.content || '';
+  const lastUserFiles = lastUserMessage?.files || [];
   
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 1500));
   
   let aiResponse = '';
   
+  // Check if user uploaded files in the most recent message
+  if (uploadedFiles && uploadedFiles.length > 0) {
+    aiResponse = `I've received ${uploadedFiles.length} file${uploadedFiles.length === 1 ? '' : 's'} from you:\n\n`;
+    
+    uploadedFiles.forEach((file, index) => {
+      aiResponse += `${index + 1}. **${file.name}** (${(file.size / 1024).toFixed(1)} KB)\n`;
+      
+      // Add file type specific response
+      if (file.type.includes('pdf')) {
+        aiResponse += `   This appears to be a PDF document. I can see the contents of this document.\n\n`;
+      } else if (file.type.includes('image')) {
+        aiResponse += `   This appears to be an image. I can see what's in this image.\n\n`;
+      } else if (file.type.includes('word') || file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
+        aiResponse += `   This appears to be a Word document. I can see the contents of this document.\n\n`;
+      } else if (file.type.includes('text') || file.name.endsWith('.txt')) {
+        aiResponse += `   This appears to be a text file. I can see the contents of this file.\n\n`;
+      } else {
+        aiResponse += `   I can see the contents of this file.\n\n`;
+      }
+    });
+    
+    // Add a response to their message if they included text
+    if (lastUserContent.trim()) {
+      aiResponse += `\nRegarding your message: "${lastUserContent}"\n\n`;
+      
+      // Add a contextual response based on the message
+      if (lastUserContent.toLowerCase().includes('analyze') || 
+          lastUserContent.toLowerCase().includes('review')) {
+        aiResponse += `I'll help analyze these files in the context of your case "${caseName}". The documents appear to contain information relevant to your case. Let me know if you need any specific details from them.`;
+      } else if (lastUserContent.toLowerCase().includes('summarize')) {
+        aiResponse += `I'll summarize the key points from these files for your case "${caseName}". The documents contain information that could be useful for your legal strategy. Let me know if you'd like me to focus on any particular aspects.`;
+      } else {
+        aiResponse += `I'll review these files in relation to your case "${caseName}". They contain information that might be relevant to your legal matters. Feel free to ask me specific questions about the content.`;
+      }
+    } else {
+      // Generic response if no message text
+      aiResponse += `I've added these files to the case "${caseName}". Would you like me to analyze their contents or extract specific information from them?`;
+    }
+    
+    // Note about file storage
+    aiResponse += `\n\nNote: These files are now associated with this conversation session. You can reference them in future messages.`;
+  }
   // Check if user is asking about documents
-  if (lastUserMessage.toLowerCase().includes('document') || 
-      lastUserMessage.toLowerCase().includes('file') || 
-      lastUserMessage.toLowerCase().includes('content') ||
-      lastUserMessage.toLowerCase().includes('information')) {
+  else if (lastUserContent.toLowerCase().includes('document') || 
+      lastUserContent.toLowerCase().includes('file') || 
+      lastUserContent.toLowerCase().includes('content') ||
+      lastUserContent.toLowerCase().includes('information')) {
     
     if (caseDocuments.length === 0) {
-      aiResponse = `I don't see any documents associated with "${caseName}" yet. You can add documents to this case from the document drafting page.`;
+      aiResponse = `I don't see any documents associated with "${caseName}" yet. You can add documents by:
+      
+1. Using the document drafting page to create new documents
+2. Uploading files directly in this chat using the paperclip icon below
+3. Importing existing documents from other sources
+
+Would you like me to help you create a new document for this case?`;
     } else {
       // Construct response based on available documents
       aiResponse = `I found ${caseDocuments.length} document(s) related to case "${caseName}":\n\n`;
@@ -166,7 +225,7 @@ export const generateAIResponse = async (
       });
       
       // Attempt to answer the specific query based on document content
-      if (lastUserMessage.toLowerCase().includes('summary') || lastUserMessage.toLowerCase().includes('summarize')) {
+      if (lastUserContent.toLowerCase().includes('summary') || lastUserContent.toLowerCase().includes('summarize')) {
         aiResponse += `\nHere's a brief summary of the documents: The documents appear to be related to ${
           caseDocuments[0].title.includes('contract') ? 'contractual matters' : 
           caseDocuments[0].title.includes('legal') ? 'legal proceedings' : 
@@ -176,7 +235,7 @@ export const generateAIResponse = async (
     }
   } 
   // Use different response types based on conversation
-  else if (lastUserMessage.toLowerCase().includes('deadline') || lastUserMessage.toLowerCase().includes('date')) {
+  else if (lastUserContent.toLowerCase().includes('deadline') || lastUserContent.toLowerCase().includes('date')) {
     aiResponse = `Based on our previous conversation about "${caseName}", I notice there are some important deadlines coming up. The main filing deadline appears to be ${new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toLocaleDateString()}.`;
     
     // Add document-specific date information if available
@@ -192,13 +251,23 @@ export const generateAIResponse = async (
       }
     }
   }
-  else if (lastUserMessage.toLowerCase().includes('summary') || lastUserMessage.toLowerCase().includes('overview')) {
-    aiResponse = `Here's a summary of case "${caseName}" based on our discussion so far:\n\n1. Case involves ${['contract dispute', 'intellectual property', 'employment law', 'regulatory compliance'][Math.floor(Math.random() * 4)]}\n2. Current stage: ${['Initial filing', 'Discovery', 'Pre-trial', 'Settlement negotiation'][Math.floor(Math.random() * 4)]}\n3. Key concerns we've discussed: ${lastUserMessage.substring(0, 20)}...`;
+  else if (lastUserContent.toLowerCase().includes('summary') || lastUserContent.toLowerCase().includes('overview')) {
+    aiResponse = `Here's a summary of case "${caseName}" based on our discussion so far:\n\n1. Case involves ${['contract dispute', 'intellectual property', 'employment law', 'regulatory compliance'][Math.floor(Math.random() * 4)]}\n2. Current stage: ${['Initial filing', 'Discovery', 'Pre-trial', 'Settlement negotiation'][Math.floor(Math.random() * 4)]}\n3. Key concerns we've discussed: ${lastUserContent.substring(0, 20)}...`;
     
     // Add document count if available
     if (caseDocuments.length > 0) {
       aiResponse += `\n4. Case has ${caseDocuments.length} associated document(s)`;
     }
+  }
+  else if (lastUserContent.toLowerCase().includes('upload') || lastUserContent.toLowerCase().includes('attach')) {
+    aiResponse = `You can upload files to this case by clicking the paperclip icon in the message input area. This allows you to:
+
+1. Upload PDF documents
+2. Upload Word documents (.doc, .docx)
+3. Upload text files (.txt)
+4. Upload images (.jpg, .png)
+
+Files you upload will be associated with this conversation and I can help analyze their contents in the context of your case "${caseName}".`;
   }
   else {
     // Generic responses that reference previous conversation and documents
@@ -215,6 +284,9 @@ export const generateAIResponse = async (
     if (caseDocuments.length > 0) {
       aiResponse += `\n\nBy the way, I have access to ${caseDocuments.length} document(s) associated with this case. Let me know if you'd like me to provide information from any of them.`;
     }
+    
+    // Remind about file upload capability
+    aiResponse += `\n\nRemember, you can also upload files directly to this conversation using the paperclip icon below.`;
   }
   
   return {

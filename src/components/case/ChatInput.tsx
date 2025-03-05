@@ -7,9 +7,10 @@ import ChatHistory from '@/components/case/ChatHistory';
 import { ChatMessageProps } from '@/components/case/ChatMessage';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import PromptManager from '@/components/PromptManager';
+import FilesUploadButton from '@/components/case-chat/FilesUploadButton';
 
 interface ChatInputProps {
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, files?: File[]) => void;
   isDisabled: boolean;
   messages: ChatMessageProps[];
   onNewDialog: () => void;
@@ -18,13 +19,15 @@ interface ChatInputProps {
 const ChatInput = ({ onSendMessage, isDisabled, messages, onNewDialog }: ChatInputProps) => {
   const [currentMessage, setCurrentMessage] = useState('');
   const [showPrompts, setShowPrompts] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   
   const handleSendMessage = () => {
-    if (!currentMessage.trim()) return;
+    if (!currentMessage.trim() && uploadedFiles.length === 0) return;
     
-    // Send message
-    onSendMessage(currentMessage);
+    // Send message with any uploaded files
+    onSendMessage(currentMessage, uploadedFiles);
     setCurrentMessage('');
+    setUploadedFiles([]);
   };
   
   const handleSelectHistoryMessage = (messageText: string) => {
@@ -34,6 +37,10 @@ const ChatInput = ({ onSendMessage, isDisabled, messages, onNewDialog }: ChatInp
   const handleSelectPrompt = (promptText: string) => {
     setCurrentMessage(promptText);
     setShowPrompts(false);
+  };
+  
+  const handleFilesUploaded = (files: File[]) => {
+    setUploadedFiles(prev => [...prev, ...files]);
   };
 
   // Auto-resize textarea based on content
@@ -97,11 +104,46 @@ const ChatInput = ({ onSendMessage, isDisabled, messages, onNewDialog }: ChatInp
         </Popover>
       </div>
       
+      {uploadedFiles.length > 0 && (
+        <div className="mb-3 p-2 bg-muted rounded-md">
+          <div className="flex justify-between items-center mb-1.5">
+            <div className="text-sm font-medium">
+              Uploaded Files ({uploadedFiles.length})
+            </div>
+            <button
+              type="button"
+              className="text-xs text-destructive hover:underline"
+              onClick={() => setUploadedFiles([])}
+            >
+              Remove All
+            </button>
+          </div>
+          <div className="space-y-1.5">
+            {uploadedFiles.map((file, index) => (
+              <div key={index} className="flex justify-between items-center text-xs p-1.5 bg-background rounded">
+                <span className="truncate max-w-[240px]">{file.name}</span>
+                <button
+                  type="button"
+                  className="text-xs text-destructive hover:underline"
+                  onClick={() => {
+                    const newFiles = [...uploadedFiles];
+                    newFiles.splice(index, 1);
+                    setUploadedFiles(newFiles);
+                  }}
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
       <div className="flex gap-3 items-end">
         <Textarea 
           value={currentMessage}
           onChange={handleTextareaChange}
-          placeholder="Type a new message or select from history..."
+          placeholder={uploadedFiles.length > 0 ? "Add a message about your files..." : "Type a new message or select from history..."}
           className="flex-1 min-h-[48px] max-h-[120px] bg-background border shadow-sm focus-visible:ring-primary resize-none overflow-y-auto py-3 px-4 rounded-xl"
           disabled={isDisabled}
           style={{ height: '48px' }} // Initial height
@@ -113,10 +155,15 @@ const ChatInput = ({ onSendMessage, isDisabled, messages, onNewDialog }: ChatInp
           }}
         />
         
+        <FilesUploadButton 
+          onFilesUploaded={handleFilesUploaded}
+          isDisabled={isDisabled}
+        />
+        
         <Button 
           type="submit"
           onClick={handleSendMessage}
-          disabled={!currentMessage.trim() || isDisabled}
+          disabled={(!currentMessage.trim() && uploadedFiles.length === 0) || isDisabled}
           className="h-12 w-12 rounded-full shadow-sm"
           size="icon"
         >
