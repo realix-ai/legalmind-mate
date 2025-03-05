@@ -36,13 +36,15 @@ const Signup = () => {
         await setActive({ session: result.createdSessionId });
         toast.success('Account created successfully');
         navigate('/');
-      } else if (result.status === 'needs_verification') {
-        // Handle email verification if needed
-        toast.info('Please check your email to verify your account');
-        navigate('/verify-email');
       } else {
-        console.error('Sign up failed', result);
-        toast.error('Something went wrong during sign up');
+        // Handle verification or other statuses
+        if (result.status === 'needs_verification') {
+          toast.info('Please check your email to verify your account');
+          navigate('/verify-email');
+        } else {
+          console.error('Sign up failed', result);
+          toast.error('Something went wrong during sign up');
+        }
       }
     } catch (err: any) {
       console.error('Error during sign up:', err);
