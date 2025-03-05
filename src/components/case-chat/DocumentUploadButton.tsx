@@ -4,6 +4,7 @@ import { Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
+import { saveDocument } from '@/utils/documents';
 
 interface DocumentUploadButtonProps {
   caseId?: string;
@@ -97,26 +98,63 @@ const DocumentUploadButton = ({ caseId, onDocumentUploaded }: DocumentUploadButt
           return;
         }
         
-        // Continue with valid files
-        // In a real application, you would upload these files to your backend
-        // For now, we'll just simulate a successful upload
-        setTimeout(() => {
+        // Process and save valid files
+        Promise.all(validFiles.map(file => {
+          return new Promise<void>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const content = e.target?.result as string || 'File content placeholder';
+              // Save the document with the file name as title
+              saveDocument(file.name, content, null, caseId);
+              resolve();
+            };
+            
+            if (file.type.includes('image') || 
+                file.name.endsWith('.jpg') || 
+                file.name.endsWith('.jpeg') || 
+                file.name.endsWith('.png')) {
+              reader.readAsDataURL(file);
+            } else {
+              reader.readAsText(file);
+            }
+          });
+        })).then(() => {
+          // All files have been processed
           toast.success(`${validFiles.length} document${validFiles.length === 1 ? '' : 's'} uploaded to case`);
           setIsUploading(false);
           
           // Call the callback to refresh the documents list
           onDocumentUploaded();
-        }, 1500);
+        });
       } else {
         // All files are valid
-        // Simulate upload
-        setTimeout(() => {
+        Promise.all(files.map(file => {
+          return new Promise<void>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const content = e.target?.result as string || 'File content placeholder';
+              // Save the document with the file name as title
+              saveDocument(file.name, content, null, caseId);
+              resolve();
+            };
+            
+            if (file.type.includes('image') || 
+                file.name.endsWith('.jpg') || 
+                file.name.endsWith('.jpeg') || 
+                file.name.endsWith('.png')) {
+              reader.readAsDataURL(file);
+            } else {
+              reader.readAsText(file);
+            }
+          });
+        })).then(() => {
+          // All files have been processed
           toast.success(`${files.length} document${files.length === 1 ? '' : 's'} uploaded to case`);
           setIsUploading(false);
           
           // Call the callback to refresh the documents list
           onDocumentUploaded();
-        }, 1500);
+        });
       }
       
       // Reset input
