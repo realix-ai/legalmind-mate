@@ -18,7 +18,8 @@ import { toast } from 'sonner';
 import { 
   saveDocument, 
   getCases, 
-  createCase 
+  createCase,
+  normalizeCaseId
 } from '@/utils/documents';
 
 interface SaveToCaseDialogProps {
@@ -68,11 +69,7 @@ const SaveToCaseDialog = ({
         caseId = newCase.id;
       }
       
-      // Make sure caseId is properly formatted (ensure it starts with "case-")
-      if (caseId && !caseId.startsWith('case-')) {
-        caseId = `case-${caseId.replace(/^case-/, '')}`;
-      }
-      
+      // The caseId will be normalized in the saveDocument function
       const saved = saveDocument(documentTitle, documentContent, currentDocumentId, caseId);
       
       toast.success(`Document saved to ${isCreatingCase ? `new case "${newCaseName}"` : 'the selected case'}`);

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -5,7 +6,7 @@ import { FileText, MoreHorizontal, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import DocumentUploadButton from '@/components/case-chat/DocumentUploadButton';
-import { getCaseDocuments } from '@/utils/documents';
+import { getCaseDocuments, normalizeCaseId } from '@/utils/documents';
 
 interface Document {
   id: string;
@@ -20,24 +21,6 @@ interface DocumentsPanelProps {
   documents: Document[];
 }
 
-// Helper function to normalize case IDs
-const normalizeCaseId = (displayedCaseNumber: string): string => {
-  if (!displayedCaseNumber) return '';
-  
-  // If it already starts with 'case-', return it
-  if (displayedCaseNumber.startsWith('case-')) {
-    return displayedCaseNumber;
-  }
-  
-  // If it starts with 'CASE-', convert to lowercase and add 'case-' prefix
-  if (displayedCaseNumber.startsWith('CASE-')) {
-    return `case-${displayedCaseNumber.substring(5)}`;
-  }
-  
-  // Otherwise, just ensure it has the 'case-' prefix
-  return `case-${displayedCaseNumber.replace(/^case-/, '')}`;
-};
-
 const DocumentsPanel = ({ caseNumber, caseName, documents: initialDocuments }: DocumentsPanelProps) => {
   const navigate = useNavigate();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -45,10 +28,17 @@ const DocumentsPanel = ({ caseNumber, caseName, documents: initialDocuments }: D
   
   useEffect(() => {
     if (caseNumber) {
-      const normalizedCaseId = normalizeCaseId(caseNumber);
-      console.log("Loading documents for normalized case ID:", normalizedCaseId);
+      // Extract case ID from the displayed case number (e.g., "CASE-12345")
+      let caseIdFromNumber = '';
+      if (caseNumber.startsWith('CASE-')) {
+        caseIdFromNumber = `case-${caseNumber.substring(5)}`;
+      } else {
+        caseIdFromNumber = normalizeCaseId(caseNumber);
+      }
       
-      const docs = getCaseDocuments(normalizedCaseId);
+      console.log("Loading documents for case ID:", caseIdFromNumber);
+      
+      const docs = getCaseDocuments(caseIdFromNumber);
       console.log("Retrieved documents:", docs);
       
       setDocuments(docs.map(doc => ({
@@ -76,7 +66,7 @@ const DocumentsPanel = ({ caseNumber, caseName, documents: initialDocuments }: D
           <p className="text-muted-foreground text-sm">Case: {caseNumber}</p>
         </div>
         <DocumentUploadButton 
-          caseId={normalizeCaseId(caseNumber)} 
+          caseId={normalizeCaseId(caseNumber.startsWith('CASE-') ? `case-${caseNumber.substring(5)}` : caseNumber)} 
           onDocumentUploaded={handleDocumentUploaded} 
         />
       </div>

@@ -1,16 +1,18 @@
-
 import { SavedDocument } from './types';
 
 // Document storage functions
 export const saveDocument = (title: string, content: string, id?: string | null, caseId?: string): SavedDocument => {
   const savedDocuments = getSavedDocuments();
   
+  // Normalize the caseId if it exists
+  const normalizedCaseId = caseId ? normalizeCaseId(caseId) : undefined;
+  
   const newDocument: SavedDocument = {
     id: id || `doc-${Date.now()}`,
     title,
     content,
     lastModified: Date.now(),
-    caseId
+    caseId: normalizedCaseId
   };
   
   const existingIndex = id ? savedDocuments.findIndex(doc => doc.id === id) : -1;
@@ -57,11 +59,27 @@ export const updateDocumentCaseId = (documentId: string, caseId?: string): Saved
   
   if (index === -1) return null;
   
+  // Normalize the caseId if it exists
+  const normalizedCaseId = caseId ? normalizeCaseId(caseId) : undefined;
+  
   documents[index] = {
     ...documents[index],
-    caseId
+    caseId: normalizedCaseId
   };
   
   localStorage.setItem('savedDocuments', JSON.stringify(documents));
   return documents[index];
+};
+
+// Helper function to normalize case IDs
+export const normalizeCaseId = (caseId: string): string => {
+  if (!caseId) return '';
+  
+  // If it already starts with 'case-', return it
+  if (caseId.startsWith('case-')) {
+    return caseId;
+  }
+  
+  // Otherwise, ensure it has the 'case-' prefix
+  return `case-${caseId.replace(/^case-/, '')}`;
 };

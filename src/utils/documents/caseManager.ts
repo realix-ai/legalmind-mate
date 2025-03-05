@@ -1,5 +1,6 @@
+
 import { Case, SavedDocument } from './types';
-import { getSavedDocuments, updateDocumentCaseId } from './documentManager';
+import { getSavedDocuments, updateDocumentCaseId, normalizeCaseId } from './documentManager';
 
 // Case management functions
 export const createCase = (name: string): Case => {
@@ -32,18 +33,22 @@ export const getCases = (): Case[] => {
 
 export const getCase = (id: string): Case | null => {
   const cases = getCases();
-  return cases.find(c => c.id === id) || null;
+  // Use normalized case ID for comparison
+  const normalizedId = normalizeCaseId(id);
+  return cases.find(c => c.id === normalizedId) || null;
 };
 
 export const deleteCase = (id: string): void => {
   const cases = getCases();
-  const filtered = cases.filter(c => c.id !== id);
+  // Use normalized case ID for comparison
+  const normalizedId = normalizeCaseId(id);
+  const filtered = cases.filter(c => c.id !== normalizedId);
   localStorage.setItem('cases', JSON.stringify(filtered));
   
   // Also remove case association from documents
   const documents = getSavedDocuments();
   documents.forEach(doc => {
-    if (doc.caseId === id) {
+    if (doc.caseId === normalizedId) {
       updateDocumentCaseId(doc.id, undefined);
     }
   });
@@ -51,7 +56,9 @@ export const deleteCase = (id: string): void => {
 
 export const getCaseDocuments = (caseId: string): SavedDocument[] => {
   const documents = getSavedDocuments();
-  return documents.filter(doc => doc.caseId === caseId);
+  // Use normalized case ID for comparison
+  const normalizedId = normalizeCaseId(caseId);
+  return documents.filter(doc => doc.caseId === normalizedId);
 };
 
 export const getCaseDocumentsContent = (caseId: string): Array<{id: string, title: string, content: string}> => {
@@ -88,7 +95,9 @@ export const updateCaseNotes = (id: string, notes: string): Case | null => {
 
 export const updateCaseDetails = (id: string, updates: Partial<Omit<Case, 'id' | 'createdAt'>>): Case | null => {
   const cases = getCases();
-  const index = cases.findIndex(c => c.id === id);
+  // Use normalized case ID for comparison
+  const normalizedId = normalizeCaseId(id);
+  const index = cases.findIndex(c => c.id === normalizedId);
   
   if (index === -1) return null;
   
