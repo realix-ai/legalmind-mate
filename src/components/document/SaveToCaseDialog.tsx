@@ -57,10 +57,8 @@ const SaveToCaseDialog = ({
       
       if (isCreatingCase) {
         if (!newCaseName.trim()) {
-          toast({
-            title: "Case name required",
-            description: "Please enter a name for the new case.",
-            variant: "destructive"
+          toast.error("Case name required", {
+            description: "Please enter a name for the new case."
           });
           return;
         }
