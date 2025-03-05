@@ -9,8 +9,9 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 
-// Import our new form field components
+// Import our form field components
 import CaseNameField from './edit-case/CaseNameField';
+import ClientNameField from './edit-case/ClientNameField';
 import StatusField from './edit-case/StatusField';
 import PriorityField from './edit-case/PriorityField';
 import DeadlineField from './edit-case/DeadlineField';
@@ -21,6 +22,8 @@ interface EditCaseDialogProps {
   setIsEditCaseDialogOpen: (isOpen: boolean) => void;
   editCaseName: string;
   setEditCaseName: (name: string) => void;
+  editClientName: string;
+  setEditClientName: (name: string) => void;
   editCaseStatus: 'active' | 'pending' | 'closed';
   setEditCaseStatus: (status: 'active' | 'pending' | 'closed') => void;
   editCasePriority: 'high' | 'medium' | 'low';
@@ -37,6 +40,8 @@ const EditCaseDialog = ({
   setIsEditCaseDialogOpen,
   editCaseName,
   setEditCaseName,
+  editClientName,
+  setEditClientName,
   editCaseStatus,
   setEditCaseStatus,
   editCasePriority,
@@ -59,6 +64,11 @@ const EditCaseDialog = ({
         <CaseNameField 
           editCaseName={editCaseName}
           setEditCaseName={setEditCaseName}
+        />
+        
+        <ClientNameField 
+          editClientName={editClientName}
+          setEditClientName={setEditClientName}
         />
         
         <StatusField 

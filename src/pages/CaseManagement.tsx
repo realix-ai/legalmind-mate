@@ -1,4 +1,3 @@
-
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Navigation from '@/components/Navigation';
@@ -27,8 +26,7 @@ const CaseManagement = () => {
     handleUpdateStatus,
     handleUpdatePriority,
     handleUpdateDeadline,
-    handleUpdateNotes,
-    handleCreateCase
+    handleUpdateNotes
   } = useCaseManagement();
   
   // Get filtering functionality
@@ -63,6 +61,8 @@ const CaseManagement = () => {
     setEditCaseDeadline,
     editCaseDescription,
     setEditCaseDescription,
+    editClientName,
+    setEditClientName,
     editingCaseId,
     handleEditCase,
     resetEditCaseForm
@@ -84,7 +84,8 @@ const CaseManagement = () => {
         status: editCaseStatus,
         priority: editCasePriority,
         deadline: editCaseDeadline ? editCaseDeadline.getTime() : undefined,
-        notes: editCaseDescription
+        notes: editCaseDescription,
+        clientName: editClientName
       });
       resetEditCaseForm();
     }
@@ -178,6 +179,8 @@ const CaseManagement = () => {
           setIsEditCaseDialogOpen={setIsEditCaseDialogOpen}
           editCaseName={editCaseName}
           setEditCaseName={setEditCaseName}
+          editClientName={editClientName}
+          setEditClientName={setEditClientName}
           editCaseStatus={editCaseStatus}
           setEditCaseStatus={setEditCaseStatus}
           editCasePriority={editCasePriority}

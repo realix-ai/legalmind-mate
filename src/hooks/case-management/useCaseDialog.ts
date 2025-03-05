@@ -12,6 +12,7 @@ export const useCaseDialog = () => {
   const [editCasePriority, setEditCasePriority] = useState<'high' | 'medium' | 'low'>('medium');
   const [editCaseDeadline, setEditCaseDeadline] = useState<Date | undefined>(undefined);
   const [editCaseDescription, setEditCaseDescription] = useState('');
+  const [editClientName, setEditClientName] = useState('');
 
   const handleEditCase = (e: React.MouseEvent, caseId: string) => {
     e.stopPropagation();
@@ -23,6 +24,7 @@ export const useCaseDialog = () => {
       setEditCasePriority(caseToEdit.priority || 'medium');
       setEditCaseDeadline(caseToEdit.deadline ? new Date(caseToEdit.deadline) : undefined);
       setEditCaseDescription(caseToEdit.notes || '');
+      setEditClientName(caseToEdit.clientName || '');
       setIsEditCaseDialogOpen(true);
     }
   };
@@ -39,6 +41,7 @@ export const useCaseDialog = () => {
     setEditCasePriority('medium');
     setEditCaseDeadline(undefined);
     setEditCaseDescription('');
+    setEditClientName('');
     setIsEditCaseDialogOpen(false);
   };
 
@@ -64,6 +67,8 @@ export const useCaseDialog = () => {
     setEditCaseDeadline,
     editCaseDescription,
     setEditCaseDescription,
+    editClientName,
+    setEditClientName,
     handleEditCase,
     resetEditCaseForm
   };
