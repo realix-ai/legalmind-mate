@@ -22,22 +22,78 @@ export interface CollaboratorStatus {
   name: string;
   status: 'online' | 'away' | 'offline';
   lastActive: number;
+  email?: string;
 }
 
 export const useDocumentCollaboration = (documentId: string | null) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [collaborators, setCollaborators] = useState<CollaboratorStatus[]>([]);
   
-  // Simulated collaborators
+  // Load collaborators from localStorage
   useEffect(() => {
     if (documentId) {
-      setCollaborators([
-        { id: '1', name: 'Sarah Johnson', status: 'online', lastActive: Date.now() },
-        { id: '2', name: 'Mark Williams', status: 'away', lastActive: Date.now() - 300000 },
-        { id: '3', name: 'Alice Chen', status: 'offline', lastActive: Date.now() - 3600000 }
-      ]);
+      const storedCollaborators = localStorage.getItem(`document_collaborators_${documentId}`);
+      if (storedCollaborators) {
+        try {
+          setCollaborators(JSON.parse(storedCollaborators));
+        } catch (error) {
+          console.error('Error parsing stored collaborators:', error);
+          // Initialize with default collaborators if there's an error
+          setCollaborators([
+            { id: '1', name: 'Sarah Johnson', status: 'online', lastActive: Date.now() },
+            { id: '2', name: 'Mark Williams', status: 'away', lastActive: Date.now() - 300000 },
+            { id: '3', name: 'Alice Chen', status: 'offline', lastActive: Date.now() - 3600000 }
+          ]);
+        }
+      } else {
+        // Initialize with default collaborators if none exist
+        setCollaborators([
+          { id: '1', name: 'Sarah Johnson', status: 'online', lastActive: Date.now() },
+          { id: '2', name: 'Mark Williams', status: 'away', lastActive: Date.now() - 300000 },
+          { id: '3', name: 'Alice Chen', status: 'offline', lastActive: Date.now() - 3600000 }
+        ]);
+      }
     }
   }, [documentId]);
+  
+  // Save collaborators
+  const saveCollaborators = (newCollaborators: CollaboratorStatus[]) => {
+    if (documentId) {
+      localStorage.setItem(`document_collaborators_${documentId}`, JSON.stringify(newCollaborators));
+    }
+  };
+  
+  // Add a new collaborator
+  const addCollaborator = (email: string) => {
+    if (!documentId) return null;
+    
+    // Simple name generation from email
+    const name = email.split('@')[0].replace(/[.]/g, ' ').split(' ').map(part => 
+      part.charAt(0).toUpperCase() + part.slice(1)
+    ).join(' ');
+    
+    const newCollaborator: CollaboratorStatus = {
+      id: uuidv4(),
+      name: `${name} (Pending)`,
+      status: 'offline',
+      lastActive: Date.now(),
+      email: email
+    };
+    
+    const updatedCollaborators = [...collaborators, newCollaborator];
+    setCollaborators(updatedCollaborators);
+    saveCollaborators(updatedCollaborators);
+    
+    return newCollaborator;
+  };
+  
+  // Remove a collaborator
+  const removeCollaborator = (collaboratorId: string) => {
+    const updatedCollaborators = collaborators.filter(c => c.id !== collaboratorId);
+    setCollaborators(updatedCollaborators);
+    saveCollaborators(updatedCollaborators);
+    toast.success('Collaborator removed');
+  };
   
   // Load comments
   useEffect(() => {
@@ -121,6 +177,8 @@ export const useDocumentCollaboration = (documentId: string | null) => {
     addComment,
     updateComment,
     deleteComment,
-    toggleCommentResolution
+    toggleCommentResolution,
+    addCollaborator,
+    removeCollaborator
   };
 };

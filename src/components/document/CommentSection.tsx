@@ -20,7 +20,8 @@ const CommentSection = ({ documentId }: CommentSectionProps) => {
     addComment, 
     updateComment, 
     deleteComment, 
-    toggleCommentResolution 
+    toggleCommentResolution,
+    removeCollaborator
   } = useDocumentCollaboration(documentId);
 
   const handleAddComment = () => {
@@ -76,7 +77,10 @@ const CommentSection = ({ documentId }: CommentSectionProps) => {
         </TabsContent>
 
         <TabsContent value="collaborators" className="p-4">
-          <CollaboratorsList collaborators={collaborators} />
+          <CollaboratorsList 
+            collaborators={collaborators} 
+            onRemoveCollaborator={removeCollaborator}
+          />
         </TabsContent>
       </Tabs>
     </div>

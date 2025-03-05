@@ -8,6 +8,7 @@ import DocumentEditor from '@/components/document/DocumentEditor';
 import DocumentToolbar from '@/components/document/DocumentToolbar';
 import AiPromptInput from '@/components/document/AiPromptInput';
 import CommentSection from '@/components/document/CommentSection';
+import AddCollaborator from '@/components/document/AddCollaborator';
 import TemplateList from '@/components/document/TemplateList';
 import { getSavedDocument, saveDocument } from '@/utils/documents';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,7 @@ const DocumentDrafting = () => {
   const [aiPrompt, setAiPrompt] = useState('');
   const [isAiProcessing, setIsAiProcessing] = useState(false);
   const [showRightPanel, setShowRightPanel] = useState(true);
+  const [isAddingCollaborator, setIsAddingCollaborator] = useState(false);
   
   useEffect(() => {
     if (documentId) {
@@ -100,6 +102,19 @@ const DocumentDrafting = () => {
     }, 1500);
   };
   
+  const handleAddCollaborator = (email: string) => {
+    setIsAddingCollaborator(true);
+    
+    // Simulate network request
+    setTimeout(() => {
+      setIsAddingCollaborator(false);
+      toast.success(`Invitation sent to ${email}`);
+      
+      // In a real application, you would make an API call to invite the collaborator
+      // and then refresh the collaborators list
+    }, 1000);
+  };
+  
   // Mock AI response generator
   const generateAiResponse = (prompt: string) => {
     if (prompt.includes('conclusion') || prompt.includes('summary')) {
@@ -172,6 +187,11 @@ const DocumentDrafting = () => {
                       />
                     </div>
                   )}
+                  
+                  <AddCollaborator 
+                    onAddCollaborator={handleAddCollaborator}
+                    isLoading={isAddingCollaborator}
+                  />
                   
                   <CommentSection documentId={currentDocumentId} />
                 </div>
