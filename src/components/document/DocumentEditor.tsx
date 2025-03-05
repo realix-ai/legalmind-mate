@@ -19,22 +19,11 @@ interface DocumentEditorProps {
 }
 
 const DocumentEditor = ({ 
-  documentTitle, 
-  setDocumentTitle, 
   documentContent, 
   setDocumentContent 
 }: DocumentEditorProps) => {
   return (
     <div className="border rounded-xl overflow-hidden mb-6">
-      <div className="bg-muted p-3 flex items-center">
-        <input
-          type="text"
-          value={documentTitle}
-          onChange={(e) => setDocumentTitle(e.target.value)}
-          className="bg-transparent border-none focus:ring-0 font-medium text-base w-full"
-        />
-      </div>
-      
       <div className="border-t p-1 flex items-center gap-1 flex-wrap">
         <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
           <Bold className="h-3.5 w-3.5" />
