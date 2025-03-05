@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -37,6 +36,9 @@ const CaseChat = () => {
   const [isAiTyping, setIsAiTyping] = useState(false);
   // Track active conversation with a session ID
   const [sessionId, setSessionId] = useState<string>(`session-${Date.now()}`);
+  
+  // Add state for document panel visibility
+  const [showDocumentPanel, setShowDocumentPanel] = useState<boolean>(true);
   
   useEffect(() => {
     if (!caseId) {
@@ -187,21 +189,27 @@ const CaseChat = () => {
           <h1 className="text-2xl font-semibold">Case: {caseData?.name}</h1>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Documents Panel */}
-          <DocumentsPanel 
-            caseNumber={caseData?.caseNumber}
-            caseName={caseData?.name}
-            documents={caseDocuments}
-          />
+        <div className={`grid grid-cols-1 ${showDocumentPanel ? 'lg:grid-cols-3' : 'lg:grid-cols-1'} gap-6`}>
+          {/* Documents Panel - conditionally show based on showDocumentPanel state */}
+          {showDocumentPanel && (
+            <DocumentsPanel 
+              caseNumber={caseData?.caseNumber}
+              caseName={caseData?.name}
+              documents={caseDocuments}
+            />
+          )}
           
-          {/* AI Assistant Chat */}
-          <ChatPanel 
-            messages={messages}
-            isAiTyping={isAiTyping}
-            onSendMessage={handleSendMessage}
-            onNewDialog={handleNewDialog}
-          />
+          {/* AI Assistant Chat - make it span the full width when document panel is hidden */}
+          <div className={showDocumentPanel ? 'lg:col-span-2' : 'lg:col-span-1'}>
+            <ChatPanel 
+              messages={messages}
+              isAiTyping={isAiTyping}
+              onSendMessage={handleSendMessage}
+              onNewDialog={handleNewDialog}
+              showDocumentPanel={showDocumentPanel}
+              toggleDocumentPanel={() => setShowDocumentPanel(!showDocumentPanel)}
+            />
+          </div>
         </div>
       </main>
     </div>
