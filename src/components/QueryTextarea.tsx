@@ -30,6 +30,11 @@ const QueryTextarea = ({
         disabled={isProcessing}
       />
       <div className="absolute bottom-3 right-3 flex space-x-2">
+        <FileUploadButton 
+          isProcessing={isProcessing}
+          hasFile={hasFile}
+          onClick={onTriggerFileUpload}
+        />
         <SubmitButton 
           isProcessing={isProcessing} 
           isDisabled={!query.trim() || !!fileError} 

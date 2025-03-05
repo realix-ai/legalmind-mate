@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Sparkles } from 'lucide-react';
+import Navigation from '@/components/Navigation';
 import DocumentEditor from '@/components/document/DocumentEditor';
 import DocumentToolbar from '@/components/document/DocumentToolbar';
 import AiPromptInput from '@/components/document/AiPromptInput';
@@ -101,64 +102,67 @@ const DocumentDrafting = () => {
   };
   
   return (
-    <div className="container mx-auto p-6">
-      {showTemplates ? (
-        <TemplateList 
-          onSelectTemplate={handleSelectTemplate}
-        />
-      ) : (
-        <div className="space-y-6">
-          <DocumentToolbar 
-            onBack={handleBack}
-            showAiPrompt={showAiPrompt}
-            setShowAiPrompt={setShowAiPrompt}
-            onSaveDocument={handleSaveDocument}
-            documentTitle={documentTitle}
-            documentContent={documentContent}
-            currentDocumentId={currentDocumentId}
-            onDocumentSaved={handleDocumentSaved}
+    <>
+      <Navigation />
+      <div className="container mx-auto p-6 pt-24">
+        {showTemplates ? (
+          <TemplateList 
+            onSelectTemplate={handleSelectTemplate}
           />
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              <input
-                type="text"
-                value={documentTitle}
-                onChange={(e) => setDocumentTitle(e.target.value)}
-                placeholder="Document Title"
-                className="w-full px-4 py-2 text-xl font-semibold border-b border-gray-200 focus:outline-none focus:border-primary"
-              />
-              
-              <DocumentEditor
-                documentTitle={documentTitle}
-                setDocumentTitle={setDocumentTitle}
-                documentContent={documentContent}
-                setDocumentContent={setDocumentContent}
-              />
-            </div>
+        ) : (
+          <div className="space-y-6">
+            <DocumentToolbar 
+              onBack={handleBack}
+              showAiPrompt={showAiPrompt}
+              setShowAiPrompt={setShowAiPrompt}
+              onSaveDocument={handleSaveDocument}
+              documentTitle={documentTitle}
+              documentContent={documentContent}
+              currentDocumentId={currentDocumentId}
+              onDocumentSaved={handleDocumentSaved}
+            />
             
-            <div className="space-y-6">
-              {showAiPrompt && (
-                <div className="p-4 border rounded-md bg-card">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                    <h3 className="font-medium">AI Assistant</h3>
-                  </div>
-                  <AiPromptInput 
-                    aiPrompt={aiPrompt}
-                    setAiPrompt={setAiPrompt}
-                    isAiProcessing={isAiProcessing}
-                    onSubmit={handleAiPromptSubmit}
-                  />
-                </div>
-              )}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                <input
+                  type="text"
+                  value={documentTitle}
+                  onChange={(e) => setDocumentTitle(e.target.value)}
+                  placeholder="Document Title"
+                  className="w-full px-4 py-2 text-xl font-semibold border-b border-gray-200 focus:outline-none focus:border-primary"
+                />
+                
+                <DocumentEditor
+                  documentTitle={documentTitle}
+                  setDocumentTitle={setDocumentTitle}
+                  documentContent={documentContent}
+                  setDocumentContent={setDocumentContent}
+                />
+              </div>
               
-              <CommentSection documentId={currentDocumentId} />
+              <div className="space-y-6">
+                {showAiPrompt && (
+                  <div className="p-4 border rounded-md bg-card">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                      <h3 className="font-medium">AI Assistant</h3>
+                    </div>
+                    <AiPromptInput 
+                      aiPrompt={aiPrompt}
+                      setAiPrompt={setAiPrompt}
+                      isAiProcessing={isAiProcessing}
+                      onSubmit={handleAiPromptSubmit}
+                    />
+                  </div>
+                )}
+                
+                <CommentSection documentId={currentDocumentId} />
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 

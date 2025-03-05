@@ -17,15 +17,18 @@ const FileUploadButton = ({ onClick, isProcessing, hasFile }: FileUploadButtonPr
           type="button"
           size="icon"
           variant="ghost"
-          disabled={true} // Always disabled since we removed file upload
-          className="hover:bg-primary/10 relative opacity-50" // Added opacity to show it's disabled
+          disabled={isProcessing}
+          className="hover:bg-primary/10 relative"
           onClick={onClick}
         >
           <FileUp className="h-5 w-5 text-muted-foreground" />
+          {hasFile && (
+            <span className="absolute -top-1 -right-1 h-2 w-2 bg-green-500 rounded-full" />
+          )}
         </Button>
       </TooltipTrigger>
       <TooltipContent>
-        <p>File upload disabled</p> 
+        <p>Upload a document</p>
       </TooltipContent>
     </Tooltip>
   );
