@@ -1,10 +1,10 @@
 
 import { motion } from 'framer-motion';
 import QueryForm from '@/components/QueryForm';
-import QueryResponseDisplay from '@/components/QueryResponseDisplay';
-import CitationBox from '@/components/citation/CitationBox';
-import { Citation } from '@/services/citationService';
 import { ResearchToolType } from '@/services/legalResearchToolsService';
+import { Citation } from '@/services/citationService';
+import QueryHeader from './QueryHeader';
+import ResponseSection from './ResponseSection';
 
 interface QueryTabProps {
   isProcessing: boolean;
@@ -43,43 +43,22 @@ const QueryTab = ({ isProcessing, response, onSubmit, onShare, citations }: Quer
         animate="visible"
         className="max-w-3xl mx-auto"
       >
-        <motion.h2 
-          variants={itemVariants}
-          className="text-2xl md:text-3xl font-semibold mb-4 text-center"
-        >
-          Query Assistant
-        </motion.h2>
+        <QueryHeader />
         
-        <motion.p 
-          variants={itemVariants}
-          className="text-muted-foreground text-center mb-8"
-        >
-          Ask a legal question and select how you'd like the AI to process your query.
-        </motion.p>
-        
-        <QueryForm 
-          onSubmit={onSubmit}
-          isProcessing={isProcessing}
-        />
+        <motion.div variants={itemVariants}>
+          <QueryForm 
+            onSubmit={onSubmit}
+            isProcessing={isProcessing}
+          />
+        </motion.div>
       </motion.div>
       
-      <QueryResponseDisplay
+      <ResponseSection 
         isProcessing={isProcessing}
         response={response}
         onShare={onShare}
-        showShareButton={!!response && !isProcessing}
+        citations={citations}
       />
-      
-      {!isProcessing && citations.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="max-w-4xl mx-auto"
-        >
-          <CitationBox citations={citations} />
-        </motion.div>
-      )}
     </>
   );
 };
