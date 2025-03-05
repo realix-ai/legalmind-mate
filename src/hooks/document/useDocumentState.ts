@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -10,6 +11,7 @@ export function useDocumentState(documentId: string | undefined) {
   const [showTemplates, setShowTemplates] = useState(!documentId);
   const [documentTitle, setDocumentTitle] = useState('');
   const [documentContent, setDocumentContent] = useState('');
+  const [documentCategory, setDocumentCategory] = useState('general');
   const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(documentId || null);
 
   useEffect(() => {
@@ -19,6 +21,7 @@ export function useDocumentState(documentId: string | undefined) {
       if (document) {
         setDocumentTitle(document.title);
         setDocumentContent(document.content);
+        setDocumentCategory(document.category || 'general');
         setCurrentDocumentId(documentId);
         setShowTemplates(false);
       } else {
@@ -53,6 +56,7 @@ export function useDocumentState(documentId: string | undefined) {
     if (savedDoc) {
       setCurrentDocumentId(id);
       setDocumentTitle(savedDoc.title);
+      setDocumentCategory(savedDoc.category || 'general');
       console.log("Updated document title to:", savedDoc.title);
     }
   };
@@ -70,6 +74,7 @@ export function useDocumentState(documentId: string | undefined) {
       // Create a new blank document
       setDocumentTitle('Untitled Document');
       setDocumentContent('');
+      setDocumentCategory('general');
       setShowTemplates(false);
       return;
     }
@@ -79,6 +84,7 @@ export function useDocumentState(documentId: string | undefined) {
     if (document) {
       setDocumentTitle(document.title);
       setDocumentContent(document.content);
+      setDocumentCategory(document.category || 'general');
       setShowTemplates(false);
       return;
     }
@@ -88,6 +94,7 @@ export function useDocumentState(documentId: string | undefined) {
     if (customTemplate) {
       setDocumentTitle(customTemplate.title);
       setDocumentContent(customTemplate.content);
+      setDocumentCategory(customTemplate.category);
       setShowTemplates(false);
       return;
     }
@@ -103,11 +110,16 @@ export function useDocumentState(documentId: string | undefined) {
       
       setDocumentTitle(defaultTitle);
       setDocumentContent(templateContent);
+      setDocumentCategory(idParts[0] || 'general'); // Use first part of ID as category
       setShowTemplates(false);
       toast.success(`Template loaded: ${defaultTitle}`);
     } else {
       toast.error('Template not found');
     }
+  };
+
+  const handleCategoryChange = (category: string) => {
+    setDocumentCategory(category);
   };
 
   return {
@@ -117,11 +129,14 @@ export function useDocumentState(documentId: string | undefined) {
     setDocumentTitle,
     documentContent,
     setDocumentContent,
+    documentCategory,
+    setDocumentCategory,
     currentDocumentId,
     setCurrentDocumentId,
     handleSaveDocument,
     handleDocumentSaved,
     handleBack,
     handleSelectTemplate,
+    handleCategoryChange,
   };
 }

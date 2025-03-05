@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react';
 import { SavedDocument, CustomTemplate } from '@/utils/documents/types';
 import { templates } from '@/utils/documents/templateData';
 import { getCustomTemplates } from '@/utils/documents/templateManager';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { DOCUMENT_CATEGORIES } from './DocumentCategories';
 
 interface TemplateListProps {
   onSelectTemplate: (id: string) => void;
@@ -16,6 +18,7 @@ interface TemplateListProps {
 const TemplateList = ({ onSelectTemplate }: TemplateListProps) => {
   const [savedDocuments, setSavedDocuments] = useState<SavedDocument[]>([]);
   const [customTemplates, setCustomTemplates] = useState<CustomTemplate[]>([]);
+  const [activeTab, setActiveTab] = useState('all');
   
   useEffect(() => {
     // Load saved documents
@@ -55,6 +58,18 @@ const TemplateList = ({ onSelectTemplate }: TemplateListProps) => {
     }
   };
 
+  // Filter documents by category
+  const filterByCategory = (items: any[], category: string) => {
+    if (category === 'all') return items;
+    return items.filter(item => 
+      (item.category || 'general').toLowerCase() === category.toLowerCase()
+    );
+  };
+
+  // Get documents for current tab
+  const filteredDocuments = filterByCategory(savedDocuments, activeTab);
+  const filteredTemplates = filterByCategory([...customTemplates, ...templates], activeTab);
+
   return (
     <motion.div
       variants={containerVariants}
@@ -86,17 +101,28 @@ const TemplateList = ({ onSelectTemplate }: TemplateListProps) => {
         <TemplateUploadDialog onTemplateAdded={handleTemplateAdded} />
       </motion.div>
 
-      {savedDocuments.length > 0 && (
+      <motion.div variants={itemVariants} className="mb-6">
+        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="w-full max-w-lg mx-auto grid grid-cols-4 mb-6">
+            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="contract">Contracts</TabsTrigger>
+            <TabsTrigger value="pleading">Pleadings</TabsTrigger>
+            <TabsTrigger value="research">Research</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </motion.div>
+      
+      {filteredDocuments.length > 0 && (
         <motion.div variants={itemVariants} className="mb-8">
           <h2 className="text-xl font-medium mb-4">Your Documents</h2>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {savedDocuments.map((doc) => (
+            {filteredDocuments.map((doc) => (
               <DocumentTemplate
                 key={doc.id}
                 title={doc.title}
                 description={`Last modified: ${new Date(doc.lastModified).toLocaleDateString()}`}
-                category="Your Document"
+                category={doc.category ? DOCUMENT_CATEGORIES.find(c => c.id === doc.category)?.name || doc.category : 'General'}
                 onClick={() => onSelectTemplate(doc.id)}
               />
             ))}
@@ -104,12 +130,12 @@ const TemplateList = ({ onSelectTemplate }: TemplateListProps) => {
         </motion.div>
       )}
       
-      {customTemplates.length > 0 && (
-        <motion.div variants={itemVariants} className="mb-8">
-          <h2 className="text-xl font-medium mb-4">Your Templates</h2>
+      {filteredTemplates.length > 0 && (
+        <motion.div variants={itemVariants}>
+          <h2 className="text-xl font-medium mb-4">Templates</h2>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {customTemplates.map((template) => (
+            {filteredTemplates.map((template) => (
               <DocumentTemplate
                 key={template.id}
                 title={template.title}
@@ -121,22 +147,6 @@ const TemplateList = ({ onSelectTemplate }: TemplateListProps) => {
           </div>
         </motion.div>
       )}
-      
-      <motion.div variants={itemVariants}>
-        <h2 className="text-xl font-medium mb-4">Templates</h2>
-        
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {templates.map((template) => (
-            <DocumentTemplate
-              key={template.id}
-              title={template.title}
-              description={template.description}
-              category={template.category}
-              onClick={() => onSelectTemplate(template.id)}
-            />
-          ))}
-        </div>
-      </motion.div>
     </motion.div>
   );
 };

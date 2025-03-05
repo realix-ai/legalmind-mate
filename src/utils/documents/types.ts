@@ -23,6 +23,7 @@ export interface SavedDocument {
   content: string;
   lastModified: number;
   caseId?: string;
+  category?: string; // Added category field
 }
 
 export interface Case {

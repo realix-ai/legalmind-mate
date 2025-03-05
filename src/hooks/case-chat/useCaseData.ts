@@ -33,6 +33,7 @@ export function useCaseData(caseId: string | undefined) {
           // Use the normalized case ID for getting documents
           const docs = getCaseDocuments(normalizedCaseId);
           console.log(`Found ${docs.length} documents for case:`, normalizedCaseId);
+          console.log("Documents:", docs);
           
           setCaseDocuments(docs.map(doc => ({
             id: doc.id,
@@ -57,5 +58,19 @@ export function useCaseData(caseId: string | undefined) {
     loadCase();
   }, [caseId, navigate]);
 
-  return { caseData, caseDocuments, loading };
+  // Add a function to refresh documents (useful after uploads)
+  const refreshCaseDocuments = () => {
+    if (caseId) {
+      const normalizedCaseId = normalizeCaseId(caseId);
+      const docs = getCaseDocuments(normalizedCaseId);
+      setCaseDocuments(docs.map(doc => ({
+        id: doc.id,
+        name: doc.title,
+        type: 'Document',
+        date: new Date(doc.lastModified).toLocaleDateString()
+      })));
+    }
+  };
+
+  return { caseData, caseDocuments, loading, refreshCaseDocuments };
 }

@@ -2,12 +2,15 @@
 import { Sparkles } from 'lucide-react';
 import DocumentEditor from '@/components/document/DocumentEditor';
 import AiPromptInput from '@/components/document/AiPromptInput';
+import DocumentCategories from '@/components/document/DocumentCategories';
 
 interface DocumentContentProps {
   documentTitle: string;
   setDocumentTitle: (title: string) => void;
   documentContent: string;
   setDocumentContent: (content: string) => void;
+  documentCategory: string;
+  onCategoryChange: (category: string) => void;
   showAiPrompt: boolean;
   aiPrompt: string;
   setAiPrompt: (prompt: string) => void;
@@ -20,6 +23,8 @@ const DocumentContent = ({
   setDocumentTitle,
   documentContent,
   setDocumentContent,
+  documentCategory,
+  onCategoryChange,
   showAiPrompt,
   aiPrompt,
   setAiPrompt,
@@ -34,6 +39,12 @@ const DocumentContent = ({
         onChange={(e) => setDocumentTitle(e.target.value)}
         placeholder="Document Title"
         className="w-full px-4 py-2 text-xl font-semibold border-b border-gray-200 focus:outline-none focus:border-primary/50 transition-all duration-200"
+      />
+      
+      {/* Document categorization */}
+      <DocumentCategories 
+        currentCategory={documentCategory}
+        onCategoryChange={onCategoryChange}
       />
       
       {/* AI Prompt section above the editor */}

@@ -22,11 +22,14 @@ const DocumentDrafting = () => {
     setDocumentTitle,
     documentContent,
     setDocumentContent,
+    documentCategory,
+    setDocumentCategory,
     currentDocumentId,
     handleSaveDocument,
     handleDocumentSaved,
     handleBack,
     handleSelectTemplate,
+    handleCategoryChange,
   } = useDocumentState(documentId);
   
   const {
@@ -64,6 +67,7 @@ const DocumentDrafting = () => {
               onSaveDocument={handleSaveDocument}
               documentTitle={documentTitle}
               documentContent={documentContent}
+              documentCategory={documentCategory}
               currentDocumentId={currentDocumentId}
               onDocumentSaved={handleDocumentSaved}
             />
@@ -76,6 +80,8 @@ const DocumentDrafting = () => {
                   setDocumentTitle={setDocumentTitle}
                   documentContent={documentContent}
                   setDocumentContent={setDocumentContent}
+                  documentCategory={documentCategory}
+                  onCategoryChange={handleCategoryChange}
                   showAiPrompt={showAiPrompt}
                   aiPrompt={aiPrompt}
                   setAiPrompt={setAiPrompt}

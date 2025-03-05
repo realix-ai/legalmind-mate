@@ -9,13 +9,18 @@ export const saveDocument = (title: string, content: string, id?: string | null,
   const normalizedCaseId = caseId ? normalizeCaseId(caseId) : undefined;
   
   console.log("Saving document with normalized caseId:", normalizedCaseId);
+  console.log("Original document title:", title);
+  
+  // Ensure title is never empty
+  const documentTitle = title.trim() ? title.trim() : "Untitled Document";
   
   const newDocument: SavedDocument = {
     id: id || `doc-${Date.now()}`,
-    title,
+    title: documentTitle,
     content,
     lastModified: Date.now(),
-    caseId: normalizedCaseId
+    caseId: normalizedCaseId,
+    category: 'general' // Default category
   };
   
   const existingIndex = id ? savedDocuments.findIndex(doc => doc.id === id) : -1;
@@ -29,6 +34,11 @@ export const saveDocument = (title: string, content: string, id?: string | null,
       newDocument.caseId = savedDocuments[existingIndex].caseId;
     }
     
+    // Preserve existing category if not changing it
+    if (savedDocuments[existingIndex].category) {
+      newDocument.category = savedDocuments[existingIndex].category;
+    }
+    
     savedDocuments[existingIndex] = newDocument;
     console.log("Updated document:", newDocument);
   } else {
@@ -37,7 +47,7 @@ export const saveDocument = (title: string, content: string, id?: string | null,
   }
   
   localStorage.setItem('savedDocuments', JSON.stringify(savedDocuments));
-  console.log("Saved documents to localStorage");
+  console.log("Saved documents to localStorage with title:", newDocument.title);
   return newDocument;
 };
 
@@ -79,6 +89,28 @@ export const updateDocumentCaseId = (documentId: string, caseId?: string): Saved
   
   localStorage.setItem('savedDocuments', JSON.stringify(documents));
   return documents[index];
+};
+
+// Update document category
+export const updateDocumentCategory = (documentId: string, category: string): SavedDocument | null => {
+  const documents = getSavedDocuments();
+  const index = documents.findIndex(doc => doc.id === documentId);
+  
+  if (index === -1) return null;
+  
+  documents[index] = {
+    ...documents[index],
+    category
+  };
+  
+  localStorage.setItem('savedDocuments', JSON.stringify(documents));
+  return documents[index];
+};
+
+// Get documents by category
+export const getDocumentsByCategory = (category: string): SavedDocument[] => {
+  const documents = getSavedDocuments();
+  return documents.filter(doc => doc.category === category);
 };
 
 // Helper function to normalize case IDs
