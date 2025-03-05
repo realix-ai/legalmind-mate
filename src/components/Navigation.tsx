@@ -8,9 +8,13 @@ import {
   Briefcase, 
   Settings, 
   Menu, 
-  X
+  X,
+  LogIn,
+  UserPlus
 } from 'lucide-react';
+import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
 import UserProfileButton from '@/components/profile/UserProfileButton';
+import { Button } from '@/components/ui/button';
 
 const Navigation = () => {
   const location = useLocation();
@@ -60,32 +64,53 @@ const Navigation = () => {
             </Link>
             
             {!isLandingPage && (
-              <div className="hidden md:flex items-center space-x-1">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={cn(
-                      "px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition-all duration-200",
-                      location.pathname === item.path
-                        ? "bg-primary text-white"
-                        : "text-muted-foreground hover:bg-secondary"
-                    )}
-                  >
-                    {item.icon}
-                    <span>{item.name}</span>
-                  </Link>
-                ))}
-              </div>
+              <SignedIn>
+                <div className="hidden md:flex items-center space-x-1">
+                  {navItems.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={cn(
+                        "px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition-all duration-200",
+                        location.pathname === item.path
+                          ? "bg-primary text-white"
+                          : "text-muted-foreground hover:bg-secondary"
+                      )}
+                    >
+                      {item.icon}
+                      <span>{item.name}</span>
+                    </Link>
+                  ))}
+                </div>
+              </SignedIn>
             )}
             
             <div className="hidden md:flex items-center space-x-2">
-              {!isLandingPage && (
-                <button className="p-2 rounded-full hover:bg-secondary transition-all duration-200">
-                  <Settings className="h-5 w-5 text-muted-foreground" />
-                </button>
-              )}
-              <UserProfileButton />
+              <SignedIn>
+                {!isLandingPage && (
+                  <button className="p-2 rounded-full hover:bg-secondary transition-all duration-200">
+                    <Settings className="h-5 w-5 text-muted-foreground" />
+                  </button>
+                )}
+                <UserButton afterSignOutUrl="/" />
+              </SignedIn>
+              
+              <SignedOut>
+                <div className="flex items-center gap-2">
+                  <Link to="/login">
+                    <Button variant="outline" size="sm" className="flex items-center gap-1.5">
+                      <LogIn className="h-4 w-4" />
+                      <span>Sign In</span>
+                    </Button>
+                  </Link>
+                  <Link to="/signup">
+                    <Button size="sm" className="flex items-center gap-1.5">
+                      <UserPlus className="h-4 w-4" />
+                      <span>Sign Up</span>
+                    </Button>
+                  </Link>
+                </div>
+              </SignedOut>
             </div>
             
             <button 
@@ -118,31 +143,54 @@ const Navigation = () => {
             </div>
             
             <div className="flex-1 overflow-auto p-4">
-              <div className="space-y-2">
-                {navItems.map((item) => (
+              <SignedIn>
+                <div className="space-y-2">
+                  {navItems.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={cn(
+                        "p-3 rounded-lg flex items-center gap-3 transition-all duration-200",
+                        location.pathname === item.path
+                          ? "bg-primary text-white"
+                          : "text-foreground hover:bg-secondary"
+                      )}
+                    >
+                      {item.icon}
+                      <span className="font-medium">{item.name}</span>
+                    </Link>
+                  ))}
+                </div>
+              </SignedIn>
+              
+              <SignedOut>
+                <div className="space-y-2 mt-4">
                   <Link
-                    key={item.path}
-                    to={item.path}
-                    className={cn(
-                      "p-3 rounded-lg flex items-center gap-3 transition-all duration-200",
-                      location.pathname === item.path
-                        ? "bg-primary text-white"
-                        : "text-foreground hover:bg-secondary"
-                    )}
+                    to="/login"
+                    className="p-3 rounded-lg flex items-center gap-3 transition-all duration-200 border border-input"
                   >
-                    {item.icon}
-                    <span className="font-medium">{item.name}</span>
+                    <LogIn className="h-5 w-5" />
+                    <span className="font-medium">Sign In</span>
                   </Link>
-                ))}
-              </div>
+                  <Link
+                    to="/signup"
+                    className="p-3 rounded-lg flex items-center gap-3 transition-all duration-200 bg-primary text-white"
+                  >
+                    <UserPlus className="h-5 w-5" />
+                    <span className="font-medium">Sign Up</span>
+                  </Link>
+                </div>
+              </SignedOut>
             </div>
             
-            <div className="p-4 border-t">
-              <button className="w-full p-3 rounded-lg flex items-center gap-3 hover:bg-secondary transition-all duration-200">
-                <Settings className="h-5 w-5" />
-                <span className="font-medium">Settings</span>
-              </button>
-            </div>
+            <SignedIn>
+              <div className="p-4 border-t">
+                <button className="w-full p-3 rounded-lg flex items-center gap-3 hover:bg-secondary transition-all duration-200">
+                  <Settings className="h-5 w-5" />
+                  <span className="font-medium">Settings</span>
+                </button>
+              </div>
+            </SignedIn>
           </div>
         </div>
       )}
