@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -30,7 +31,7 @@ const itemVariants = {
 const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
   const [query, setQuery] = useState('');
   const [selectedOption, setSelectedOption] = useState<QueryType>('legal-research');
-  const [selectedResearchTool, setSelectedResearchTool] = useState<ResearchToolType | ''>('none');
+  const [selectedResearchTool, setSelectedResearchTool] = useState<ResearchToolType>('none');
   
   const {
     uploadedFiles,
@@ -72,8 +73,7 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
       addToHistory(query);
       
       // If research tool is selected but not configured, show error
-      if (selectedResearchTool && 
-          selectedResearchTool !== 'none' && 
+      if (selectedResearchTool !== 'none' && 
           !isToolConfigured(selectedResearchTool) && 
           selectedResearchTool !== 'googlescholar') {
         toast.error(`Please configure ${selectedResearchTool} first in the Research Tools tab`);
@@ -81,7 +81,7 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
       }
       
       // Only pass the research tool if it's not 'none'
-      const toolToUse = selectedResearchTool && selectedResearchTool !== 'none' 
+      const toolToUse = selectedResearchTool !== 'none' 
         ? selectedResearchTool 
         : undefined;
       

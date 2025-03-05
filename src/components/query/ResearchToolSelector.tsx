@@ -9,8 +9,8 @@ import {
 import { ResearchToolType } from '@/services/legalResearchToolsService';
 
 interface ResearchToolSelectorProps {
-  selectedTool: ResearchToolType | '';
-  onToolSelect: (tool: ResearchToolType | '') => void;
+  selectedTool: ResearchToolType;
+  onToolSelect: (tool: ResearchToolType) => void;
 }
 
 const ResearchToolSelector = ({ selectedTool, onToolSelect }: ResearchToolSelectorProps) => {
@@ -19,7 +19,7 @@ const ResearchToolSelector = ({ selectedTool, onToolSelect }: ResearchToolSelect
       <p className="text-sm font-medium mb-2">Research database (optional):</p>
       <Select 
         value={selectedTool} 
-        onValueChange={(value) => onToolSelect(value as ResearchToolType | '')}
+        onValueChange={(value) => onToolSelect(value as ResearchToolType)}
       >
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Select a research database (optional)" />

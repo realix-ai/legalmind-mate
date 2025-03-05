@@ -1,7 +1,7 @@
 
 // Integration with external legal research tools like Westlaw and LexisNexis
 
-export type ResearchToolType = 'westlaw' | 'lexisnexis' | 'googlescholar' | 'heinonline';
+export type ResearchToolType = 'westlaw' | 'lexisnexis' | 'googlescholar' | 'heinonline' | 'fastcase' | 'none';
 
 export interface ResearchTool {
   id: ResearchToolType;
@@ -17,7 +17,9 @@ const toolsConfiguration = {
   westlaw: false,
   lexisnexis: false,
   googlescholar: true, // Google Scholar doesn't need API keys
-  heinonline: false
+  heinonline: false,
+  fastcase: false,
+  none: true // 'none' is always configured
 };
 
 export const researchTools: ResearchTool[] = [
@@ -52,6 +54,14 @@ export const researchTools: ResearchTool[] = [
     description: 'Access to legal history and government documents.',
     url: 'https://home.heinonline.org',
     isConfigured: toolsConfiguration.heinonline
+  },
+  {
+    id: 'fastcase',
+    name: 'Fastcase',
+    icon: '🔎',
+    description: 'Legal research service with access to cases, statutes, regulations, and more.',
+    url: 'https://www.fastcase.com',
+    isConfigured: toolsConfiguration.fastcase
   }
 ];
 
@@ -66,6 +76,9 @@ export const formatSearchQuery = (query: string, tool: ResearchToolType): string
       return `https://scholar.google.com/scholar?q=${encodeURIComponent(query)}`;
     case 'heinonline':
       return `https://heinonline.org/HOL/LuceneSearch?terms=${encodeURIComponent(query)}&collection=all&searchtype=advanced`;
+    case 'fastcase':
+      return `https://app.fastcase.com/Research/Search/Home?searchValue=${encodeURIComponent(query)}`;
+    case 'none':
     default:
       return '';
   }
@@ -73,6 +86,8 @@ export const formatSearchQuery = (query: string, tool: ResearchToolType): string
 
 // Function to search in an external research tool
 export const searchExternalTool = (query: string, tool: ResearchToolType): void => {
+  if (tool === 'none') return; // No action needed for 'none'
+  
   const url = formatSearchQuery(query, tool);
   if (url) {
     window.open(url, '_blank');
