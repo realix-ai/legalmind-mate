@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useSignUp } from '@clerk/clerk-react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -36,19 +35,15 @@ const Signup = () => {
         await setActive({ session: result.createdSessionId });
         toast.success('Account created successfully');
         navigate('/');
+      } else if (result.status === 'missing_requirements') {
+        console.error('Sign up failed: missing requirements', result);
+        toast.error('Missing requirements for sign up');
+      } else if (result.status === 'abandoned') {
+        console.error('Sign up failed: abandoned', result);
+        toast.error('Sign up process was abandoned');
       } else {
-        // Since TypeScript is complaining about the specific status types,
-        // we'll handle the verification case without direct comparison
-        const nextStep = result.status;
-        
-        if (nextStep === 'missing_requirements' || nextStep === 'abandoned') {
-          console.error('Sign up failed', result);
-          toast.error('Something went wrong during sign up');
-        } else {
-          // This branch handles the 'needs_verification' case without explicitly comparing strings
-          toast.info('Please check your email to verify your account');
-          navigate('/verify-email');
-        }
+        toast.info('Please check your email to verify your account');
+        navigate('/verify-email');
       }
     } catch (err: any) {
       console.error('Error during sign up:', err);
