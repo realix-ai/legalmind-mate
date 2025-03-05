@@ -9,7 +9,7 @@ interface QueryTabsProps {
   setActiveTab: (value: string) => void;
   isProcessing: boolean;
   response: string | null;
-  handleSubmit: (query: string, selectedOption: string, file: File | null) => Promise<void>;
+  handleSubmit: (query: string, selectedOption: string, files: File[]) => Promise<void>;
   onShare: () => void;
   citations: any[];
 }
