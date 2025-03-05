@@ -21,10 +21,13 @@ const CollaboratorsList = ({ collaborators, onRemoveCollaborator }: Collaborator
         collaborators.map((collaborator) => (
           <div key={collaborator.id} className="flex items-center gap-2 p-2 border rounded-md">
             <Avatar className="h-8 w-8">
-              <AvatarFallback className={collaborator.status === 'offline' && collaborator.name.includes('Pending') 
-                ? 'bg-amber-100 text-amber-800' 
-                : 'bg-primary/10 text-primary'
-                } text-xs">
+              <AvatarFallback 
+                className={
+                  collaborator.status === 'offline' && collaborator.name.includes('Pending') 
+                    ? 'bg-amber-100 text-amber-800' 
+                    : 'bg-primary/10 text-primary text-xs'
+                }
+              >
                 {collaborator.name.split(' ').map(n => n[0]).join('')}
               </AvatarFallback>
             </Avatar>
