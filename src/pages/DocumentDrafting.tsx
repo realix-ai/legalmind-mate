@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, PanelRightClose, PanelRightOpen } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import DocumentEditor from '@/components/document/DocumentEditor';
 import DocumentToolbar from '@/components/document/DocumentToolbar';
@@ -10,6 +9,7 @@ import AiPromptInput from '@/components/document/AiPromptInput';
 import CommentSection from '@/components/document/CommentSection';
 import TemplateList from '@/components/document/TemplateList';
 import { getSavedDocument, saveDocument } from '@/utils/documents';
+import { Button } from '@/components/ui/button';
 
 const DocumentDrafting = () => {
   const { documentId } = useParams<{ documentId: string }>();
@@ -22,6 +22,7 @@ const DocumentDrafting = () => {
   const [showAiPrompt, setShowAiPrompt] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
   const [isAiProcessing, setIsAiProcessing] = useState(false);
+  const [showRightPanel, setShowRightPanel] = useState(true);
   
   useEffect(() => {
     if (documentId) {
@@ -109,6 +110,10 @@ const DocumentDrafting = () => {
     }
   };
   
+  const toggleRightPanel = () => {
+    setShowRightPanel(!showRightPanel);
+  };
+  
   return (
     <>
       <Navigation />
@@ -130,8 +135,8 @@ const DocumentDrafting = () => {
               onDocumentSaved={handleDocumentSaved}
             />
             
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative">
+              <div className={`lg:col-span-${showRightPanel ? '2' : '3'} space-y-6 transition-all duration-300`}>
                 <input
                   type="text"
                   value={documentTitle}
@@ -148,24 +153,36 @@ const DocumentDrafting = () => {
                 />
               </div>
               
-              <div className="space-y-6">
-                {showAiPrompt && (
-                  <div className="p-4 border rounded-md bg-card">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Sparkles className="h-5 w-5 text-primary" />
-                      <h3 className="font-medium">AI Assistant</h3>
+              {showRightPanel && (
+                <div className="space-y-6">
+                  {showAiPrompt && (
+                    <div className="p-4 border rounded-md bg-card">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                        <h3 className="font-medium">AI Assistant</h3>
+                      </div>
+                      <AiPromptInput 
+                        aiPrompt={aiPrompt}
+                        setAiPrompt={setAiPrompt}
+                        isAiProcessing={isAiProcessing}
+                        onSubmit={handleAiPromptSubmit}
+                      />
                     </div>
-                    <AiPromptInput 
-                      aiPrompt={aiPrompt}
-                      setAiPrompt={setAiPrompt}
-                      isAiProcessing={isAiProcessing}
-                      onSubmit={handleAiPromptSubmit}
-                    />
-                  </div>
-                )}
-                
-                <CommentSection documentId={currentDocumentId} />
-              </div>
+                  )}
+                  
+                  <CommentSection documentId={currentDocumentId} />
+                </div>
+              )}
+              
+              <Button
+                onClick={toggleRightPanel}
+                variant="outline"
+                size="icon"
+                className="absolute top-0 right-0 lg:right-[-50px] z-10"
+                title={showRightPanel ? "Hide comments panel" : "Show comments panel"}
+              >
+                {showRightPanel ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
+              </Button>
             </div>
           </div>
         )}
