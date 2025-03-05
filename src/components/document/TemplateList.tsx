@@ -10,6 +10,7 @@ import { templates } from '@/utils/documents/templateData';
 import { getCustomTemplates } from '@/utils/documents/templateManager';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DOCUMENT_CATEGORIES } from './DocumentCategories';
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface TemplateListProps {
   onSelectTemplate: (id: string) => void;
@@ -103,12 +104,20 @@ const TemplateList = ({ onSelectTemplate }: TemplateListProps) => {
 
       <motion.div variants={itemVariants} className="mb-6">
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full max-w-lg mx-auto grid grid-cols-4 mb-6">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="contract">Contracts</TabsTrigger>
-            <TabsTrigger value="pleading">Pleadings</TabsTrigger>
-            <TabsTrigger value="research">Research</TabsTrigger>
-          </TabsList>
+          <ScrollArea className="w-full max-w-4xl mx-auto">
+            <TabsList className="inline-flex w-full min-w-max mb-6 h-auto px-4 py-2 flex-wrap">
+              <TabsTrigger value="all" className="m-1">All</TabsTrigger>
+              {DOCUMENT_CATEGORIES.map(category => (
+                <TabsTrigger 
+                  key={category.id} 
+                  value={category.id}
+                  className="m-1"
+                >
+                  {category.name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </ScrollArea>
         </Tabs>
       </motion.div>
       
