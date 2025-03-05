@@ -55,6 +55,7 @@ export const useCaseCrud = () => {
       priority: 'high' | 'medium' | 'low';
       deadline?: number;
       notes?: string;
+      clientName?: string; // Add clientName to the type definition
     }
   ) => {
     try {

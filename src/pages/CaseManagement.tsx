@@ -22,6 +22,7 @@ const CaseManagement = () => {
     cases,
     isLoading,
     loadCases,
+    handleCreateCase,
     handleUpdateCase,
     handleUpdateStatus,
     handleUpdatePriority,
