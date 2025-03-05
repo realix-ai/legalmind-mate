@@ -162,6 +162,22 @@ const DocumentDrafting = () => {
                   className="w-full px-4 py-2 text-xl font-semibold border-b border-gray-200 focus:outline-none focus:border-primary/50 transition-all duration-200"
                 />
                 
+                {/* AI Prompt section - moved here above the editor for better user experience */}
+                {showAiPrompt && (
+                  <div className="p-4 border rounded-md bg-card">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                      <h3 className="font-medium">AI Assistant</h3>
+                    </div>
+                    <AiPromptInput 
+                      aiPrompt={aiPrompt}
+                      setAiPrompt={setAiPrompt}
+                      isAiProcessing={isAiProcessing}
+                      onSubmit={handleAiPromptSubmit}
+                    />
+                  </div>
+                )}
+                
                 <DocumentEditor
                   documentTitle={documentTitle}
                   setDocumentTitle={setDocumentTitle}
@@ -170,24 +186,9 @@ const DocumentDrafting = () => {
                 />
               </div>
               
-              {/* Right panel with comments and AI prompt */}
+              {/* Right panel with comments and collaborators */}
               {showRightPanel && (
                 <div className="w-1/3 space-y-6">
-                  {showAiPrompt && (
-                    <div className="p-4 border rounded-md bg-card">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Sparkles className="h-5 w-5 text-primary" />
-                        <h3 className="font-medium">AI Assistant</h3>
-                      </div>
-                      <AiPromptInput 
-                        aiPrompt={aiPrompt}
-                        setAiPrompt={setAiPrompt}
-                        isAiProcessing={isAiProcessing}
-                        onSubmit={handleAiPromptSubmit}
-                      />
-                    </div>
-                  )}
-                  
                   <AddCollaborator 
                     onAddCollaborator={handleAddCollaborator}
                     isLoading={isAddingCollaborator}
