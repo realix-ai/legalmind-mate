@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import QueryOptions from '@/components/QueryOptions';
@@ -27,6 +27,8 @@ const itemVariants = {
 const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
   const [query, setQuery] = useState('');
   const [selectedOption, setSelectedOption] = useState<QueryType>('legal-research');
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
   
   const {
     showPromptManager,
@@ -59,7 +61,7 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
       // Add query to history
       addToHistory(query);
       
-      await onSubmit(query.trim(), selectedOption, null);
+      await onSubmit(query.trim(), selectedOption, uploadedFile);
       console.log("Form submission completed");
     } catch (error) {
       console.error("Error in form submission:", error);
@@ -77,17 +79,78 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
     setShowHistory(false); // Hide history after selection
   };
 
+  const handleFileUpload = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.pdf,.doc,.docx,.txt';
+    
+    input.onchange = (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      if (target.files && target.files.length > 0) {
+        const file = target.files[0];
+        
+        // Check file size (max 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+          setFileError("File size exceeds the limit of 10MB");
+          setUploadedFile(null);
+          toast.error("File size exceeds the limit of 10MB");
+          return;
+        }
+        
+        // Check file type
+        const allowedTypes = [
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'text/plain'
+        ];
+        
+        if (!allowedTypes.includes(file.type)) {
+          setFileError("Unsupported file type. Please upload PDF, Word, or Text files");
+          setUploadedFile(null);
+          toast.error("Unsupported file type");
+          return;
+        }
+        
+        // File is valid
+        setFileError(null);
+        setUploadedFile(file);
+        toast.success(`File uploaded: ${file.name}`);
+      }
+    };
+    
+    input.click();
+  };
+
   return (
     <motion.div variants={itemVariants}>
       <form onSubmit={handleSubmit} className="mb-8">
         <QueryTextarea
           query={query}
           onChange={(e) => setQuery(e.target.value)}
-          onTriggerFileUpload={() => toast.info('File upload has been disabled')}
+          onTriggerFileUpload={handleFileUpload}
           isProcessing={isProcessing}
-          hasFile={false}
-          fileError={null}
+          hasFile={!!uploadedFile}
+          fileError={fileError}
         />
+        
+        {uploadedFile && (
+          <div className="mb-4 p-2 bg-muted rounded-md flex justify-between items-center">
+            <div className="text-sm">
+              <span className="font-medium">File:</span> {uploadedFile.name}
+            </div>
+            <button
+              type="button"
+              className="text-sm text-destructive hover:underline"
+              onClick={() => {
+                setUploadedFile(null);
+                setFileError(null);
+              }}
+            >
+              Remove
+            </button>
+          </div>
+        )}
         
         <PromptManagerSection 
           showPromptManager={showPromptManager}

@@ -21,10 +21,14 @@ export const useLegalQuery = (setActiveTab: (tab: string) => void) => {
     try {
       console.log("QueryAssistant: Starting to process query:", query);
       console.log("QueryAssistant: Selected option:", selectedOption);
-      console.log("QueryAssistant: File upload has been disabled");
       
-      // Always pass null for file since we've removed file upload functionality
-      const result = await processLegalQuery(query, selectedOption, null);
+      if (file) {
+        console.log("QueryAssistant: Processing with file:", file.name);
+      } else {
+        console.log("QueryAssistant: No file uploaded");
+      }
+      
+      const result = await processLegalQuery(query, selectedOption, file);
       console.log("QueryAssistant: Received result:", result);
       
       if (result.status === 'success') {

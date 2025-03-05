@@ -63,6 +63,14 @@ const DocumentDrafting = () => {
   };
   
   const handleSelectTemplate = (id: string) => {
+    if (id === 'blank') {
+      // Create a new blank document
+      setDocumentTitle('Untitled Document');
+      setDocumentContent('');
+      setShowTemplates(false);
+      return;
+    }
+    
     // Get template or document by ID and set title/content
     const document = getSavedDocument(id);
     if (document) {
@@ -72,8 +80,8 @@ const DocumentDrafting = () => {
     }
   };
   
-  const handleAiPromptSubmit = () => {
-    if (!aiPrompt.trim()) return;
+  const handleAiPromptSubmit = (prompt: string) => {
+    if (!prompt.trim()) return;
     
     setIsAiProcessing(true);
     toast.loading('Generating content...');
@@ -81,7 +89,7 @@ const DocumentDrafting = () => {
     // Simulate AI processing
     setTimeout(() => {
       // Add AI-generated content at the end of the current content
-      const aiContent = generateAiResponse(aiPrompt);
+      const aiContent = generateAiResponse(prompt);
       setDocumentContent(prev => prev + '\n\n' + aiContent);
       setIsAiProcessing(false);
       setAiPrompt('');
@@ -129,12 +137,10 @@ const DocumentDrafting = () => {
                   value={documentTitle}
                   onChange={(e) => setDocumentTitle(e.target.value)}
                   placeholder="Document Title"
-                  className="w-full px-4 py-2 text-xl font-semibold border-b border-gray-200 focus:outline-none focus:border-primary"
+                  className="w-full px-4 py-2 text-xl font-semibold border-b border-gray-200 focus:outline-none focus:border-primary/50 transition-all duration-200"
                 />
                 
                 <DocumentEditor
-                  documentTitle={documentTitle}
-                  setDocumentTitle={setDocumentTitle}
                   documentContent={documentContent}
                   setDocumentContent={setDocumentContent}
                 />

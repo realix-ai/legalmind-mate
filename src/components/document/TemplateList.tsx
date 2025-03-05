@@ -1,4 +1,3 @@
-
 import { motion } from 'framer-motion';
 import DocumentTemplate from '@/components/DocumentTemplate';
 import { Button } from '@/components/ui/button';
@@ -41,7 +40,10 @@ const TemplateList = ({ onSelectTemplate }: TemplateListProps) => {
   }, []);
   
   const handleCreateBlank = () => {
-    onSelectTemplate('new');
+    // Create a blank document with default title and empty content
+    const blankDocTitle = "Untitled Document";
+    const blankDocContent = "";
+    onSelectTemplate('blank');
   };
   
   const handleTemplateAdded = () => {
