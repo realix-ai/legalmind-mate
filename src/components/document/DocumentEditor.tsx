@@ -12,8 +12,6 @@ import {
 import { Button } from '@/components/ui/button';
 
 interface DocumentEditorProps {
-  documentTitle: string;
-  setDocumentTitle: (title: string) => void;
   documentContent: string;
   setDocumentContent: (content: string) => void;
 }
