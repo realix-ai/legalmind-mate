@@ -25,13 +25,15 @@ import {
 interface SaveToCaseDialogProps {
   documentTitle: string;
   documentContent: string;
+  documentCategory: string; // Add the documentCategory prop
   currentDocumentId: string | null;
   onSaved: (documentId: string) => void;
 }
 
 const SaveToCaseDialog = ({ 
   documentTitle, 
-  documentContent, 
+  documentContent,
+  documentCategory, // Include in destructuring
   currentDocumentId,
   onSaved
 }: SaveToCaseDialogProps) => {
@@ -78,13 +80,14 @@ const SaveToCaseDialog = ({
       console.log("Document content length:", documentContent.length);
       console.log("Current document ID:", currentDocumentId);
       console.log("Saving document to case ID:", caseId);
+      console.log("Document category:", documentCategory); // Log the category
       
       // Normalize the case ID before saving
       const normalizedCaseId = normalizeCaseId(caseId);
       console.log("Normalized case ID:", normalizedCaseId);
       
-      // Save document with normalized case ID
-      const saved = saveDocument(finalDocumentTitle, documentContent, currentDocumentId, normalizedCaseId);
+      // Save document with normalized case ID and category
+      const saved = saveDocument(finalDocumentTitle, documentContent, currentDocumentId, normalizedCaseId, documentCategory);
       
       console.log("Document saved:", saved);
       toast.success(`Document saved to ${isCreatingCase ? `new case "${newCaseName}"` : 'the selected case'}`);
