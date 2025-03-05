@@ -6,7 +6,7 @@ interface AiPromptInputProps {
   aiPrompt: string;
   setAiPrompt: (prompt: string) => void;
   isAiProcessing: boolean;
-  onSubmit: () => void;
+  onSubmit: (prompt: string) => void;  // Updated the type to accept a prompt parameter
 }
 
 const AiPromptInput = ({ 
@@ -26,7 +26,7 @@ const AiPromptInput = ({
         disabled={isAiProcessing}
       />
       <Button 
-        onClick={onSubmit}
+        onClick={() => onSubmit(aiPrompt)}  // Update to pass the current prompt to the onSubmit function
         disabled={isAiProcessing || !aiPrompt.trim()}
         size="sm"
         className="gap-1"
