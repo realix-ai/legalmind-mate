@@ -20,27 +20,35 @@ interface DocumentsPanelProps {
   documents: Document[];
 }
 
+// Helper function to normalize case IDs
+const normalizeCaseId = (displayedCaseNumber: string): string => {
+  if (!displayedCaseNumber) return '';
+  
+  // If it already starts with 'case-', return it
+  if (displayedCaseNumber.startsWith('case-')) {
+    return displayedCaseNumber;
+  }
+  
+  // If it starts with 'CASE-', convert to lowercase and add 'case-' prefix
+  if (displayedCaseNumber.startsWith('CASE-')) {
+    return `case-${displayedCaseNumber.substring(5)}`;
+  }
+  
+  // Otherwise, just ensure it has the 'case-' prefix
+  return `case-${displayedCaseNumber.replace(/^case-/, '')}`;
+};
+
 const DocumentsPanel = ({ caseNumber, caseName, documents: initialDocuments }: DocumentsPanelProps) => {
   const navigate = useNavigate();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   
-  const extractCaseId = (displayedCaseNumber: string) => {
-    if (displayedCaseNumber.startsWith('case-')) {
-      return displayedCaseNumber;
-    }
-    if (displayedCaseNumber.startsWith('CASE-')) {
-      return 'case-' + displayedCaseNumber.substring(5);
-    }
-    return displayedCaseNumber;
-  };
-  
   useEffect(() => {
     if (caseNumber) {
-      const caseId = extractCaseId(caseNumber);
-      console.log("Loading documents for case ID:", caseId);
+      const normalizedCaseId = normalizeCaseId(caseNumber);
+      console.log("Loading documents for normalized case ID:", normalizedCaseId);
       
-      const docs = getCaseDocuments(caseId);
+      const docs = getCaseDocuments(normalizedCaseId);
       console.log("Retrieved documents:", docs);
       
       setDocuments(docs.map(doc => ({
@@ -68,7 +76,7 @@ const DocumentsPanel = ({ caseNumber, caseName, documents: initialDocuments }: D
           <p className="text-muted-foreground text-sm">Case: {caseNumber}</p>
         </div>
         <DocumentUploadButton 
-          caseId={extractCaseId(caseNumber)} 
+          caseId={normalizeCaseId(caseNumber)} 
           onDocumentUploaded={handleDocumentUploaded} 
         />
       </div>

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { 
@@ -65,6 +66,11 @@ const SaveToCaseDialog = ({
         
         const newCase = createCase(newCaseName);
         caseId = newCase.id;
+      }
+      
+      // Make sure caseId is properly formatted (ensure it starts with "case-")
+      if (caseId && !caseId.startsWith('case-')) {
+        caseId = `case-${caseId.replace(/^case-/, '')}`;
       }
       
       const saved = saveDocument(documentTitle, documentContent, currentDocumentId, caseId);
