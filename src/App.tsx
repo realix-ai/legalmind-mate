@@ -9,18 +9,11 @@ import CaseChat from './pages/CaseChat';
 import QueryAssistant from './pages/QueryAssistant';
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import { ProtectedRoute, PublicOnlyRoute } from './components/auth/AuthRoutes';
 import './App.css';
 
 const queryClient = new QueryClient();
 
 function App() {
-  // Check if Clerk is available
-  const isClerkAvailable = typeof window !== 'undefined' && 
-    !!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -29,23 +22,13 @@ function App() {
             {/* Public routes accessible to everyone */}
             <Route path="/" element={<Index />} />
             
-            {/* Auth routes - only shown when Clerk is available */}
-            {isClerkAvailable && (
-              <Route element={<PublicOnlyRoute />}>
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-              </Route>
-            )}
-            
-            {/* Protected routes - bypass auth check when Clerk is not available */}
-            <Route element={<ProtectedRoute bypassAuth={!isClerkAvailable} />}>
-              <Route path="/document-drafting" element={<DocumentDrafting />} />
-              <Route path="/document-drafting/:templateId" element={<DocumentDrafting />} />
-              <Route path="/document-drafting/edit/:documentId" element={<DocumentDrafting />} />
-              <Route path="/case-management" element={<CaseManagement />} />
-              <Route path="/case-chat/:caseId" element={<CaseChat />} />
-              <Route path="/query-assistant" element={<QueryAssistant />} />
-            </Route>
+            {/* All routes are now accessible without authentication */}
+            <Route path="/document-drafting" element={<DocumentDrafting />} />
+            <Route path="/document-drafting/:templateId" element={<DocumentDrafting />} />
+            <Route path="/document-drafting/edit/:documentId" element={<DocumentDrafting />} />
+            <Route path="/case-management" element={<CaseManagement />} />
+            <Route path="/case-chat/:caseId" element={<CaseChat />} />
+            <Route path="/query-assistant" element={<QueryAssistant />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>
