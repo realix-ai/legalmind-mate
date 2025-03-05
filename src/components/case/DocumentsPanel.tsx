@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -28,18 +27,13 @@ const DocumentsPanel = ({ caseNumber, caseName, documents: initialDocuments }: D
   
   useEffect(() => {
     if (caseNumber) {
-      // Extract case ID from the displayed case number (e.g., "CASE-12345")
-      let caseIdFromNumber = '';
+      // Extract case ID from the displayed case number
+      let caseIdFromNumber = caseNumber;
       
-      // Handle different case number formats
-      if (caseNumber.startsWith('CASE-')) {
-        caseIdFromNumber = `case-${caseNumber.substring(5)}`;
-      } else {
-        // If it's already a case ID format, just normalize it
-        caseIdFromNumber = normalizeCaseId(caseNumber);
-      }
+      // Ensure we have a properly formatted case ID
+      caseIdFromNumber = normalizeCaseId(caseIdFromNumber);
       
-      console.log("Loading documents for normalized case ID:", caseIdFromNumber);
+      console.log("Loading documents for case ID:", caseIdFromNumber);
       
       // Get documents using the normalized case ID
       const docs = getCaseDocuments(caseIdFromNumber);
@@ -58,6 +52,9 @@ const DocumentsPanel = ({ caseNumber, caseName, documents: initialDocuments }: D
     setRefreshTrigger(prev => prev + 1);
   };
   
+  // Derive normalized case ID for upload button
+  const normalizedCaseId = caseNumber ? normalizeCaseId(caseNumber) : '';
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -70,7 +67,7 @@ const DocumentsPanel = ({ caseNumber, caseName, documents: initialDocuments }: D
           <p className="text-muted-foreground text-sm">Case: {caseNumber}</p>
         </div>
         <DocumentUploadButton 
-          caseId={normalizeCaseId(caseNumber.startsWith('CASE-') ? `case-${caseNumber.substring(5)}` : caseNumber)} 
+          caseId={normalizedCaseId} 
           onDocumentUploaded={handleDocumentUploaded} 
         />
       </div>

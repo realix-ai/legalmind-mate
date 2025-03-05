@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -30,18 +29,32 @@ export function useDocumentState(documentId: string | undefined) {
   }, [documentId, navigate]);
 
   const handleSaveDocument = () => {
-    if (!documentTitle.trim()) {
-      toast.error('Please enter a document title');
-      return;
-    }
+    // Ensure we have a valid title
+    const titleToSave = documentTitle.trim() || "Untitled Document";
     
-    const savedDoc = saveDocument(documentTitle, documentContent, currentDocumentId);
+    console.log("Saving document with title:", titleToSave);
+    console.log("Current ID:", currentDocumentId);
+    
+    const savedDoc = saveDocument(titleToSave, documentContent, currentDocumentId);
     setCurrentDocumentId(savedDoc.id);
+    
+    // Make sure our local state matches what was saved
+    setDocumentTitle(savedDoc.title);
+    
+    console.log("Document saved with ID:", savedDoc.id, "and title:", savedDoc.title);
     toast.success('Document saved successfully');
   };
 
   const handleDocumentSaved = (id: string) => {
-    setCurrentDocumentId(id);
+    console.log("Document saved with ID:", id);
+    
+    // Update the local state with the latest document data
+    const savedDoc = getSavedDocument(id);
+    if (savedDoc) {
+      setCurrentDocumentId(id);
+      setDocumentTitle(savedDoc.title);
+      console.log("Updated document title to:", savedDoc.title);
+    }
   };
 
   const handleBack = () => {

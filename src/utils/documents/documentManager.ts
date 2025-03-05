@@ -1,3 +1,4 @@
+
 import { SavedDocument } from './types';
 
 // Document storage functions
@@ -6,6 +7,8 @@ export const saveDocument = (title: string, content: string, id?: string | null,
   
   // Normalize the caseId if it exists
   const normalizedCaseId = caseId ? normalizeCaseId(caseId) : undefined;
+  
+  console.log("Saving document with normalized caseId:", normalizedCaseId);
   
   const newDocument: SavedDocument = {
     id: id || `doc-${Date.now()}`,
@@ -18,16 +21,23 @@ export const saveDocument = (title: string, content: string, id?: string | null,
   const existingIndex = id ? savedDocuments.findIndex(doc => doc.id === id) : -1;
   
   if (existingIndex >= 0) {
+    console.log(`Updating existing document at index ${existingIndex}`);
+    console.log("Previous document state:", savedDocuments[existingIndex]);
+    
     // Preserve the existing caseId if not explicitly changing it
-    if (!caseId && savedDocuments[existingIndex].caseId) {
+    if (caseId === undefined && savedDocuments[existingIndex].caseId) {
       newDocument.caseId = savedDocuments[existingIndex].caseId;
     }
+    
     savedDocuments[existingIndex] = newDocument;
+    console.log("Updated document:", newDocument);
   } else {
+    console.log("Adding new document to storage");
     savedDocuments.push(newDocument);
   }
   
   localStorage.setItem('savedDocuments', JSON.stringify(savedDocuments));
+  console.log("Saved documents to localStorage");
   return newDocument;
 };
 

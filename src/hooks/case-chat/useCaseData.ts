@@ -27,7 +27,7 @@ export function useCaseData(caseId: string | undefined) {
           console.log("Case found:", caseInfo);
           setCaseData({
             ...caseInfo,
-            caseNumber: `CASE-${caseInfo.id.substring(5, 10)}`
+            caseNumber: caseInfo.id
           });
           
           // Use the normalized case ID for getting documents

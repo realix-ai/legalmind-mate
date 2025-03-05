@@ -1,3 +1,4 @@
+
 import { Case, SavedDocument } from './types';
 import { getSavedDocuments, updateDocumentCaseId, normalizeCaseId } from './documentManager';
 
@@ -62,11 +63,14 @@ export const getCaseDocuments = (caseId: string): SavedDocument[] => {
   console.log("All documents:", documents);
   
   const filteredDocs = documents.filter(doc => {
-    const docCaseMatch = doc.caseId === normalizedId;
+    if (!doc.caseId) return false;
+    
+    const docCaseId = normalizeCaseId(doc.caseId);
+    const docCaseMatch = docCaseId === normalizedId;
+    
     // Debug logging for document case matching
-    if (doc.caseId) {
-      console.log(`Comparing document.caseId ${doc.caseId} with normalizedId ${normalizedId}: ${docCaseMatch}`);
-    }
+    console.log(`Comparing document.caseId ${docCaseId} with normalizedId ${normalizedId}: ${docCaseMatch}`);
+    
     return docCaseMatch;
   });
   
