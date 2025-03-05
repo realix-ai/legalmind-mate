@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FileText, MoreHorizontal, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import DocumentUploadButton from '@/components/case-chat/DocumentUploadButton';
 
 interface Document {
   id: string;
@@ -21,6 +22,12 @@ interface DocumentsPanelProps {
 
 const DocumentsPanel = ({ caseNumber, caseName, documents }: DocumentsPanelProps) => {
   const navigate = useNavigate();
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  
+  const handleDocumentUploaded = () => {
+    // Trigger a refresh of the documents list
+    setRefreshTrigger(prev => prev + 1);
+  };
   
   return (
     <motion.div
@@ -33,6 +40,13 @@ const DocumentsPanel = ({ caseNumber, caseName, documents }: DocumentsPanelProps
           <h2 className="text-xl font-semibold">Documents</h2>
           <p className="text-muted-foreground text-sm">Case: {caseNumber}</p>
         </div>
+      </div>
+      
+      <div className="mb-4">
+        <DocumentUploadButton 
+          caseId={caseNumber} 
+          onDocumentUploaded={handleDocumentUploaded} 
+        />
       </div>
       
       {documents.length > 0 ? (
@@ -95,11 +109,13 @@ const DocumentsPanel = ({ caseNumber, caseName, documents }: DocumentsPanelProps
           </div>
           <h3 className="text-lg font-medium mb-1">No documents yet</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Create a document and assign it to this case
+            Upload a document or create one and assign it to this case
           </p>
-          <Button onClick={() => navigate('/document-drafting')}>
-            Create Document
-          </Button>
+          <div className="space-y-2">
+            <Button onClick={() => navigate('/document-drafting')} className="w-full">
+              Create Document
+            </Button>
+          </div>
         </div>
       )}
     </motion.div>
