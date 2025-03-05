@@ -27,6 +27,7 @@ export function useCaseData(caseId: string | undefined) {
             caseNumber: `CASE-${caseInfo.id.substring(5, 10)}`
           });
           
+          // Use the original caseId for getting documents
           const docs = getCaseDocuments(caseId);
           console.log(`Found ${docs.length} documents for case:`, caseId);
           

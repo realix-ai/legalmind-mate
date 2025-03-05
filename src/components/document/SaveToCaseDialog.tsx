@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 import { 
   saveDocument, 
   getCases, 
@@ -71,20 +71,13 @@ const SaveToCaseDialog = ({
       
       const saved = saveDocument(documentTitle, documentContent, currentDocumentId, caseId);
       
-      toast({
-        title: "Document saved",
-        description: `Your document has been saved to ${isCreatingCase ? `the new case "${newCaseName}"` : 'the selected case'}.`,
-      });
+      toast.success(`Document saved to ${isCreatingCase ? `new case "${newCaseName}"` : 'the selected case'}`);
       
       setOpen(false);
       onSaved(saved.id);
     } catch (error) {
       console.error("Error saving document:", error);
-      toast({
-        title: "Save failed",
-        description: "There was an error saving your document.",
-        variant: "destructive"
-      });
+      toast.error("There was an error saving your document.");
     }
   };
 

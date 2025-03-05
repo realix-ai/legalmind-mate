@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -26,11 +25,23 @@ const DocumentsPanel = ({ caseNumber, caseName, documents: initialDocuments }: D
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   
+  const extractCaseId = (displayedCaseNumber: string) => {
+    if (displayedCaseNumber.startsWith('case-')) {
+      return displayedCaseNumber;
+    }
+    if (displayedCaseNumber.startsWith('CASE-')) {
+      return 'case-' + displayedCaseNumber.substring(5);
+    }
+    return displayedCaseNumber;
+  };
+  
   useEffect(() => {
-    // Only run this effect when refreshTrigger changes
     if (caseNumber) {
-      const caseId = caseNumber.replace('CASE-', '');
+      const caseId = extractCaseId(caseNumber);
+      console.log("Loading documents for case ID:", caseId);
+      
       const docs = getCaseDocuments(caseId);
+      console.log("Retrieved documents:", docs);
       
       setDocuments(docs.map(doc => ({
         id: doc.id,
@@ -42,7 +53,6 @@ const DocumentsPanel = ({ caseNumber, caseName, documents: initialDocuments }: D
   }, [refreshTrigger, caseNumber]);
   
   const handleDocumentUploaded = () => {
-    // Trigger a refresh of the documents list
     setRefreshTrigger(prev => prev + 1);
   };
   
@@ -58,7 +68,7 @@ const DocumentsPanel = ({ caseNumber, caseName, documents: initialDocuments }: D
           <p className="text-muted-foreground text-sm">Case: {caseNumber}</p>
         </div>
         <DocumentUploadButton 
-          caseId={caseNumber.replace('CASE-', '')} 
+          caseId={extractCaseId(caseNumber)} 
           onDocumentUploaded={handleDocumentUploaded} 
         />
       </div>
