@@ -16,7 +16,7 @@ const SUPPORTED_FILE_TYPES = {
 
 // Process file and query together
 export async function processFileWithQuery(file: File, query: string, queryType: QueryType): Promise<string> {
-  console.log("FileProcessingService: Inside processFileWithQuery function");
+  console.log("FileProcessingService: Inside processFileWithQuery function for file:", file.name);
   
   // Validate file size
   if (file.size > MAX_FILE_SIZE) {
@@ -36,7 +36,7 @@ export async function processFileWithQuery(file: File, query: string, queryType:
   }
   
   // Simulate file processing delay with progress feedback
-  toast.info("Processing your file...");
+  toast.info(`Processing file: ${file.name}...`);
   await new Promise(resolve => setTimeout(resolve, 1500));
   
   // Read the file content (for text files)
@@ -51,11 +51,11 @@ export async function processFileWithQuery(file: File, query: string, queryType:
         fileContent.substring(0, 100) + (fileContent.length > 100 ? "..." : ""));
     } else if (fileTypeInfo.isImage) {
       console.log("FileProcessingService: Processing image file...");
-      toast.info("Analyzing image content...");
+      toast.info(`Analyzing image content: ${file.name}...`);
       fileContent = '[Image analysis would be performed here]';
     } else if (fileTypeInfo.isPdf) {
       console.log("FileProcessingService: Processing PDF file...");
-      toast.info("Extracting PDF content...");
+      toast.info(`Extracting PDF content: ${file.name}...`);
       fileContent = '[PDF content extraction would be performed here]';
     } else {
       console.log("FileProcessingService: Unknown file type:", file.type);
@@ -69,12 +69,12 @@ export async function processFileWithQuery(file: File, query: string, queryType:
   }
   
   // Generate a response based on file type and query
-  toast.info("Generating analysis...");
+  toast.info(`Generating analysis for: ${file.name}...`);
   const fileTypeResponse = getFileAnalysisResponse(file.type || file.name, queryType);
   
   const finalResponse = `ANALYSIS OF UPLOADED FILE: ${file.name}\n\n${fileTypeResponse}\n\nRELATED TO QUERY: "${query}"\n\n${await simulateApiCall(query, queryType)}`;
   console.log("FileProcessingService: Generated file analysis response");
-  toast.success("Analysis complete!");
+  toast.success(`Analysis complete for: ${file.name}`);
   
   return finalResponse;
 }

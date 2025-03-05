@@ -11,7 +11,7 @@ import PromptManagerSection from '@/components/query/PromptManagerSection';
 import QueryHistory from '@/components/query/QueryHistory';
 
 interface QueryFormProps {
-  onSubmit: (query: string, queryType: QueryType, file: File | null) => Promise<void>;
+  onSubmit: (query: string, queryType: QueryType, files: File[]) => Promise<void>;
   isProcessing: boolean;
 }
 
@@ -27,7 +27,7 @@ const itemVariants = {
 const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
   const [query, setQuery] = useState('');
   const [selectedOption, setSelectedOption] = useState<QueryType>('legal-research');
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState<string | null>(null);
   
   const {
@@ -61,7 +61,7 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
       // Add query to history
       addToHistory(query);
       
-      await onSubmit(query.trim(), selectedOption, uploadedFile);
+      await onSubmit(query.trim(), selectedOption, uploadedFiles);
       console.log("Form submission completed");
     } catch (error) {
       console.error("Error in form submission:", error);
@@ -83,39 +83,57 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.pdf,.doc,.docx,.txt';
+    input.multiple = true;
     
     input.onchange = (e: Event) => {
       const target = e.target as HTMLInputElement;
       if (target.files && target.files.length > 0) {
-        const file = target.files[0];
+        const newFiles: File[] = Array.from(target.files);
+        const MAX_FILES = 5;
         
-        // Check file size (max 10MB)
-        if (file.size > 10 * 1024 * 1024) {
-          setFileError("File size exceeds the limit of 10MB");
-          setUploadedFile(null);
-          toast.error("File size exceeds the limit of 10MB");
+        // Check number of files
+        if (newFiles.length > MAX_FILES) {
+          setFileError(`You can only upload up to ${MAX_FILES} files at once`);
+          toast.error(`You can only upload up to ${MAX_FILES} files at once`);
           return;
         }
         
-        // Check file type
-        const allowedTypes = [
-          'application/pdf',
-          'application/msword',
-          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          'text/plain'
-        ];
+        // Check each file for size and type
+        let hasError = false;
+        for (const file of newFiles) {
+          // Check file size (max 10MB)
+          if (file.size > 10 * 1024 * 1024) {
+            setFileError(`File ${file.name} exceeds the limit of 10MB`);
+            toast.error(`File ${file.name} exceeds the limit of 10MB`);
+            hasError = true;
+            break;
+          }
+          
+          // Check file type
+          const allowedTypes = [
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'text/plain'
+          ];
+          
+          if (!allowedTypes.includes(file.type)) {
+            setFileError(`File ${file.name} has an unsupported type. Please upload PDF, Word, or Text files`);
+            toast.error(`Unsupported file type: ${file.name}`);
+            hasError = true;
+            break;
+          }
+        }
         
-        if (!allowedTypes.includes(file.type)) {
-          setFileError("Unsupported file type. Please upload PDF, Word, or Text files");
-          setUploadedFile(null);
-          toast.error("Unsupported file type");
+        if (hasError) {
+          setUploadedFiles([]);
           return;
         }
         
-        // File is valid
+        // Files are valid
         setFileError(null);
-        setUploadedFile(file);
-        toast.success(`File uploaded: ${file.name}`);
+        setUploadedFiles(newFiles);
+        toast.success(`${newFiles.length} ${newFiles.length === 1 ? 'file' : 'files'} uploaded`);
       }
     };
     
@@ -130,25 +148,48 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
           onChange={(e) => setQuery(e.target.value)}
           onTriggerFileUpload={handleFileUpload}
           isProcessing={isProcessing}
-          hasFile={!!uploadedFile}
+          hasFiles={uploadedFiles.length > 0}
           fileError={fileError}
         />
         
-        {uploadedFile && (
-          <div className="mb-4 p-2 bg-muted rounded-md flex justify-between items-center">
-            <div className="text-sm">
-              <span className="font-medium">File:</span> {uploadedFile.name}
+        {uploadedFiles.length > 0 && (
+          <div className="mb-4 p-2 bg-muted rounded-md">
+            <div className="flex justify-between items-center mb-2">
+              <div className="text-sm font-medium">
+                Uploaded Files ({uploadedFiles.length})
+              </div>
+              <button
+                type="button"
+                className="text-sm text-destructive hover:underline"
+                onClick={() => {
+                  setUploadedFiles([]);
+                  setFileError(null);
+                }}
+              >
+                Remove All
+              </button>
             </div>
-            <button
-              type="button"
-              className="text-sm text-destructive hover:underline"
-              onClick={() => {
-                setUploadedFile(null);
-                setFileError(null);
-              }}
-            >
-              Remove
-            </button>
+            <div className="space-y-2">
+              {uploadedFiles.map((file, index) => (
+                <div key={index} className="flex justify-between items-center text-sm p-1.5 bg-background rounded">
+                  <span className="truncate max-w-[240px]">{file.name}</span>
+                  <button
+                    type="button"
+                    className="text-xs text-destructive hover:underline"
+                    onClick={() => {
+                      const newFiles = [...uploadedFiles];
+                      newFiles.splice(index, 1);
+                      setUploadedFiles(newFiles);
+                      if (newFiles.length === 0) {
+                        setFileError(null);
+                      }
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         )}
         

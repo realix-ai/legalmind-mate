@@ -50,18 +50,26 @@ const BatchProcessingPanel = () => {
         
         // Generate a mock result based on query type
         let result = '';
+        
+        // Check if query has files attached
+        if (query.files && query.files.length > 0) {
+          const fileInfo = query.files.map(file => `${file.name} (${file.type}, ${(file.size / 1024).toFixed(2)} KB)`).join('\n- ');
+          result = `ANALYSIS WITH ${query.files.length} FILES:\n- ${fileInfo}\n\n`;
+        }
+        
+        // Add query type specific response
         switch (query.type) {
           case 'legal-research':
-            result = `Research findings for "${query.text}": Several precedents were identified including Smith v. Johnson (2018) and Wilson Corp v. Davidson (2020).`;
+            result += `Research findings for "${query.text}": Several precedents were identified including Smith v. Johnson (2018) and Wilson Corp v. Davidson (2020).`;
             break;
           case 'risk-analysis':
-            result = `Risk analysis for "${query.text}": Medium risk level identified with potential issues in jurisdictional considerations.`;
+            result += `Risk analysis for "${query.text}": Medium risk level identified with potential issues in jurisdictional considerations.`;
             break;
           case 'summarize':
-            result = `Summary of "${query.text}": This query relates to contractual obligations and potential breach scenarios.`;
+            result += `Summary of "${query.text}": This query relates to contractual obligations and potential breach scenarios.`;
             break;
           case 'data-analysis':
-            result = `Data analysis for "${query.text}": Statistical findings indicate 73% of similar cases settled before trial.`;
+            result += `Data analysis for "${query.text}": Statistical findings indicate 73% of similar cases settled before trial.`;
             break;
         }
         

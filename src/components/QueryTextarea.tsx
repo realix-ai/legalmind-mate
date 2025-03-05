@@ -8,7 +8,7 @@ interface QueryTextareaProps {
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onTriggerFileUpload: () => void;
   isProcessing: boolean;
-  hasFile: boolean;
+  hasFiles: boolean;
   fileError: string | null;
 }
 
@@ -17,7 +17,7 @@ const QueryTextarea = ({
   onChange, 
   onTriggerFileUpload, 
   isProcessing, 
-  hasFile,
+  hasFiles,
   fileError
 }: QueryTextareaProps) => {
   return (
@@ -32,7 +32,7 @@ const QueryTextarea = ({
       <div className="absolute bottom-3 right-3 flex space-x-2">
         <FileUploadButton 
           isProcessing={isProcessing}
-          hasFile={hasFile}
+          hasFiles={hasFiles}
           onClick={onTriggerFileUpload}
         />
         <SubmitButton 

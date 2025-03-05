@@ -14,31 +14,30 @@ interface QueryResponse {
 export async function processLegalQuery(
   queryText: string, 
   queryType: QueryType,
-  file: File | null
+  files: File[]
 ): Promise<QueryResponse> {
   console.log(`LegalQueryService: Processing ${queryType} query: ${queryText}`);
   
   try {
-    if (file) {
-      console.log(`LegalQueryService: File details:`, {
-        name: file.name,
-        type: file.type,
-        size: `${(file.size / 1024).toFixed(2)} KB`,
-        lastModified: new Date(file.lastModified).toISOString()
-      });
+    if (files && files.length > 0) {
+      console.log(`LegalQueryService: Processing ${files.length} files`);
       
-      // Process the file
-      console.log("LegalQueryService: Starting file processing...");
-      const response = await processFileWithQuery(file, queryText, queryType);
-      console.log("LegalQueryService: File processing complete");
+      // Process multiple files and combine results
+      const fileResults = await Promise.all(
+        files.map(file => processFileWithQuerySafe(file, queryText, queryType))
+      );
+      
+      // Combine all file results
+      const combinedResponse = fileResults.join('\n\n---\n\n');
+      console.log("LegalQueryService: All files processed");
       
       return {
-        content: response,
+        content: combinedResponse,
         status: 'success'
       };
     } else {
       // Just process the query without file
-      console.log("LegalQueryService: Processing query without file...");
+      console.log("LegalQueryService: Processing query without files...");
       const response = await simulateApiCall(queryText, queryType);
       console.log("LegalQueryService: Query processing complete");
       
@@ -55,5 +54,20 @@ export async function processLegalQuery(
       content: `An error occurred while processing your query: ${errorMessage}`,
       status: 'error'
     };
+  }
+}
+
+// Safe version of processFileWithQuery that catches individual file errors
+async function processFileWithQuerySafe(
+  file: File, 
+  queryText: string, 
+  queryType: QueryType
+): Promise<string> {
+  try {
+    const result = await processFileWithQuery(file, queryText, queryType);
+    return result;
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return `ERROR PROCESSING FILE ${file.name}: ${errorMessage}`;
   }
 }

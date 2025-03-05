@@ -7,10 +7,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 interface FileUploadButtonProps {
   onClick: () => void;
   isProcessing: boolean;
-  hasFile: boolean;
+  hasFiles: boolean;
 }
 
-const FileUploadButton = ({ onClick, isProcessing, hasFile }: FileUploadButtonProps) => {
+const FileUploadButton = ({ onClick, isProcessing, hasFiles }: FileUploadButtonProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleButtonClick = () => {
@@ -34,26 +34,26 @@ const FileUploadButton = ({ onClick, isProcessing, hasFile }: FileUploadButtonPr
             onClick={handleButtonClick}
           >
             <FileUp className="h-5 w-5 text-muted-foreground" />
-            {hasFile && (
+            {hasFiles && (
               <span className="absolute -top-1 -right-1 h-2 w-2 bg-green-500 rounded-full" />
             )}
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Upload a document</p>
+          <p>Upload documents</p>
         </TooltipContent>
       </Tooltip>
       <input
         type="file"
+        multiple
         ref={fileInputRef}
         style={{ display: 'none' }}
         onChange={e => {
           // The file input is hidden, but will trigger this onChange
-          // when a file is selected
+          // when files are selected
           if (e.target.files && e.target.files.length > 0) {
-            const file = e.target.files[0];
             // We'll use the onClick handler that was passed in
-            // to process the file
+            // to process the files
             onClick();
           }
         }}

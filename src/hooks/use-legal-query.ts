@@ -12,7 +12,7 @@ export const useLegalQuery = (setActiveTab: (tab: string) => void) => {
   const [currentQuery, setCurrentQuery] = useState<string>('');
   const [currentQueryType, setCurrentQueryType] = useState<QueryType>('legal-research');
 
-  const handleSubmit = async (query: string, selectedOption: QueryType, file: File | null) => {
+  const handleSubmit = async (query: string, selectedOption: QueryType, files: File[]) => {
     setIsProcessing(true);
     setResponse(null);
     setCurrentQuery(query);
@@ -22,13 +22,13 @@ export const useLegalQuery = (setActiveTab: (tab: string) => void) => {
       console.log("QueryAssistant: Starting to process query:", query);
       console.log("QueryAssistant: Selected option:", selectedOption);
       
-      if (file) {
-        console.log("QueryAssistant: Processing with file:", file.name);
+      if (files.length > 0) {
+        console.log(`QueryAssistant: Processing with ${files.length} files:`, files.map(f => f.name));
       } else {
-        console.log("QueryAssistant: No file uploaded");
+        console.log("QueryAssistant: No files uploaded");
       }
       
-      const result = await processLegalQuery(query, selectedOption, file);
+      const result = await processLegalQuery(query, selectedOption, files);
       console.log("QueryAssistant: Received result:", result);
       
       if (result.status === 'success') {

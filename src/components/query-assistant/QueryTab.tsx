@@ -8,7 +8,7 @@ import { Citation } from '@/services/citationService';
 interface QueryTabProps {
   isProcessing: boolean;
   response: string | null;
-  onSubmit: (query: string, selectedOption: string, file: File | null) => Promise<void>;
+  onSubmit: (query: string, selectedOption: string, files: File[]) => Promise<void>;
   onShare: () => void;
   citations: Citation[];
 }
