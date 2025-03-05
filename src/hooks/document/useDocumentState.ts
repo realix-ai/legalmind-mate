@@ -37,8 +37,10 @@ export function useDocumentState(documentId: string | undefined) {
     
     console.log("Saving document with title:", titleToSave);
     console.log("Current ID:", currentDocumentId);
+    console.log("Category:", documentCategory);
     
-    const savedDoc = saveDocument(titleToSave, documentContent, currentDocumentId);
+    // Pass the category when saving the document
+    const savedDoc = saveDocument(titleToSave, documentContent, currentDocumentId, undefined, documentCategory);
     setCurrentDocumentId(savedDoc.id);
     
     // Make sure our local state matches what was saved
@@ -120,6 +122,12 @@ export function useDocumentState(documentId: string | undefined) {
 
   const handleCategoryChange = (category: string) => {
     setDocumentCategory(category);
+    
+    // If we have a current document, update its category in storage
+    if (currentDocumentId) {
+      saveDocument(documentTitle, documentContent, currentDocumentId, undefined, category);
+      console.log("Updated document category to:", category);
+    }
   };
 
   return {

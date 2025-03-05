@@ -25,6 +25,7 @@ interface DocumentToolbarProps {
   onSaveDocument: () => void;
   documentTitle: string;
   documentContent: string;
+  documentCategory: string; // Add this prop
   currentDocumentId: string | null;
   onDocumentSaved: (id: string) => void;
 }
@@ -36,6 +37,7 @@ const DocumentToolbar = ({
   onSaveDocument,
   documentTitle,
   documentContent,
+  documentCategory, // Add this prop
   currentDocumentId,
   onDocumentSaved
 }: DocumentToolbarProps) => {
@@ -129,6 +131,7 @@ const DocumentToolbar = ({
         <SaveToCaseDialog 
           documentTitle={documentTitle}
           documentContent={documentContent}
+          documentCategory={documentCategory} // Pass the category to SaveToCaseDialog
           currentDocumentId={currentDocumentId}
           onSaved={onDocumentSaved}
         />

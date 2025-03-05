@@ -1,8 +1,7 @@
-
 import { SavedDocument } from './types';
 
 // Document storage functions
-export const saveDocument = (title: string, content: string, id?: string | null, caseId?: string): SavedDocument => {
+export const saveDocument = (title: string, content: string, id?: string | null, caseId?: string, category?: string): SavedDocument => {
   const savedDocuments = getSavedDocuments();
   
   // Normalize the caseId if it exists
@@ -10,6 +9,7 @@ export const saveDocument = (title: string, content: string, id?: string | null,
   
   console.log("Saving document with normalized caseId:", normalizedCaseId);
   console.log("Original document title:", title);
+  console.log("Document category:", category);
   
   // Ensure title is never empty
   const documentTitle = title.trim() ? title.trim() : "Untitled Document";
@@ -20,7 +20,7 @@ export const saveDocument = (title: string, content: string, id?: string | null,
     content,
     lastModified: Date.now(),
     caseId: normalizedCaseId,
-    category: 'general' // Default category
+    category: category || 'general' // Use provided category or default to 'general'
   };
   
   const existingIndex = id ? savedDocuments.findIndex(doc => doc.id === id) : -1;
@@ -35,7 +35,7 @@ export const saveDocument = (title: string, content: string, id?: string | null,
     }
     
     // Preserve existing category if not changing it
-    if (savedDocuments[existingIndex].category) {
+    if (category === undefined && savedDocuments[existingIndex].category) {
       newDocument.category = savedDocuments[existingIndex].category;
     }
     
