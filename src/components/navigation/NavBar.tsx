@@ -6,6 +6,7 @@ import { Menu, Settings } from 'lucide-react';
 import NavItems from './NavItems';
 import SettingsDialog from '../settings/SettingsDialog';
 import { Button } from '@/components/ui/button';
+import UserProfileButton from '../profile/UserProfileButton';
 
 type NavBarProps = {
   isScrolled: boolean;
@@ -52,14 +53,17 @@ const NavBar = ({
           
           <div className="hidden md:flex items-center space-x-2">
             {!isLandingPage && (
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => setIsSettingsOpen(true)}
-                className="text-muted-foreground"
-              >
-                <Settings className="h-5 w-5" />
-              </Button>
+              <>
+                <UserProfileButton />
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => setIsSettingsOpen(true)}
+                  className="text-muted-foreground"
+                >
+                  <Settings className="h-5 w-5" />
+                </Button>
+              </>
             )}
           </div>
           

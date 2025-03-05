@@ -2,8 +2,9 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { X, Settings } from 'lucide-react';
+import { X, Settings, User } from 'lucide-react';
 import SettingsDialog from '../settings/SettingsDialog';
+import UserProfileButton from '../profile/UserProfileButton';
 
 type MobileMenuProps = {
   navItems: {
@@ -56,7 +57,10 @@ const MobileMenu = ({ navItems, onClose }: MobileMenuProps) => {
           </div>
         </div>
         
-        <div className="p-4 border-t">
+        <div className="p-4 border-t space-y-2">
+          <div className="flex justify-center mb-2">
+            <UserProfileButton />
+          </div>
           <button 
             className="w-full p-3 rounded-lg flex items-center gap-3 hover:bg-secondary transition-all duration-200"
             onClick={() => setIsSettingsOpen(true)}
