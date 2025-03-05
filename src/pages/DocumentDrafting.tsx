@@ -141,6 +141,8 @@ const DocumentDrafting = () => {
                 />
                 
                 <DocumentEditor
+                  documentTitle={documentTitle}
+                  setDocumentTitle={setDocumentTitle}
                   documentContent={documentContent}
                   setDocumentContent={setDocumentContent}
                 />
