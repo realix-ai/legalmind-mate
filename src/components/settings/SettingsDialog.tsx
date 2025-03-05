@@ -9,10 +9,10 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { CreditCard, Shield, Zap } from 'lucide-react';
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type SubscriptionTier = 'free' | 'pro' | 'enterprise';
