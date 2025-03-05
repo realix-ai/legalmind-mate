@@ -1,8 +1,12 @@
 
-import { useState } from 'react';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ResearchToolType, researchTools, isToolConfigured } from '@/services/legalResearchToolsService';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ResearchToolType } from '@/services/legalResearchToolsService';
 
 interface ResearchToolSelectorProps {
   selectedTool: ResearchToolType | '';
@@ -11,32 +15,24 @@ interface ResearchToolSelectorProps {
 
 const ResearchToolSelector = ({ selectedTool, onToolSelect }: ResearchToolSelectorProps) => {
   return (
-    <div className="w-full max-w-3xl mx-auto">
-      <Label htmlFor="research-database" className="text-sm font-medium mb-2 block">
-        Research Database (Optional)
-      </Label>
-      <Select value={selectedTool} onValueChange={(value) => onToolSelect(value as ResearchToolType | '')}>
-        <SelectTrigger id="research-database" className="w-full">
+    <div className="mb-4">
+      <p className="text-sm font-medium mb-2">Research database (optional):</p>
+      <Select 
+        value={selectedTool} 
+        onValueChange={(value) => onToolSelect(value as ResearchToolType | '')}
+      >
+        <SelectTrigger className="w-full">
           <SelectValue placeholder="Select a research database (optional)" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">None (Use built-in research)</SelectItem>
-          {researchTools.map((tool) => (
-            <SelectItem 
-              key={tool.id} 
-              value={tool.id}
-              disabled={!tool.isConfigured && tool.id !== 'googlescholar'}
-            >
-              {tool.name} {!tool.isConfigured && tool.id !== 'googlescholar' ? "(Not Configured)" : ""}
-            </SelectItem>
-          ))}
+          <SelectItem value="none">None (Use built-in AI only)</SelectItem>
+          <SelectItem value="westlaw">Westlaw</SelectItem>
+          <SelectItem value="lexisnexis">LexisNexis</SelectItem>
+          <SelectItem value="googlescholar">Google Scholar</SelectItem>
+          <SelectItem value="heinonline">HeinOnline</SelectItem>
+          <SelectItem value="fastcase">Fastcase</SelectItem>
         </SelectContent>
       </Select>
-      {selectedTool && !isToolConfigured(selectedTool) && selectedTool !== 'googlescholar' && (
-        <p className="text-xs text-amber-500 mt-1">
-          This database needs to be configured in the Research Tools tab
-        </p>
-      )}
     </div>
   );
 };

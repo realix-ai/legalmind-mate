@@ -29,6 +29,7 @@ export const useLegalQuery = (setActiveTab: (tab: string) => void) => {
     try {
       console.log("QueryAssistant: Starting to process query:", query);
       console.log("QueryAssistant: Selected option:", selectedOption);
+      console.log("QueryAssistant: Research tool:", researchTool || "none");
       
       if (files.length > 0) {
         console.log(`QueryAssistant: Processing with ${files.length} files:`, files.map(f => f.name));
