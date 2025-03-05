@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -135,8 +136,9 @@ const DocumentDrafting = () => {
               onDocumentSaved={handleDocumentSaved}
             />
             
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative">
-              <div className={`lg:col-span-${showRightPanel ? '2' : '3'} space-y-6 transition-all duration-300`}>
+            <div className="flex gap-6 relative">
+              {/* Document editor section - expands to full width when right panel is hidden */}
+              <div className={`${showRightPanel ? 'w-2/3' : 'w-full'} space-y-6 transition-all duration-300`}>
                 <input
                   type="text"
                   value={documentTitle}
@@ -153,8 +155,9 @@ const DocumentDrafting = () => {
                 />
               </div>
               
+              {/* Right panel with comments and AI prompt */}
               {showRightPanel && (
-                <div className="space-y-6">
+                <div className="w-1/3 space-y-6">
                   {showAiPrompt && (
                     <div className="p-4 border rounded-md bg-card">
                       <div className="flex items-center gap-2 mb-3">
@@ -174,6 +177,7 @@ const DocumentDrafting = () => {
                 </div>
               )}
               
+              {/* Panel toggle button */}
               <Button
                 onClick={toggleRightPanel}
                 variant="outline"
