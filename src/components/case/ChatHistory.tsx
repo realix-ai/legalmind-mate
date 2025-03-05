@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { ChatMessageProps } from './ChatMessage';
-import { getSessionsList, getChatMessages } from '@/utils/documents/chatManager';
+import { getSessionsList, getChatMessages } from '@/utils/documents/chat';
 import { useParams } from 'react-router-dom';
 
 interface ChatHistoryProps {

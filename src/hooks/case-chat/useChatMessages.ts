@@ -8,7 +8,7 @@ import {
   generateWelcomeMessage,
   generateAIResponse,
   getSessionsList
-} from '@/utils/documents/chatManager';
+} from '@/utils/documents/chat';
 
 export function useChatMessages(caseId: string | undefined, caseName: string | undefined) {
   const [messages, setMessages] = useState<ChatMessageProps[]>([]);
