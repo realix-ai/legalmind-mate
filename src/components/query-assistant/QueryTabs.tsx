@@ -4,13 +4,14 @@ import BatchProcessingPanel from '@/components/batch/BatchProcessingPanel';
 import CollaborationPanel from '@/components/collaboration/CollaborationPanel';
 import ResearchToolsPanel from '@/components/research-tools/ResearchToolsPanel';
 import QueryTab from './QueryTab';
+import { ResearchToolType } from '@/services/legalResearchToolsService';
 
 interface QueryTabsProps {
   activeTab: string;
   setActiveTab: (value: string) => void;
   isProcessing: boolean;
   response: string | null;
-  handleSubmit: (query: string, selectedOption: string, files: File[]) => Promise<void>;
+  handleSubmit: (query: string, selectedOption: string, files: File[], researchTool?: ResearchToolType) => Promise<void>;
   onShare: () => void;
   citations: any[];
   currentQuery: string;

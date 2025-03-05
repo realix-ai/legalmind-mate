@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { processLegalQuery, QueryType } from '@/services/legalQueryService';
 import { fetchRelatedCitations, Citation } from '@/services/citationService';
 import { shareQuery } from '@/services/collaborationService';
+import { ResearchToolType, searchExternalTool } from '@/services/legalResearchToolsService';
 
 export const useLegalQuery = (setActiveTab: (tab: string) => void) => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -11,12 +12,19 @@ export const useLegalQuery = (setActiveTab: (tab: string) => void) => {
   const [citations, setCitations] = useState<Citation[]>([]);
   const [currentQuery, setCurrentQuery] = useState<string>('');
   const [currentQueryType, setCurrentQueryType] = useState<QueryType>('legal-research');
+  const [currentResearchTool, setCurrentResearchTool] = useState<ResearchToolType | undefined>(undefined);
 
-  const handleSubmit = async (query: string, selectedOption: QueryType, files: File[]) => {
+  const handleSubmit = async (
+    query: string, 
+    selectedOption: QueryType, 
+    files: File[], 
+    researchTool?: ResearchToolType
+  ) => {
     setIsProcessing(true);
     setResponse(null);
     setCurrentQuery(query);
     setCurrentQueryType(selectedOption);
+    setCurrentResearchTool(researchTool);
     
     try {
       console.log("QueryAssistant: Starting to process query:", query);
@@ -28,18 +36,38 @@ export const useLegalQuery = (setActiveTab: (tab: string) => void) => {
         console.log("QueryAssistant: No files uploaded");
       }
       
-      const result = await processLegalQuery(query, selectedOption, files);
-      console.log("QueryAssistant: Received result:", result);
-      
-      if (result.status === 'success') {
-        setResponse(result.content);
-        toast.success('Query processed successfully');
+      // If research tool is selected, open it in a new tab
+      if (researchTool) {
+        console.log(`QueryAssistant: Using external research tool: ${researchTool}`);
+        searchExternalTool(query, researchTool);
+        toast.success(`Opened search in ${researchTool}`);
         
-        // Fetch citations related to the query
-        const relatedCitations = await fetchRelatedCitations(query);
-        setCitations(relatedCitations);
+        // Still process the query with our system for local results
+        const result = await processLegalQuery(query, selectedOption, files);
+        if (result.status === 'success') {
+          setResponse(result.content + "\n\n*Note: Your query was also opened in " + researchTool + ".*");
+          
+          // Fetch citations related to the query
+          const relatedCitations = await fetchRelatedCitations(query);
+          setCitations(relatedCitations);
+        } else {
+          toast.error('Failed to process query: ' + (result.content || 'Unknown error'));
+        }
       } else {
-        toast.error('Failed to process query: ' + (result.content || 'Unknown error'));
+        // Regular processing without external tool
+        const result = await processLegalQuery(query, selectedOption, files);
+        console.log("QueryAssistant: Received result:", result);
+        
+        if (result.status === 'success') {
+          setResponse(result.content);
+          toast.success('Query processed successfully');
+          
+          // Fetch citations related to the query
+          const relatedCitations = await fetchRelatedCitations(query);
+          setCitations(relatedCitations);
+        } else {
+          toast.error('Failed to process query: ' + (result.content || 'Unknown error'));
+        }
       }
     } catch (error) {
       console.error('Error processing query:', error);
@@ -65,6 +93,7 @@ export const useLegalQuery = (setActiveTab: (tab: string) => void) => {
     citations,
     currentQuery,
     currentQueryType,
+    currentResearchTool,
     handleSubmit,
     handleShareQuery
   };

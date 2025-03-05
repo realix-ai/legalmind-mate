@@ -1,4 +1,3 @@
-
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -9,9 +8,12 @@ import { usePromptManager } from '@/hooks/use-prompt-manager';
 import { useQueryHistory } from '@/hooks/use-query-history';
 import PromptManagerSection from '@/components/query/PromptManagerSection';
 import QueryHistory from '@/components/query/QueryHistory';
+import { ResearchToolType, researchTools, isToolConfigured } from '@/services/legalResearchToolsService';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 
 interface QueryFormProps {
-  onSubmit: (query: string, queryType: QueryType, files: File[]) => Promise<void>;
+  onSubmit: (query: string, queryType: QueryType, files: File[], researchTool?: ResearchToolType) => Promise<void>;
   isProcessing: boolean;
 }
 
@@ -29,6 +31,7 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
   const [selectedOption, setSelectedOption] = useState<QueryType>('legal-research');
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [selectedResearchTool, setSelectedResearchTool] = useState<ResearchToolType | ''>('');
   
   const {
     showPromptManager,
@@ -61,7 +64,13 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
       // Add query to history
       addToHistory(query);
       
-      await onSubmit(query.trim(), selectedOption, uploadedFiles);
+      // If research tool is selected but not configured, show error
+      if (selectedResearchTool && !isToolConfigured(selectedResearchTool) && selectedResearchTool !== 'googlescholar') {
+        toast.error(`Please configure ${selectedResearchTool} first in the Research Tools tab`);
+        return;
+      }
+      
+      await onSubmit(query.trim(), selectedOption, uploadedFiles, selectedResearchTool || undefined);
       console.log("Form submission completed");
     } catch (error) {
       console.error("Error in form submission:", error);
@@ -214,11 +223,45 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
           </div>
         )}
         
-        <p className="text-sm font-medium mb-2">Select analysis type:</p>
-        <QueryOptions
-          onSelect={(option) => setSelectedOption(option as QueryType)}
-          selectedOption={selectedOption}
-        />
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm font-medium mb-2">Select analysis type:</p>
+            <QueryOptions
+              onSelect={(option) => setSelectedOption(option as QueryType)}
+              selectedOption={selectedOption}
+            />
+          </div>
+          
+          {selectedOption === 'legal-research' && (
+            <div className="w-full max-w-3xl mx-auto">
+              <Label htmlFor="research-database" className="text-sm font-medium mb-2 block">
+                Research Database (Optional)
+              </Label>
+              <Select value={selectedResearchTool} onValueChange={(value) => setSelectedResearchTool(value as ResearchToolType | '')}>
+                <SelectTrigger id="research-database" className="w-full">
+                  <SelectValue placeholder="Select a research database (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">None (Use built-in research)</SelectItem>
+                  {researchTools.map((tool) => (
+                    <SelectItem 
+                      key={tool.id} 
+                      value={tool.id}
+                      disabled={!tool.isConfigured && tool.id !== 'googlescholar'}
+                    >
+                      {tool.name} {!tool.isConfigured && tool.id !== 'googlescholar' ? "(Not Configured)" : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedResearchTool && !isToolConfigured(selectedResearchTool) && selectedResearchTool !== 'googlescholar' && (
+                <p className="text-xs text-amber-500 mt-1">
+                  This database needs to be configured in the Research Tools tab
+                </p>
+              )}
+            </div>
+          )}
+        </div>
       </form>
     </motion.div>
   );

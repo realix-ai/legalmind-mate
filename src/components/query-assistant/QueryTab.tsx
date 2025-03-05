@@ -4,11 +4,12 @@ import QueryForm from '@/components/QueryForm';
 import QueryResponseDisplay from '@/components/QueryResponseDisplay';
 import CitationBox from '@/components/citation/CitationBox';
 import { Citation } from '@/services/citationService';
+import { ResearchToolType } from '@/services/legalResearchToolsService';
 
 interface QueryTabProps {
   isProcessing: boolean;
   response: string | null;
-  onSubmit: (query: string, selectedOption: string, files: File[]) => Promise<void>;
+  onSubmit: (query: string, selectedOption: string, files: File[], researchTool?: ResearchToolType) => Promise<void>;
   onShare: () => void;
   citations: Citation[];
 }
