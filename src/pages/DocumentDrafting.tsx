@@ -1,130 +1,47 @@
 
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
-import { Sparkles, PanelRightClose, PanelRightOpen } from 'lucide-react';
+import { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { PanelRightClose, PanelRightOpen } from 'lucide-react';
 import Navigation from '@/components/Navigation';
-import DocumentEditor from '@/components/document/DocumentEditor';
 import DocumentToolbar from '@/components/document/DocumentToolbar';
-import AiPromptInput from '@/components/document/AiPromptInput';
-import CommentSection from '@/components/document/CommentSection';
-import AddCollaborator from '@/components/document/AddCollaborator';
 import TemplateList from '@/components/document/TemplateList';
-import { getSavedDocument, saveDocument } from '@/utils/documents';
 import { Button } from '@/components/ui/button';
+import { useDocumentState } from '@/hooks/document/useDocumentState';
+import { useAiAssistant } from '@/hooks/document/useAiAssistant';
+import { useCollaboratorManagement } from '@/hooks/document/useCollaboratorManagement';
+import DocumentContent from '@/components/document/DocumentContent';
+import DocumentRightPanel from '@/components/document/DocumentRightPanel';
 
 const DocumentDrafting = () => {
   const { documentId } = useParams<{ documentId: string }>();
-  const navigate = useNavigate();
-  
-  const [showTemplates, setShowTemplates] = useState(!documentId);
-  const [documentTitle, setDocumentTitle] = useState('');
-  const [documentContent, setDocumentContent] = useState('');
-  const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(documentId || null);
-  const [showAiPrompt, setShowAiPrompt] = useState(false);
-  const [aiPrompt, setAiPrompt] = useState('');
-  const [isAiProcessing, setIsAiProcessing] = useState(false);
   const [showRightPanel, setShowRightPanel] = useState(true);
-  const [isAddingCollaborator, setIsAddingCollaborator] = useState(false);
   
-  useEffect(() => {
-    if (documentId) {
-      // Load existing document
-      const document = getSavedDocument(documentId);
-      if (document) {
-        setDocumentTitle(document.title);
-        setDocumentContent(document.content);
-        setCurrentDocumentId(documentId);
-        setShowTemplates(false);
-      } else {
-        toast.error('Document not found');
-        navigate('/document-drafting');
-      }
-    }
-  }, [documentId, navigate]);
+  const {
+    showTemplates,
+    documentTitle,
+    setDocumentTitle,
+    documentContent,
+    setDocumentContent,
+    currentDocumentId,
+    handleSaveDocument,
+    handleDocumentSaved,
+    handleBack,
+    handleSelectTemplate,
+  } = useDocumentState(documentId);
   
-  const handleSaveDocument = () => {
-    if (!documentTitle.trim()) {
-      toast.error('Please enter a document title');
-      return;
-    }
-    
-    const savedDoc = saveDocument(documentTitle, documentContent, currentDocumentId);
-    setCurrentDocumentId(savedDoc.id);
-    toast.success('Document saved successfully');
-  };
+  const {
+    showAiPrompt,
+    setShowAiPrompt,
+    aiPrompt,
+    setAiPrompt,
+    isAiProcessing,
+    handleAiPromptSubmit
+  } = useAiAssistant(setDocumentContent);
   
-  const handleDocumentSaved = (id: string) => {
-    setCurrentDocumentId(id);
-  };
-  
-  const handleBack = () => {
-    if (documentId) {
-      navigate('/cases');
-    } else {
-      setShowTemplates(true);
-    }
-  };
-  
-  const handleSelectTemplate = (id: string) => {
-    if (id === 'blank') {
-      // Create a new blank document
-      setDocumentTitle('Untitled Document');
-      setDocumentContent('');
-      setShowTemplates(false);
-      return;
-    }
-    
-    // Get template or document by ID and set title/content
-    const document = getSavedDocument(id);
-    if (document) {
-      setDocumentTitle(document.title);
-      setDocumentContent(document.content);
-      setShowTemplates(false);
-    }
-  };
-  
-  const handleAiPromptSubmit = (prompt: string) => {
-    if (!prompt.trim()) return;
-    
-    setIsAiProcessing(true);
-    toast.loading('Generating content...');
-    
-    // Simulate AI processing
-    setTimeout(() => {
-      // Add AI-generated content at the end of the current content
-      const aiContent = generateAiResponse(prompt);
-      setDocumentContent(prev => prev + '\n\n' + aiContent);
-      setIsAiProcessing(false);
-      setAiPrompt('');
-      toast.dismiss();
-      toast.success('Content generated successfully');
-    }, 1500);
-  };
-  
-  const handleAddCollaborator = (email: string) => {
-    setIsAddingCollaborator(true);
-    
-    // Simulate network request
-    setTimeout(() => {
-      setIsAddingCollaborator(false);
-      toast.success(`Invitation sent to ${email}`);
-      
-      // In a real application, you would make an API call to invite the collaborator
-      // and then refresh the collaborators list
-    }, 1000);
-  };
-  
-  // Mock AI response generator
-  const generateAiResponse = (prompt: string) => {
-    if (prompt.includes('conclusion') || prompt.includes('summary')) {
-      return "In conclusion, the foregoing analysis demonstrates that the plaintiff's claims are well-founded in both fact and law. The evidence presented clearly establishes all required elements of the cause of action, and relevant case precedent supports our legal theory.";
-    } else if (prompt.includes('introduction') || prompt.includes('beginning')) {
-      return "INTRODUCTION\n\nThis memorandum addresses the legal and factual issues arising from the dispute between ABC Corporation and XYZ Industries concerning alleged breach of contract and misappropriation of trade secrets.";
-    } else {
-      return `The requested content related to "${prompt}" has been analyzed, and the following legal assessment can be provided:\n\nBased on the applicable statutes and case law in this jurisdiction, the position appears to be defensible. The key precedent in Johnson v. Smith (2018) established that similar circumstances were found to satisfy the legal standard. However, careful documentation and procedural compliance will be essential to maintain this position.`;
-    }
-  };
+  const {
+    isAddingCollaborator,
+    handleAddCollaborator
+  } = useCollaboratorManagement();
   
   const toggleRightPanel = () => {
     setShowRightPanel(!showRightPanel);
@@ -153,49 +70,27 @@ const DocumentDrafting = () => {
             
             <div className="flex gap-6 relative">
               {/* Document editor section - expands to full width when right panel is hidden */}
-              <div className={`${showRightPanel ? 'w-2/3' : 'w-full'} space-y-6 transition-all duration-300`}>
-                <input
-                  type="text"
-                  value={documentTitle}
-                  onChange={(e) => setDocumentTitle(e.target.value)}
-                  placeholder="Document Title"
-                  className="w-full px-4 py-2 text-xl font-semibold border-b border-gray-200 focus:outline-none focus:border-primary/50 transition-all duration-200"
-                />
-                
-                {/* AI Prompt section - moved here above the editor for better user experience */}
-                {showAiPrompt && (
-                  <div className="p-4 border rounded-md bg-card">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Sparkles className="h-5 w-5 text-primary" />
-                      <h3 className="font-medium">AI Assistant</h3>
-                    </div>
-                    <AiPromptInput 
-                      aiPrompt={aiPrompt}
-                      setAiPrompt={setAiPrompt}
-                      isAiProcessing={isAiProcessing}
-                      onSubmit={handleAiPromptSubmit}
-                    />
-                  </div>
-                )}
-                
-                <DocumentEditor
+              <div className={`${showRightPanel ? 'w-2/3' : 'w-full'} transition-all duration-300`}>
+                <DocumentContent 
                   documentTitle={documentTitle}
                   setDocumentTitle={setDocumentTitle}
                   documentContent={documentContent}
                   setDocumentContent={setDocumentContent}
+                  showAiPrompt={showAiPrompt}
+                  aiPrompt={aiPrompt}
+                  setAiPrompt={setAiPrompt}
+                  isAiProcessing={isAiProcessing}
+                  onAiPromptSubmit={handleAiPromptSubmit}
                 />
               </div>
               
               {/* Right panel with comments and collaborators */}
               {showRightPanel && (
-                <div className="w-1/3 space-y-6">
-                  <AddCollaborator 
-                    onAddCollaborator={handleAddCollaborator}
-                    isLoading={isAddingCollaborator}
-                  />
-                  
-                  <CommentSection documentId={currentDocumentId} />
-                </div>
+                <DocumentRightPanel 
+                  documentId={currentDocumentId}
+                  isAddingCollaborator={isAddingCollaborator}
+                  onAddCollaborator={handleAddCollaborator}
+                />
               )}
               
               {/* Panel toggle button */}
