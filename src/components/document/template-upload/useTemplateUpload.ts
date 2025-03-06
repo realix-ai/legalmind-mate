@@ -50,18 +50,16 @@ export const useTemplateUpload = (onTemplateAdded: () => void) => {
       toast.success('Template uploaded successfully');
       onTemplateAdded();
       
-      // Navigate to document editor with the new template
+      // Reset form and close dialog BEFORE navigation
+      resetForm();
+      setOpen(false);
+      
+      // Log navigation information
       console.log('Created template with ID:', template.id);
       console.log('About to navigate to:', `/document-drafting/${template.id}`);
       
-      // Force navigation to happen after current execution
-      setTimeout(() => {
-        navigate(`/document-drafting/${template.id}`);
-      }, 0);
-      
-      // Reset form and close dialog
-      resetForm();
-      setOpen(false);
+      // Use direct navigation without setTimeout
+      navigate(`/document-drafting/${template.id}`);
     } catch (error) {
       console.error('Error saving template:', error);
       toast.error('Failed to save template');

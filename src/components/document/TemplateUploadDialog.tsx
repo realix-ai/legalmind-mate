@@ -56,8 +56,8 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
 
   const onFormSubmit = (e: React.FormEvent) => {
     console.log("Form submitted, content length:", content.length);
+    // Don't close dialog here - the handleSubmit will handle closing after successful import
     handleSubmit(e);
-    // Dialog will be closed by the navigation in useTemplateUpload
   };
 
   return (
