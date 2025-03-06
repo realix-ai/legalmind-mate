@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import QueryResponseDisplay from "@/components/QueryResponseDisplay";
 import CitationBox from "@/components/citation/CitationBox";
-import { ChatBubbleIcon } from "@radix-ui/react-icons";
+import { MessageSquare } from "lucide-react";
 import { Citation } from "@/services/citationService";
 
 interface ResponseSectionProps {
@@ -27,7 +27,7 @@ const ResponseSection = ({ isProcessing, response, onShare, citations }: Respons
           Results
           {isUsingOpenAI && !isProcessing && response && (
             <Badge variant="outline" className="gap-1 text-xs py-0">
-              <ChatBubbleIcon className="h-3 w-3" />
+              <MessageSquare className="h-3 w-3" />
               ChatGPT
             </Badge>
           )}
@@ -56,7 +56,7 @@ const ResponseSection = ({ isProcessing, response, onShare, citations }: Respons
             {citations.map((citation) => (
               <CitationBox 
                 key={citation.id}
-                citation={citation}
+                citations={[citation]}
               />
             ))}
           </div>
