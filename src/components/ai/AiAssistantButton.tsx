@@ -11,13 +11,15 @@ interface AiAssistantButtonProps {
   onAssistantResponse?: (response: string) => void;
   placeholder?: string;
   buttonText?: string;
+  showUploadButton?: boolean;
 }
 
 const AiAssistantButton = ({
   context = '',
   onAssistantResponse,
   placeholder = 'Ask the AI assistant for help...',
-  buttonText = 'AI Assistant'
+  buttonText = 'AI Assistant',
+  showUploadButton = true
 }: AiAssistantButtonProps) => {
   const [open, setOpen] = useState(false);
   const [prompt, setPrompt] = useState('');
@@ -136,6 +138,12 @@ const AiAssistantButton = ({
         <Button variant="outline" size="sm" className="gap-1">
           <Sparkles className="h-4 w-4" />
           {buttonText}
+          {showUploadButton && uploadedFiles.length > 0 && (
+            <span className="relative">
+              <PaperclipIcon className="h-3 w-3" />
+              <span className="absolute -top-1 -right-1 h-2 w-2 bg-green-500 rounded-full" />
+            </span>
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 sm:w-96">
@@ -162,18 +170,19 @@ const AiAssistantButton = ({
               className="min-h-[100px] mb-2"
             />
             
-            {/* File upload button directly below textarea */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleFileUpload}
-              disabled={isProcessing}
-              className="gap-1 self-start mb-2"
-              type="button"
-            >
-              <Upload className="h-4 w-4" />
-              Upload Files
-            </Button>
+            {showUploadButton && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleFileUpload}
+                disabled={isProcessing}
+                className="gap-1 self-start mb-2"
+                type="button"
+              >
+                <Upload className="h-4 w-4" />
+                <span>Upload Files</span>
+              </Button>
+            )}
           </div>
           
           {uploadedFiles.length > 0 && (
