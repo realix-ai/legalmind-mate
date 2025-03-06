@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Share2, Users, History } from 'lucide-react';
+import { Share2, History } from 'lucide-react';
 import { 
   getTeamMembers, 
   getSharedQueries, 
