@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import DocumentEditor from '@/components/document/DocumentEditor';
 import DocumentCategories from '@/components/document/DocumentCategories';
 import AiPromptInput from '@/components/document/AiPromptInput';
+import EditorWelcomeTip from '@/components/document/EditorWelcomeTip';
 
 interface DocumentContentProps {
   documentTitle: string;
@@ -59,6 +60,8 @@ const DocumentContent = ({
           onSubmit={onAiPromptSubmit}
         />
       )}
+      
+      <EditorWelcomeTip documentId={documentId} />
       
       <DocumentEditor
         documentContent={documentContent}

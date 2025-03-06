@@ -1,5 +1,5 @@
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { 
   Bold,
   Italic,
@@ -40,6 +40,7 @@ const DocumentEditor = ({
   const [selectedSection, setSelectedSection] = useState<DocumentSection | null>(null);
   const [showCommentDialog, setShowCommentDialog] = useState(false);
   const [sections, setSections] = useState<DocumentSection[]>([]);
+  const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
 
   // Initialize real-time editing hooks
   const { 
@@ -94,6 +95,47 @@ const DocumentEditor = ({
     
     setSections(parsedSections);
   }, [documentContent]);
+
+  // Keyboard shortcut handler
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Check if Ctrl/Cmd key is pressed
+    if (e.ctrlKey || e.metaKey) {
+      switch (e.key.toLowerCase()) {
+        case 'b': // Bold
+          e.preventDefault();
+          applyStyle('bold');
+          break;
+        case 'i': // Italic
+          e.preventDefault();
+          applyStyle('italic');
+          break;
+        case '1': // Heading 1
+          e.preventDefault();
+          applyStyle('h1');
+          break;
+        case '2': // Heading 2
+          e.preventDefault();
+          applyStyle('h2');
+          break;
+        case '3': // Heading 3
+          e.preventDefault();
+          applyStyle('h3');
+          break;
+        case 'k': // Show keyboard shortcuts
+          e.preventDefault();
+          setShowKeyboardShortcuts(prev => !prev);
+          break;
+        case '/': // Show comment dialog
+          e.preventDefault();
+          if (selectedSection) {
+            setShowCommentDialog(true);
+          } else {
+            toast.info('Select a section first to add a comment');
+          }
+          break;
+      }
+    }
+  }, [selectedSection]);
 
   // Handle editor events
   const handleEditorChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -222,50 +264,101 @@ const DocumentEditor = ({
     <div className="border rounded-xl overflow-hidden mb-6">
       <div className="p-1 flex items-center justify-between border-b">
         <div className="flex items-center gap-1 flex-wrap">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-7 w-7 p-0"
-            onClick={() => applyStyle('bold')}
-          >
-            <Bold className="h-3.5 w-3.5" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-7 w-7 p-0"
-            onClick={() => applyStyle('italic')}
-          >
-            <Italic className="h-3.5 w-3.5" />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 w-7 p-0"
+                  onClick={() => applyStyle('bold')}
+                >
+                  <Bold className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Bold (Ctrl+B)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 w-7 p-0"
+                  onClick={() => applyStyle('italic')}
+                >
+                  <Italic className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Italic (Ctrl+I)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          
           <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
             <Underline className="h-3.5 w-3.5" />
           </Button>
           <div className="w-px h-4 bg-border mx-1" />
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-7 w-7 p-0"
-            onClick={() => applyStyle('h1')}
-          >
-            <Heading1 className="h-3.5 w-3.5" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-7 w-7 p-0"
-            onClick={() => applyStyle('h2')}
-          >
-            <Heading2 className="h-3.5 w-3.5" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-7 w-7 p-0"
-            onClick={() => applyStyle('h3')}
-          >
-            <Heading3 className="h-3.5 w-3.5" />
-          </Button>
+          
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 w-7 p-0"
+                  onClick={() => applyStyle('h1')}
+                >
+                  <Heading1 className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Heading 1 (Ctrl+1)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 w-7 p-0"
+                  onClick={() => applyStyle('h2')}
+                >
+                  <Heading2 className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Heading 2 (Ctrl+2)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 w-7 p-0"
+                  onClick={() => applyStyle('h3')}
+                >
+                  <Heading3 className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Heading 3 (Ctrl+3)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          
           <div className="w-px h-4 bg-border mx-1" />
           <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
             <AlignLeft className="h-3.5 w-3.5" />
@@ -292,6 +385,24 @@ const DocumentEditor = ({
                 <Button 
                   variant="ghost" 
                   size="sm" 
+                  onClick={() => setShowKeyboardShortcuts(prev => !prev)}
+                  className="text-xs"
+                >
+                  Keyboard Shortcuts
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                Press Ctrl+K to show keyboard shortcuts
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
                   onClick={handleAddComment}
                   disabled={!selectedSection}
                   className="flex items-center gap-1"
@@ -301,7 +412,7 @@ const DocumentEditor = ({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                Add a comment to the selected section
+                Add a comment to the selected section (Ctrl+/)
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -329,6 +440,29 @@ const DocumentEditor = ({
       </div>
       
       <div className="p-6 relative">
+        {showKeyboardShortcuts && (
+          <div className="absolute z-10 right-6 top-6 bg-background border rounded-md shadow-md p-4 text-sm">
+            <h4 className="font-medium mb-2">Keyboard Shortcuts</h4>
+            <ul className="space-y-1">
+              <li><kbd className="px-1.5 py-0.5 bg-muted rounded border">Ctrl+B</kbd> Bold text</li>
+              <li><kbd className="px-1.5 py-0.5 bg-muted rounded border">Ctrl+I</kbd> Italic text</li>
+              <li><kbd className="px-1.5 py-0.5 bg-muted rounded border">Ctrl+1</kbd> Heading 1</li>
+              <li><kbd className="px-1.5 py-0.5 bg-muted rounded border">Ctrl+2</kbd> Heading 2</li>
+              <li><kbd className="px-1.5 py-0.5 bg-muted rounded border">Ctrl+3</kbd> Heading 3</li>
+              <li><kbd className="px-1.5 py-0.5 bg-muted rounded border">Ctrl+/</kbd> Add comment</li>
+              <li><kbd className="px-1.5 py-0.5 bg-muted rounded border">Ctrl+K</kbd> Show/hide shortcuts</li>
+            </ul>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full mt-3"
+              onClick={() => setShowKeyboardShortcuts(false)}
+            >
+              Close
+            </Button>
+          </div>
+        )}
+      
         {selectedSection && (
           <div className="absolute right-6 top-6 z-10">
             <Badge variant="outline" className="bg-primary/20 text-xs">
@@ -348,6 +482,7 @@ const DocumentEditor = ({
           onClick={handleEditorClick}
           onFocus={() => beginEditing()}
           onBlur={() => endEditing()}
+          onKeyDown={handleKeyDown}
           className="w-full min-h-[600px] p-0 border-none focus:ring-0 resize-none font-mono text-sm relative"
           placeholder="Start typing or use formatting options above..."
         />
