@@ -13,6 +13,7 @@ export interface EditorPresence {
     };
   };
   lastActive: number;
+  isActive?: boolean;
 }
 
 export function useRealtimeEditing(documentId: string | null) {
@@ -55,7 +56,8 @@ export function useRealtimeEditing(documentId: string | null) {
       cursor: {
         position: 0
       },
-      lastActive: Date.now()
+      lastActive: Date.now(),
+      isActive: true // Set the current user as active
     };
 
     setEditors(prevEditors => {
@@ -90,7 +92,8 @@ export function useRealtimeEditing(documentId: string | null) {
               position,
               selection
             },
-            lastActive: Date.now()
+            lastActive: Date.now(),
+            isActive: true // Set this editor as active when updating cursor
           };
         }
         return editor;
@@ -114,7 +117,8 @@ export function useRealtimeEditing(documentId: string | null) {
         if (editor.id === currentEditor) {
           return {
             ...editor,
-            lastActive: Date.now()
+            lastActive: Date.now(),
+            isActive: true // Set this editor as active when beginning editing
           };
         }
         return editor;
@@ -128,6 +132,24 @@ export function useRealtimeEditing(documentId: string | null) {
   // End editing
   const endEditing = () => {
     setIsEditing(false);
+    
+    // Update editor status to inactive
+    if (documentId && currentEditor) {
+      setEditors(prevEditors => {
+        const updatedEditors = prevEditors.map(editor => {
+          if (editor.id === currentEditor) {
+            return {
+              ...editor,
+              isActive: false // Set this editor as inactive when ending editing
+            };
+          }
+          return editor;
+        });
+
+        localStorage.setItem(`document_editors_${documentId}`, JSON.stringify(updatedEditors));
+        return updatedEditors;
+      });
+    }
   };
 
   // Heartbeat to keep editor presence active
@@ -140,7 +162,8 @@ export function useRealtimeEditing(documentId: string | null) {
           if (editor.id === currentEditor) {
             return {
               ...editor,
-              lastActive: Date.now()
+              lastActive: Date.now(),
+              isActive: isEditing // Set active status based on current editing state
             };
           }
           return editor;
@@ -152,7 +175,7 @@ export function useRealtimeEditing(documentId: string | null) {
     }, 30000); // Update every 30 seconds
 
     return () => clearInterval(interval);
-  }, [documentId, currentEditor]);
+  }, [documentId, currentEditor, isEditing]);
 
   return {
     editors,
