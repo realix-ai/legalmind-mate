@@ -55,7 +55,23 @@ export const ProfileMenu = () => {
       role,
       specialization
     });
-    setIsProfileOpen(false);
+    
+    // Use setTimeout to ensure the dialog closes properly
+    setTimeout(() => {
+      setIsProfileOpen(false);
+    }, 10);
+  };
+
+  // Handle dialog open state with proper timing
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      // Small delay to ensure animations complete before state changes
+      setTimeout(() => {
+        setIsProfileOpen(open);
+      }, 10);
+    } else {
+      setIsProfileOpen(open);
+    }
   };
 
   return (
@@ -77,7 +93,7 @@ export const ProfileMenu = () => {
             </div>
           </div>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setIsProfileOpen(true)}>
+          <DropdownMenuItem onClick={() => handleOpenChange(true)}>
             <UserCog className="mr-2 h-4 w-4" />
             <span>Edit Profile</span>
           </DropdownMenuItem>
@@ -90,7 +106,7 @@ export const ProfileMenu = () => {
       </DropdownMenu>
 
       {/* Profile Dialog */}
-      <Dialog open={isProfileOpen} onOpenChange={setIsProfileOpen}>
+      <Dialog open={isProfileOpen} onOpenChange={handleOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Edit Profile</DialogTitle>
@@ -134,8 +150,8 @@ export const ProfileMenu = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsProfileOpen(false)}>Cancel</Button>
-            <Button onClick={saveProfileChanges}>Save changes</Button>
+            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>Cancel</Button>
+            <Button type="button" onClick={saveProfileChanges}>Save changes</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

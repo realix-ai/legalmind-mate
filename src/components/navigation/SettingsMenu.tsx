@@ -56,36 +56,36 @@ export const SettingsMenu = () => {
     setSelectedLanguage(language);
   }, [language]);
 
-  // Handle dialog open state change
+  // Handle dialog open state change with proper timing
   const handleOpenChange = useCallback((open: boolean) => {
     if (open) {
       // Reset selections to current values when opening
       setSelectedTheme(theme);
       setSelectedLanguage(language);
+      setIsSettingsOpen(true);
+    } else {
+      // Small delay to ensure animations complete before state changes
+      setTimeout(() => {
+        setIsSettingsOpen(false);
+      }, 10);
     }
-    setIsSettingsOpen(open);
   }, [theme, language]);
 
   // Save settings - split into separate handlers for better performance
   const handleSaveSettings = useCallback(() => {
-    // Close dialog first for perceived performance
-    setIsSettingsOpen(false);
-    
-    // Apply theme change if needed (after UI change)
+    // Apply changes first
     if (selectedTheme !== theme) {
-      // Slight delay to allow dialog closing animation to complete
-      window.setTimeout(() => {
-        setTheme(selectedTheme);
-      }, 0);
+      setTheme(selectedTheme);
     }
     
-    // Apply language change if needed
     if (selectedLanguage !== language) {
-      // Slight delay to allow dialog closing animation to complete
-      window.setTimeout(() => {
-        setLanguage(selectedLanguage);
-      }, 0);
+      setLanguage(selectedLanguage);
     }
+    
+    // Close dialog with a small delay to ensure proper closing
+    setTimeout(() => {
+      setIsSettingsOpen(false);
+    }, 10);
   }, [selectedTheme, selectedLanguage, theme, language, setTheme, setLanguage]);
 
   return (
@@ -173,7 +173,7 @@ export const SettingsMenu = () => {
                 </select>
               </div>
               <DialogFooter>
-                <Button onClick={handleSaveSettings}>Save changes</Button>
+                <Button type="button" onClick={handleSaveSettings}>Save changes</Button>
               </DialogFooter>
             </TabsContent>
             

@@ -25,8 +25,20 @@ const SettingsDialog = ({ open, onOpenChange, defaultTab = "appearance" }: Setti
     }
   }, [defaultTab]);
 
+  // This ensures the dialog properly closes and doesn't leave any artifacts
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
+      // Small delay to ensure animations complete before state changes
+      setTimeout(() => {
+        onOpenChange(newOpen);
+      }, 10);
+    } else {
+      onOpenChange(newOpen);
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Settings</DialogTitle>
@@ -45,6 +57,7 @@ const SettingsDialog = ({ open, onOpenChange, defaultTab = "appearance" }: Setti
               <h3 className="text-lg font-medium">Theme</h3>
               <div className="grid grid-cols-3 gap-2">
                 <button
+                  type="button"
                   className={`p-3 rounded-md flex flex-col items-center border ${
                     theme === "light" ? "border-primary bg-primary/10" : "border-input"
                   }`}
@@ -56,6 +69,7 @@ const SettingsDialog = ({ open, onOpenChange, defaultTab = "appearance" }: Setti
                 </button>
                 
                 <button
+                  type="button"
                   className={`p-3 rounded-md flex flex-col items-center border ${
                     theme === "dark" ? "border-primary bg-primary/10" : "border-input"
                   }`}
@@ -67,6 +81,7 @@ const SettingsDialog = ({ open, onOpenChange, defaultTab = "appearance" }: Setti
                 </button>
                 
                 <button
+                  type="button"
                   className={`p-3 rounded-md flex flex-col items-center border ${
                     theme === "system" ? "border-primary bg-primary/10" : "border-input"
                   }`}
@@ -75,7 +90,7 @@ const SettingsDialog = ({ open, onOpenChange, defaultTab = "appearance" }: Setti
                   <span className="sr-only">System</span>
                   <div className="h-16 w-full rounded-md bg-gradient-to-b from-[#FAFAFA] to-[#131313] border" />
                   <span className="mt-2">System</span>
-                </button>
+                </div>
               </div>
             </div>
           </TabsContent>
@@ -85,6 +100,7 @@ const SettingsDialog = ({ open, onOpenChange, defaultTab = "appearance" }: Setti
               <h3 className="text-lg font-medium">Language</h3>
               <div className="grid grid-cols-3 gap-2">
                 <button
+                  type="button"
                   className={`p-3 rounded-md border ${
                     language === "en" ? "border-primary bg-primary/10" : "border-input"
                   }`}
@@ -94,6 +110,7 @@ const SettingsDialog = ({ open, onOpenChange, defaultTab = "appearance" }: Setti
                 </button>
                 
                 <button
+                  type="button"
                   className={`p-3 rounded-md border ${
                     language === "es" ? "border-primary bg-primary/10" : "border-input"
                   }`}
@@ -103,6 +120,7 @@ const SettingsDialog = ({ open, onOpenChange, defaultTab = "appearance" }: Setti
                 </button>
                 
                 <button
+                  type="button"
                   className={`p-3 rounded-md border ${
                     language === "fr" ? "border-primary bg-primary/10" : "border-input"
                   }`}

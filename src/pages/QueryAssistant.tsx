@@ -32,6 +32,13 @@ const QueryAssistant = () => {
     });
   };
 
+  // Properly handle settings dialog open/close
+  const handleSettingsOpenChange = (open: boolean) => {
+    setTimeout(() => {
+      setOpenSettings(open);
+    }, 10);
+  };
+
   useEffect(() => {
     console.log("QueryAssistant component mounted, userName:", userName);
   }, [userName]);
@@ -60,7 +67,7 @@ const QueryAssistant = () => {
       
       <SettingsDialog 
         open={openSettings} 
-        onOpenChange={setOpenSettings}
+        onOpenChange={handleSettingsOpenChange}
         defaultTab={settingsTab}
       />
 

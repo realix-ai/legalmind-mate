@@ -83,7 +83,11 @@ const FeedbackPanel = () => {
       />
 
       <div className="flex justify-end">
-        <Button onClick={handleSubmitFeedback} disabled={isSubmitting}>
+        <Button 
+          type="button"
+          onClick={handleSubmitFeedback} 
+          disabled={isSubmitting}
+        >
           <Send className="mr-2 h-4 w-4" />
           {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
         </Button>
@@ -102,9 +106,9 @@ interface FeedbackButtonProps {
 
 const FeedbackButton = ({ type, icon, label, selected, onClick }: FeedbackButtonProps) => {
   const colorClasses = {
-    positive: "text-green-500 border-green-200 bg-green-50 hover:bg-green-100",
-    neutral: "text-blue-500 border-blue-200 bg-blue-50 hover:bg-blue-100",
-    negative: "text-red-500 border-red-200 bg-red-50 hover:bg-red-100",
+    positive: "text-green-500 border-green-200 bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:border-green-800 dark:hover:bg-green-900/30",
+    neutral: "text-blue-500 border-blue-200 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:border-blue-800 dark:hover:bg-blue-900/30",
+    negative: "text-red-500 border-red-200 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:border-red-800 dark:hover:bg-red-900/30",
   };
 
   return (
