@@ -1,5 +1,5 @@
 
-import { useState, Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Users } from 'lucide-react';
 import AiAssistantButton from '@/components/ai/AiAssistantButton';

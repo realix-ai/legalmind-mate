@@ -22,6 +22,11 @@ const CreateCaseDialog = ({
   setNewCaseName,
   handleCreateCase
 }: CreateCaseDialogProps) => {
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleCreateCase();
+  };
+
   return (
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
@@ -30,23 +35,26 @@ const CreateCaseDialog = ({
           Add details for your new case.
         </DialogDescription>
       </DialogHeader>
-      <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="caseName" className="text-right">
-            Case Name
-          </Label>
-          <Input
-            id="caseName"
-            value={newCaseName}
-            onChange={(e) => setNewCaseName(e.target.value)}
-            className="col-span-3"
-            placeholder="Enter case name"
-          />
+      <form onSubmit={onSubmit}>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="caseName" className="text-right">
+              Case Name
+            </Label>
+            <Input
+              id="caseName"
+              value={newCaseName}
+              onChange={(e) => setNewCaseName(e.target.value)}
+              className="col-span-3"
+              placeholder="Enter case name"
+              required
+            />
+          </div>
         </div>
-      </div>
-      <DialogFooter>
-        <Button onClick={handleCreateCase}>Create Case</Button>
-      </DialogFooter>
+        <DialogFooter>
+          <Button type="submit">Create Case</Button>
+        </DialogFooter>
+      </form>
     </DialogContent>
   );
 };

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { 
@@ -92,6 +93,18 @@ const SaveToCaseDialog = ({
     }
   };
 
+  const handleCreateNewCase = () => {
+    setIsCreatingCase(true);
+    setNewCaseName('');
+  };
+
+  const handleBackToExistingCases = () => {
+    setIsCreatingCase(false);
+    if (cases.length > 0) {
+      setSelectedCase(cases[0].id);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -135,7 +148,7 @@ const SaveToCaseDialog = ({
             <div className="flex justify-center">
               <Button 
                 variant="ghost" 
-                onClick={() => setIsCreatingCase(true)}
+                onClick={handleCreateNewCase}
                 className="text-xs gap-1"
               >
                 <Plus className="h-3 w-3" /> Create New Case
@@ -162,7 +175,7 @@ const SaveToCaseDialog = ({
             <div className="flex justify-center">
               <Button 
                 variant="ghost" 
-                onClick={() => setIsCreatingCase(false)}
+                onClick={handleBackToExistingCases}
                 className="text-xs"
               >
                 Back to Existing Cases
