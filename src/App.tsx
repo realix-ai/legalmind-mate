@@ -1,6 +1,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider"
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -22,38 +23,40 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-        <RouterProvider router={
-          createBrowserRouter([
-            {
-              path: '/',
-              element: <Index />
-            },
-            {
-              path: '/query-assistant',
-              element: <QueryAssistant />
-            },
-            {
-              path: '/document-drafting',
-              element: <DocumentDrafting />
-            },
-            {
-              path: '/case-management',
-              element: <CaseManagement />
-            },
-            {
-              path: '/case-analytics',
-              element: <CaseAnalytics />
-            },
-            {
-              path: '/case-chat/:caseId',
-              element: <CaseChat />
-            },
-            {
-              path: '*',
-              element: <NotFound />
-            }
-          ])
-        } />
+        <TooltipProvider>
+          <RouterProvider router={
+            createBrowserRouter([
+              {
+                path: '/',
+                element: <Index />
+              },
+              {
+                path: '/query-assistant',
+                element: <QueryAssistant />
+              },
+              {
+                path: '/document-drafting',
+                element: <DocumentDrafting />
+              },
+              {
+                path: '/case-management',
+                element: <CaseManagement />
+              },
+              {
+                path: '/case-analytics',
+                element: <CaseAnalytics />
+              },
+              {
+                path: '/case-chat/:caseId',
+                element: <CaseChat />
+              },
+              {
+                path: '*',
+                element: <NotFound />
+              }
+            ])
+          } />
+        </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
