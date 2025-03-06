@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom"
-import { Scale, User, Settings, UserCog, LogOut, CreditCard } from "lucide-react"
+import { Scale, User, Settings, UserCog, LogOut, CreditCard, Moon, Sun } from "lucide-react"
 import { useUserProfile } from "@/hooks/use-user-profile"
 import {
   DropdownMenu,
@@ -17,14 +17,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
+import { useTheme } from "@/hooks/use-theme"
 
 export default function Navigation() {
   const { userProfile, updateUserProfile } = useUserProfile()
+  const { theme, setTheme } = useTheme()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [name, setName] = useState("")
   const [role, setRole] = useState("")
   const [specialization, setSpecialization] = useState("")
+  const [selectedTheme, setSelectedTheme] = useState(theme)
 
   // Initialize form values when userProfile changes
   useEffect(() => {
@@ -32,6 +35,11 @@ export default function Navigation() {
     setRole(userProfile.role || "")
     setSpecialization(userProfile.specialization || "")
   }, [userProfile])
+
+  // Initialize theme selector value when theme changes
+  useEffect(() => {
+    setSelectedTheme(theme)
+  }, [theme])
 
   // Get initials for avatar
   const getInitials = (name: string) => {
@@ -52,6 +60,17 @@ export default function Navigation() {
       specialization
     });
     setIsProfileOpen(false);
+  };
+
+  // Save settings changes
+  const saveSettingsChanges = () => {
+    setTheme(selectedTheme);
+    setIsSettingsOpen(false);
+  };
+
+  // Toggle theme directly from header
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   return (
@@ -94,6 +113,17 @@ export default function Navigation() {
           </div>
 
           <nav className="ml-auto flex items-center space-x-6">
+            {/* Theme Toggle Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Toggle theme"
+              className="mr-2"
+              onClick={toggleTheme}
+            >
+              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
+
             {/* Settings Button */}
             <DropdownMenu>
               <DropdownMenuTrigger aria-label="Open settings menu" className="p-1 rounded-full hover:bg-accent transition-colors">
@@ -156,7 +186,12 @@ export default function Navigation() {
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="theme">Theme</Label>
-              <select id="theme" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
+              <select 
+                id="theme" 
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                value={selectedTheme}
+                onChange={(e) => setSelectedTheme(e.target.value as "light" | "dark" | "system")}
+              >
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
                 <option value="system">System</option>
@@ -172,7 +207,7 @@ export default function Navigation() {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={() => setIsSettingsOpen(false)}>Save changes</Button>
+            <Button onClick={saveSettingsChanges}>Save changes</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
