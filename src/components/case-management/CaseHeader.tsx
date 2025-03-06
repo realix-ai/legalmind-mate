@@ -1,44 +1,43 @@
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import AiAssistantButton from '@/components/ai/AiAssistantButton';
+import { toast } from 'sonner';
 
 interface CaseHeaderProps {
-  setIsCreateCaseDialogOpen: (isOpen: boolean) => void;
-  isCreateCaseDialogOpen: boolean;
+  onCreateCase: () => void;
+  casesCount: number;
 }
 
-const CaseHeader = ({ setIsCreateCaseDialogOpen, isCreateCaseDialogOpen }: CaseHeaderProps) => {
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { type: 'spring', stiffness: 100, damping: 15 }
-    }
+const CaseHeader = ({ onCreateCase, casesCount }: CaseHeaderProps) => {
+  const handleAssistantResponse = (response: string) => {
+    toast.info('AI Tip', {
+      description: response,
+      duration: 8000,
+    });
   };
 
   return (
-    <motion.div 
-      variants={itemVariants}
-      className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8"
-    >
+    <div className="flex justify-between items-center mb-6">
       <div>
-        <h1 className="text-3xl md:text-4xl font-semibold">Case Management</h1>
-        <p className="text-muted-foreground mt-1">Track and manage all your legal cases</p>
+        <h1 className="text-3xl font-bold">
+          Case Management
+          {casesCount > 0 && <span className="text-muted-foreground font-normal text-lg ml-2">({casesCount})</span>}
+        </h1>
+        <p className="text-muted-foreground mt-1">Organize and manage your legal cases</p>
       </div>
-      
-      <Dialog open={isCreateCaseDialogOpen} onOpenChange={setIsCreateCaseDialogOpen}>
-        <DialogTrigger asChild>
-          <Button className="gap-2 self-start">
-            <Plus className="h-4 w-4" />
-            New Case
-          </Button>
-        </DialogTrigger>
-      </Dialog>
-    </motion.div>
+      <div className="flex gap-2">
+        <AiAssistantButton 
+          context="Case Management page. The user can organize and manage legal cases."
+          onAssistantResponse={handleAssistantResponse}
+          buttonText="Case Tips"
+        />
+        <Button onClick={onCreateCase} className="ml-2">
+          <Plus className="mr-2 h-4 w-4" /> New Case
+        </Button>
+      </div>
+    </div>
   );
 };
 
