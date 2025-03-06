@@ -43,7 +43,7 @@ export const SettingsMenu = () => {
   const [selectedTheme, setSelectedTheme] = useState(theme);
   const [selectedLanguage, setSelectedLanguage] = useState(language);
 
-  // Reset local state when external values change
+  // Reset local states when external values change
   useEffect(() => {
     setSelectedTheme(theme);
   }, [theme]);
@@ -52,29 +52,37 @@ export const SettingsMenu = () => {
     setSelectedLanguage(language);
   }, [language]);
 
-  // Save settings changes with simplified approach
-  const saveSettingsChanges = useCallback(() => {
-    // Apply changes one at a time with minimal wrapping
-    if (selectedTheme !== theme) {
-      setTheme(selectedTheme);
-    }
-    
-    if (selectedLanguage !== language) {
-      setLanguage(selectedLanguage);
-    }
-    
-    // Close dialog - no need for timeouts here
-    setIsSettingsOpen(false);
-  }, [selectedTheme, selectedLanguage, theme, language, setTheme, setLanguage]);
-
-  // Reset selected values when dialog opens
-  const handleOpenChange = (open: boolean) => {
-    setIsSettingsOpen(open);
+  // Handle dialog open state change
+  const handleOpenChange = useCallback((open: boolean) => {
     if (open) {
+      // Reset selections to current values when opening
       setSelectedTheme(theme);
       setSelectedLanguage(language);
     }
-  };
+    setIsSettingsOpen(open);
+  }, [theme, language]);
+
+  // Save settings - split into separate handlers for better performance
+  const handleSaveSettings = useCallback(() => {
+    // Close dialog first for perceived performance
+    setIsSettingsOpen(false);
+    
+    // Apply theme change if needed (after UI change)
+    if (selectedTheme !== theme) {
+      // Slight delay to allow dialog closing animation to complete
+      window.setTimeout(() => {
+        setTheme(selectedTheme);
+      }, 0);
+    }
+    
+    // Apply language change if needed
+    if (selectedLanguage !== language) {
+      // Slight delay to allow dialog closing animation to complete
+      window.setTimeout(() => {
+        setLanguage(selectedLanguage);
+      }, 0);
+    }
+  }, [selectedTheme, selectedLanguage, theme, language, setTheme, setLanguage]);
 
   return (
     <>
@@ -86,7 +94,7 @@ export const SettingsMenu = () => {
         <DropdownMenuContent align="end" className="w-56">
           <DropdownMenuLabel>Settings</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setIsSettingsOpen(true)}>
+          <DropdownMenuItem onClick={() => handleOpenChange(true)}>
             <Settings className="mr-2 h-4 w-4" />
             App Settings
           </DropdownMenuItem>
@@ -137,7 +145,7 @@ export const SettingsMenu = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={saveSettingsChanges}>Save changes</Button>
+            <Button onClick={handleSaveSettings}>Save changes</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

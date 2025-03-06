@@ -14,24 +14,19 @@ export const useLanguage = () => {
   });
   
   useEffect(() => {
-    // Save language preference to localStorage when it changes
     if (typeof window !== 'undefined') {
+      // Separate the storage operation from the DOM manipulation
       localStorage.setItem('app-language', language);
       
-      // Update the HTML lang attribute using requestAnimationFrame
-      // for better performance and UI responsiveness
+      // Do DOM operations in next animation frame to avoid blocking
       requestAnimationFrame(() => {
         document.documentElement.setAttribute('lang', language);
-        console.log('Language changed to:', language);
       });
     }
   }, [language]);
   
   return { 
     language, 
-    setLanguage: (newLanguage: string) => {
-      // Simple direct state update without timeouts
-      setLanguage(newLanguage);
-    }
+    setLanguage 
   };
 };

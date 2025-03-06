@@ -35,31 +35,34 @@ export function ThemeProvider({
   )
 
   useEffect(() => {
-    const root = window.document.documentElement
+    // Create the root DOM operations inside an animation frame
+    requestAnimationFrame(() => {
+      const root = window.document.documentElement
+      root.classList.remove("light", "dark")
 
-    root.classList.remove("light", "dark")
+      if (theme === "system") {
+        const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+          .matches
+          ? "dark"
+          : "light"
 
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light"
+        root.classList.add(systemTheme)
+        return
+      }
 
-      root.classList.add(systemTheme)
-      return
-    }
-
-    root.classList.add(theme)
+      root.classList.add(theme)
+    });
   }, [theme])
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-      // Use requestAnimationFrame for smoother UI updates
-      requestAnimationFrame(() => {
-        localStorage.setItem(storageKey, theme);
-        setTheme(theme);
-      });
+    setTheme: (newTheme: Theme) => {
+      // Store in localStorage and update state separately
+      // to avoid synchronous DOM operations
+      localStorage.setItem(storageKey, newTheme);
+      
+      // Use native setState for better React batching
+      setTheme(newTheme);
     },
   }
 
