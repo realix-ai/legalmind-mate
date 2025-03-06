@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { PanelRightClose, PanelRightOpen, MessageSquare } from 'lucide-react';
@@ -21,7 +20,19 @@ const DocumentDrafting = () => {
   useEffect(() => {
     // Check if OpenAI API is configured
     setIsUsingOpenAI(Boolean(localStorage.getItem('openai-api-key')));
-  }, []);
+    
+    // Store current document ID for real-time collaboration features
+    if (documentId) {
+      localStorage.setItem('current_editing_document_id', documentId);
+    } else {
+      localStorage.removeItem('current_editing_document_id');
+    }
+    
+    // Clean up on unmount
+    return () => {
+      localStorage.removeItem('current_editing_document_id');
+    };
+  }, [documentId]);
   
   const {
     showTemplates,

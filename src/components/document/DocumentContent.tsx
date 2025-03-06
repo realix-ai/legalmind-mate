@@ -1,8 +1,9 @@
 
-import { Sparkles } from 'lucide-react';
+import React from 'react';
+import { Input } from '@/components/ui/input';
 import DocumentEditor from '@/components/document/DocumentEditor';
-import AiPromptInput from '@/components/document/AiPromptInput';
 import DocumentCategories from '@/components/document/DocumentCategories';
+import AiPromptInput from '@/components/document/AiPromptInput';
 
 interface DocumentContentProps {
   documentTitle: string;
@@ -15,7 +16,7 @@ interface DocumentContentProps {
   aiPrompt: string;
   setAiPrompt: (prompt: string) => void;
   isAiProcessing: boolean;
-  onAiPromptSubmit: (prompt: string) => void;
+  onAiPromptSubmit: () => void;
 }
 
 const DocumentContent = ({
@@ -31,41 +32,38 @@ const DocumentContent = ({
   isAiProcessing,
   onAiPromptSubmit
 }: DocumentContentProps) => {
+  // Access the document ID from the URL or state if available
+  // If you don't have direct access to documentId here, you can
+  // get it from useParams or similar methods
+  const documentId = localStorage.getItem('current_editing_document_id');
+  
   return (
-    <div className="space-y-6">
-      <input
-        type="text"
+    <div className="space-y-4">
+      <Input
         value={documentTitle}
         onChange={(e) => setDocumentTitle(e.target.value)}
         placeholder="Document Title"
-        className="w-full px-4 py-2 text-xl font-semibold border-b border-gray-200 focus:outline-none focus:border-primary/50 transition-all duration-200"
+        className="text-lg font-semibold border-none p-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto bg-transparent"
       />
       
-      {/* Document categorization */}
-      <DocumentCategories 
-        currentCategory={documentCategory}
+      <DocumentCategories
+        selectedCategory={documentCategory}
         onCategoryChange={onCategoryChange}
       />
       
-      {/* AI Prompt section above the editor */}
       {showAiPrompt && (
-        <div className="p-4 border rounded-md bg-card">
-          <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="h-5 w-5 text-primary" />
-            <h3 className="font-medium">AI Assistant</h3>
-          </div>
-          <AiPromptInput 
-            aiPrompt={aiPrompt}
-            setAiPrompt={setAiPrompt}
-            isAiProcessing={isAiProcessing}
-            onSubmit={onAiPromptSubmit}
-          />
-        </div>
+        <AiPromptInput
+          prompt={aiPrompt}
+          setPrompt={setAiPrompt}
+          isProcessing={isAiProcessing}
+          onSubmit={onAiPromptSubmit}
+        />
       )}
       
       <DocumentEditor
         documentContent={documentContent}
         setDocumentContent={setDocumentContent}
+        documentId={documentId}
       />
     </div>
   );

@@ -36,3 +36,13 @@ export interface Case {
   notes?: string;
   clientName?: string;
 }
+
+// Added for section-based commenting
+export interface DocumentSection {
+  id: string;
+  title: string;
+  level: number;
+  startPosition: number;
+  endPosition: number;
+  content: string;
+}
