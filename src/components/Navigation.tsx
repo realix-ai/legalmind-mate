@@ -76,29 +76,6 @@ export default function Navigation() {
         </div>
 
         <nav className="ml-auto flex items-center space-x-4">
-          {/* Theme Switcher */}
-          <DropdownMenu>
-            <DropdownMenuTrigger aria-label="Open theme menu" className="p-2 rounded-full hover:bg-accent">
-              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="sr-only">Toggle theme</span>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setTheme("light")}>
-                <Sun className="mr-2 h-4 w-4" />
-                Light
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("dark")}>
-                <Moon className="mr-2 h-4 w-4" />
-                Dark
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("system")}>
-                <Scale className="mr-2 h-4 w-4" />
-                System
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
           {/* Settings Button */}
           <DropdownMenu>
             <DropdownMenuTrigger aria-label="Open settings menu" className="p-2 rounded-full hover:bg-accent">
@@ -113,6 +90,12 @@ export default function Navigation() {
               <DropdownMenuItem>
                 <User className="mr-2 h-4 w-4" />
                 Account Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                Subscription
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                Theme Settings
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -133,7 +116,7 @@ export default function Navigation() {
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
+                <span>Personal Information</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
