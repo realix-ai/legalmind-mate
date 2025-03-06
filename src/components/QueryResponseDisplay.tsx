@@ -1,4 +1,3 @@
-
 import { Loader2, FileText, Download, Mail, Link, Share2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
@@ -117,13 +116,6 @@ const QueryResponseDisplay = ({ isProcessing, response, onShare, showShareButton
             
             {!isProcessing && response && (
               <div className="flex gap-2">
-                {showShareButton && (
-                  <Button variant="outline" size="sm" className="h-8" onClick={onShare}>
-                    <Share2 className="h-3.5 w-3.5 mr-1" />
-                    Share
-                  </Button>
-                )}
-                
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm" className="h-8">

@@ -55,12 +55,6 @@ const ResponseSection = ({
       <div className="flex justify-between">
         <h2 className="text-xl font-semibold flex items-center gap-2">
           Results
-          {isUsingOpenAI && !isProcessing && response && (
-            <Badge variant="outline" className="gap-1 text-xs py-0">
-              <MessageSquare className="h-3 w-3" />
-              ChatGPT
-            </Badge>
-          )}
         </h2>
         
         <div className="flex gap-2">
@@ -84,14 +78,6 @@ const ResponseSection = ({
                   </>
                 )}
               </Button>
-              
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={onShare}
-              >
-                Share Results
-              </Button>
             </>
           )}
         </div>
@@ -109,6 +95,7 @@ const ResponseSection = ({
         <QueryResponseDisplay 
           isProcessing={isProcessing}
           response={response}
+          onShare={onShare}
         />
       )}
       
