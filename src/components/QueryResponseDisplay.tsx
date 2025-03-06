@@ -122,7 +122,7 @@ const QueryResponseDisplay = ({ isProcessing, response, onShare, onEdit, showSha
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm" className="h-8">
                       <Download className="h-3.5 w-3.5 mr-1" />
-                      Export
+                      Actions
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
