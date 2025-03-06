@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -22,9 +22,16 @@ export default function Navigation() {
   const { userProfile, updateUserProfile } = useUserProfile()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
-  const [name, setName] = useState(userProfile.name)
-  const [role, setRole] = useState(userProfile.role)
-  const [specialization, setSpecialization] = useState(userProfile.specialization)
+  const [name, setName] = useState("")
+  const [role, setRole] = useState("")
+  const [specialization, setSpecialization] = useState("")
+
+  // Initialize form values when userProfile changes
+  useEffect(() => {
+    setName(userProfile.name || "")
+    setRole(userProfile.role || "")
+    setSpecialization(userProfile.specialization || "")
+  }, [userProfile])
 
   // Get initials for avatar
   const getInitials = (name: string) => {
