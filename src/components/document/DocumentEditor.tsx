@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 import { useRealtimeEditing, EditorPresence } from '@/hooks/document/useRealtimeEditing';
 import { SectionCommentDialog } from './SectionCommentDialog';
 import { useSectionComments } from '@/hooks/document/useSectionComments';

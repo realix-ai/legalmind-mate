@@ -16,7 +16,7 @@ interface DocumentContentProps {
   aiPrompt: string;
   setAiPrompt: (prompt: string) => void;
   isAiProcessing: boolean;
-  onAiPromptSubmit: () => void;
+  onAiPromptSubmit: (prompt: string) => void;
 }
 
 const DocumentContent = ({
@@ -34,7 +34,7 @@ const DocumentContent = ({
 }: DocumentContentProps) => {
   // Access the document ID from the URL or state if available
   // If you don't have direct access to documentId here, you can
-  // get it from useParams or similar methods
+  // get it from localStorage or similar methods
   const documentId = localStorage.getItem('current_editing_document_id');
   
   return (
@@ -53,7 +53,7 @@ const DocumentContent = ({
       
       {showAiPrompt && (
         <AiPromptInput
-          prompt={aiPrompt}
+          aiPrompt={aiPrompt}
           setPrompt={setAiPrompt}
           isProcessing={isAiProcessing}
           onSubmit={onAiPromptSubmit}

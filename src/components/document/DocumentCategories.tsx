@@ -16,12 +16,12 @@ export const DOCUMENT_CATEGORIES = [
 ];
 
 interface DocumentCategoriesProps {
-  currentCategory: string;
+  selectedCategory: string;
   onCategoryChange: (category: string) => void;
 }
 
 const DocumentCategories = ({ 
-  currentCategory,
+  selectedCategory,
   onCategoryChange
 }: DocumentCategoriesProps) => {
   return (
@@ -35,7 +35,7 @@ const DocumentCategories = ({
           <Button
             key={category.id}
             size="sm"
-            variant={currentCategory === category.id ? "default" : "outline"}
+            variant={selectedCategory === category.id ? "default" : "outline"}
             className="h-7 text-xs"
             onClick={() => onCategoryChange(category.id)}
           >

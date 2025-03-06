@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { useSectionComments } from '@/hooks/document/useSectionComments';
@@ -8,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Check, X, Edit, Trash, MessageSquare } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Disclosure, DisclosureContent, DisclosureTrigger } from '@components/ui/disclosure';
+import { Disclosure, DisclosureContent, DisclosureTrigger } from '@/components/ui/disclosure';
 
 interface SectionCommentsListProps {
   documentId: string | null;
@@ -25,7 +24,6 @@ const SectionCommentsList = ({ documentId }: SectionCommentsListProps) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState('');
   
-  // Group comments by section
   const groupedComments = sectionComments.reduce((acc, comment) => {
     if (!acc[comment.sectionId]) {
       acc[comment.sectionId] = {

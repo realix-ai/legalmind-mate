@@ -4,15 +4,15 @@ import { Sparkles } from 'lucide-react';
 
 interface AiPromptInputProps {
   aiPrompt: string;
-  setAiPrompt: (prompt: string) => void;
-  isAiProcessing: boolean;
-  onSubmit: (prompt: string) => void;  // Updated the type to accept a prompt parameter
+  setPrompt: (prompt: string) => void;
+  isProcessing: boolean;
+  onSubmit: (prompt: string) => void;
 }
 
 const AiPromptInput = ({ 
   aiPrompt, 
-  setAiPrompt, 
-  isAiProcessing, 
+  setPrompt, 
+  isProcessing, 
   onSubmit 
 }: AiPromptInputProps) => {
   return (
@@ -20,19 +20,19 @@ const AiPromptInput = ({
       <input
         type="text"
         value={aiPrompt}
-        onChange={(e) => setAiPrompt(e.target.value)}
+        onChange={(e) => setPrompt(e.target.value)}
         placeholder="Enter a prompt for AI assistance (e.g., 'Add a liability clause')"
         className="flex-1 px-3 py-2 rounded-md border text-sm"
-        disabled={isAiProcessing}
+        disabled={isProcessing}
       />
       <Button 
-        onClick={() => onSubmit(aiPrompt)}  // Update to pass the current prompt to the onSubmit function
-        disabled={isAiProcessing || !aiPrompt.trim()}
+        onClick={() => onSubmit(aiPrompt)}
+        disabled={isProcessing || !aiPrompt.trim()}
         size="sm"
         className="gap-1"
       >
         <Sparkles className="h-3.5 w-3.5" />
-        {isAiProcessing ? "Processing..." : "Generate"}
+        {isProcessing ? "Processing..." : "Generate"}
       </Button>
     </div>
   );

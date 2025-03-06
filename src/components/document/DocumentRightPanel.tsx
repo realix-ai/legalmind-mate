@@ -5,6 +5,7 @@ import { MessageSquare, Users } from 'lucide-react';
 import AddCollaborator from '@/components/document/AddCollaborator';
 import CommentSection from '@/components/document/CommentSection';
 import SectionCommentsList from '@/components/document/SectionCommentsList';
+import ActiveEditorsList from '@/components/document/ActiveEditorsList';
 
 interface DocumentRightPanelProps {
   documentId: string | null;
