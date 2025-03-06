@@ -52,15 +52,15 @@ export const useTemplateUpload = (onTemplateAdded: () => void) => {
       
       toast.success('Template uploaded successfully');
       
-      // Create absolute URL and use window.location.replace for cleaner navigation
+      // Forced navigation - use window.location.href directly with no setTimeout
       const baseUrl = window.location.origin;
       const targetUrl = `${baseUrl}/document-drafting/${template.id}`;
       
       console.log('Created template with ID:', template.id);
-      console.log('Redirecting to:', targetUrl);
+      console.log('Forcing navigation to:', targetUrl);
       
-      // Use replace instead of setting href directly to avoid adding to history
-      window.location.replace(targetUrl);
+      // Direct navigation without using replace or setTimeout
+      window.location.href = targetUrl;
     } catch (error) {
       console.error('Error saving template:', error);
       toast.error('Failed to save template');

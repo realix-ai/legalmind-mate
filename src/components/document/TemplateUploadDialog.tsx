@@ -56,17 +56,11 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
     };
   }, [resetForm]);
 
-  // Handle form submission
+  // Handle form submission - completely independent of dialog state
   const onFormSubmit = (e: React.FormEvent) => {
     console.log("Form submitted, content length:", content.length);
-    
-    // Close dialog first to avoid React state update issues during navigation
-    setDialogOpen(false);
-    
-    // Then submit the form after dialog is closed
-    setTimeout(() => {
-      handleSubmit(e);
-    }, 50);
+    // Just submit the form directly - no dialog state manipulations
+    handleSubmit(e);
   };
 
   return (

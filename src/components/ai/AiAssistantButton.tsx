@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { Sparkles, X } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Sparkles, X, FileUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
@@ -22,10 +22,39 @@ const AiAssistantButton = ({
   const [open, setOpen] = useState(false);
   const [prompt, setPrompt] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const files = Array.from(e.target.files);
+      
+      // Check file sizes (max 10MB per file)
+      const oversizedFiles = files.filter(file => file.size > 10 * 1024 * 1024);
+      
+      if (oversizedFiles.length > 0) {
+        toast.error(`${oversizedFiles.length} file(s) exceed the 10MB size limit`);
+        return;
+      }
+      
+      setUploadedFiles(files);
+      toast.success(`${files.length} file${files.length === 1 ? '' : 's'} uploaded`);
+    }
+  };
+
+  const handleRemoveFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = async () => {
-    if (!prompt.trim()) {
-      toast.error("Please enter a prompt");
+    if (!prompt.trim() && uploadedFiles.length === 0) {
+      toast.error("Please enter a prompt or upload files");
       return;
     }
 
@@ -41,9 +70,33 @@ const AiAssistantButton = ({
         const systemPrompt = `You are an AI legal assistant helping with legal tasks. 
           Context about current view: ${context || 'No specific context provided.'}`;
         
-        // Import and use the generateCompletion function
-        const { generateCompletion } = await import('@/services/openAiService');
-        const response = await generateCompletion(prompt, systemPrompt);
+        let response = '';
+        
+        if (uploadedFiles.length > 0) {
+          // Handle file processing with OpenAI
+          const fileContents = await Promise.all(
+            uploadedFiles.map(async (file) => {
+              if (file.type.includes('text') || file.name.endsWith('.txt')) {
+                return await file.text();
+              } else {
+                // For other file types, just use the file name in the prompt
+                return `[File: ${file.name}, Size: ${Math.round(file.size / 1024)}KB]`;
+              }
+            })
+          );
+          
+          // Import and use the generateCompletion function
+          const { generateCompletion } = await import('@/services/openAiService');
+          
+          // Create a prompt that includes file content
+          const enhancedPrompt = `${prompt || 'Please analyze these files:'}\n\nFiles:\n${fileContents.join('\n\n')}`;
+          
+          response = await generateCompletion(enhancedPrompt, systemPrompt) || '';
+        } else {
+          // Regular prompt without files
+          const { generateCompletion } = await import('@/services/openAiService');
+          response = await generateCompletion(prompt, systemPrompt) || '';
+        }
         
         if (response) {
           if (onAssistantResponse) {
@@ -52,19 +105,29 @@ const AiAssistantButton = ({
           toast.success('AI assistant responded');
           setOpen(false);
           setPrompt('');
+          setUploadedFiles([]);
         } else {
           throw new Error('Failed to get response');
         }
       } else {
         // Mock response for demo purposes
         setTimeout(() => {
-          const mockResponse = getMockAiResponse(prompt, context);
+          let mockResponse = '';
+          
+          if (uploadedFiles.length > 0) {
+            mockResponse = `I've analyzed your ${uploadedFiles.length} file(s) (${uploadedFiles.map(f => f.name).join(', ')}). `;
+            mockResponse += getMockAiResponse(prompt || 'analyze these files', context);
+          } else {
+            mockResponse = getMockAiResponse(prompt, context);
+          }
+          
           if (onAssistantResponse) {
             onAssistantResponse(mockResponse);
           }
           toast.success('AI assistant responded');
           setOpen(false);
           setPrompt('');
+          setUploadedFiles([]);
         }, 1000);
       }
     } catch (error) {
@@ -101,19 +164,58 @@ const AiAssistantButton = ({
           <Textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder={placeholder}
+            placeholder={uploadedFiles.length > 0 
+              ? "Describe what you want AI to do with these files..." 
+              : placeholder}
             className="min-h-[100px]"
           />
           
-          <div className="flex justify-end">
+          {uploadedFiles.length > 0 && (
+            <div className="bg-muted/50 p-2 rounded-md space-y-1">
+              <p className="text-sm font-medium mb-1">Uploaded Files:</p>
+              {uploadedFiles.map((file, index) => (
+                <div key={index} className="flex justify-between text-xs bg-background rounded p-1.5">
+                  <span className="truncate max-w-[220px]">{file.name}</span>
+                  <button 
+                    onClick={() => handleRemoveFile(index)}
+                    className="text-destructive hover:underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          <div className="flex justify-between">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleFileUpload}
+              disabled={isProcessing}
+              className="gap-1"
+            >
+              <FileUp className="h-4 w-4" />
+              Upload Files
+            </Button>
+            
             <Button 
               onClick={handleSubmit} 
-              disabled={isProcessing || !prompt.trim()}
+              disabled={isProcessing || (!prompt.trim() && uploadedFiles.length === 0)}
               size="sm"
             >
               {isProcessing ? "Processing..." : "Submit"}
             </Button>
           </div>
+          
+          <input 
+            type="file"
+            multiple
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+            accept=".pdf,.doc,.docx,.txt"
+          />
         </div>
       </PopoverContent>
     </Popover>
@@ -122,13 +224,15 @@ const AiAssistantButton = ({
 
 // Helper function to generate mock AI responses
 const getMockAiResponse = (prompt: string, context: string): string => {
-  const promptLower = prompt.toLowerCase();
+  const promptLower = prompt?.toLowerCase() || '';
   
-  if (promptLower.includes('query') || promptLower.includes('research')) {
+  if (promptLower.includes('file') || promptLower.includes('document') || promptLower.includes('upload')) {
+    return "Based on the files you've provided, I can see several key points worth noting. The document appears to contain legal language related to contractual agreements. I would recommend paying particular attention to sections dealing with liability, termination conditions, and dispute resolution.";
+  } else if (promptLower.includes('query') || promptLower.includes('research')) {
     return "I'd recommend using more specific terms in your legal research query. For example, instead of 'breach of contract', try 'material breach of service agreement' for more targeted results.";
   } else if (promptLower.includes('case') || promptLower.includes('manage')) {
     return "To better organize your case files, consider categorizing them by case type, jurisdiction, and priority. This makes retrieval faster and helps with deadline management.";
-  } else if (promptLower.includes('document') || promptLower.includes('draft')) {
+  } else if (promptLower.includes('draft')) {
     return "When drafting legal documents, remember to include clear definitions sections and ensure all referenced parties are consistently named throughout the document.";
   } else {
     return "I'm here to assist with your legal tasks. I can help with research queries, document drafting, case management, and provide general legal guidance.";
