@@ -1,5 +1,6 @@
+
 import { useState, useRef } from 'react';
-import { Sparkles, X, FileUp, Upload } from 'lucide-react';
+import { Sparkles, X, Upload, PaperclipIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
@@ -151,14 +152,29 @@ const AiAssistantButton = ({
             </Button>
           </div>
           
-          <Textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder={uploadedFiles.length > 0 
-              ? "Describe what you want AI to do with these files..." 
-              : placeholder}
-            className="min-h-[100px]"
-          />
+          <div className="flex flex-col">
+            <Textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder={uploadedFiles.length > 0 
+                ? "Describe what you want AI to do with these files..." 
+                : placeholder}
+              className="min-h-[100px] mb-2"
+            />
+            
+            {/* File upload button directly below textarea */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleFileUpload}
+              disabled={isProcessing}
+              className="gap-1 self-start mb-2"
+              type="button"
+            >
+              <Upload className="h-4 w-4" />
+              Upload Files
+            </Button>
+          </div>
           
           {uploadedFiles.length > 0 && (
             <div className="bg-muted/50 p-2 rounded-md space-y-1">
@@ -177,22 +193,12 @@ const AiAssistantButton = ({
             </div>
           )}
           
-          <div className="flex justify-between">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleFileUpload}
-              disabled={isProcessing}
-              className="gap-1"
-            >
-              <Upload className="h-4 w-4" />
-              Upload Files
-            </Button>
-            
+          <div className="flex justify-end">
             <Button 
               onClick={handleSubmit} 
               disabled={isProcessing || (!prompt.trim() && uploadedFiles.length === 0)}
               size="sm"
+              className="w-full"
             >
               {isProcessing ? "Processing..." : "Submit"}
             </Button>
