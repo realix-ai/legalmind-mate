@@ -50,16 +50,17 @@ export const useTemplateUpload = (onTemplateAdded: () => void) => {
       toast.success('Template uploaded successfully');
       onTemplateAdded();
       
-      // Reset form and close dialog BEFORE navigation
+      // First execute the navigation, then reset form state and close dialog
+      const targetUrl = `/document-drafting/${template.id}`;
+      console.log('Created template with ID:', template.id);
+      console.log('About to navigate to:', targetUrl);
+      
+      // Force navigation with window.location instead of React Router
+      window.location.href = targetUrl;
+      
+      // The form reset and dialog closing will happen before navigation completes
       resetForm();
       setOpen(false);
-      
-      // Log navigation information
-      console.log('Created template with ID:', template.id);
-      console.log('About to navigate to:', `/document-drafting/${template.id}`);
-      
-      // Use direct navigation without setTimeout
-      navigate(`/document-drafting/${template.id}`);
     } catch (error) {
       console.error('Error saving template:', error);
       toast.error('Failed to save template');
