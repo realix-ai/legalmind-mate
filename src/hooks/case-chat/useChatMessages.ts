@@ -71,30 +71,44 @@ export const useChatMessages = (caseId?: string, caseName?: string) => {
         
         // Get case documents content
         const caseDocuments = getCaseDocumentsContent(caseId);
+        console.log(`Found ${caseDocuments.length} documents for case ${caseId}`);
         
-        // Create document context information
+        // Create document context information with more emphasis
         let documentContext = '';
         if (caseDocuments.length > 0) {
-          documentContext = `\nCase documents (${caseDocuments.length}):\n`;
+          documentContext = `\n\n==== CASE DOCUMENTS (${caseDocuments.length}) ====\n\n`;
           caseDocuments.forEach((doc, index) => {
-            documentContext += `Document ${index + 1}: "${doc.title}"\n`;
-            documentContext += `Content: ${doc.content.substring(0, 500)}${doc.content.length > 500 ? '...' : ''}\n\n`;
+            documentContext += `DOCUMENT ${index + 1}: "${doc.title}"\n`;
+            // Include more content from each document (up to 1000 chars)
+            const contentPreview = doc.content.substring(0, 1000);
+            documentContext += `CONTENT: ${contentPreview}${doc.content.length > 1000 ? '...' : ''}\n\n`;
           });
+          documentContext += `==== END OF DOCUMENTS ====\n\n`;
+          documentContext += `USE THE ABOVE DOCUMENT INFORMATION TO ANSWER THE FOLLOWING QUERY.\n`;
         }
         
-        // Create context-aware prompt
+        // Create context-aware prompt with clear instructions about documents
         const contextPrompt = `
 You are an AI legal assistant helping with a case named "${caseName || 'Untitled'}".
+
+${documentContext ? 'IMPORTANT: You have access to the following case documents. Reference them in your response:' : 'No case documents are available.'}
+${documentContext}
+
 Previous conversation:
 ${recentMessages.map(msg => `${msg.role.toUpperCase()}: ${msg.content}`).join('\n')}
-${documentContext}
-USER: ${content}
+
+CURRENT QUERY: ${content}
+
+Provide a helpful response that references the case documents when relevant.
 `;
 
         const systemPrompt = `You are a knowledgeable legal assistant with expertise in case management, legal research, and document preparation. 
 Provide helpful, accurate, and professional responses to legal questions. 
 Be concise but thorough, focusing on relevant legal principles, cases, and practical advice.
-When documents are provided, reference them specifically in your response.`;
+IMPORTANT: When documents are provided, you MUST reference them specifically in your response.
+If you're asked about documents, always acknowledge their content and provide relevant information from them.`;
+        
+        console.log("Sending to OpenAI with document context length:", documentContext.length);
         
         const openAiResponse = await generateCompletion(contextPrompt, systemPrompt);
         
