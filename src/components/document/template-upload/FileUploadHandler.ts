@@ -44,6 +44,12 @@ export const handleFileUpload: FileUploadHandler = async (e, setContent) => {
         reader.readAsText(file);
       });
       
+      // Make sure content is not empty
+      if (!content.trim()) {
+        toast.error(`File is empty: ${file.name}`);
+        return false;
+      }
+      
       setContent(content);
       toast.success(`File uploaded: ${file.name}`);
       return true;

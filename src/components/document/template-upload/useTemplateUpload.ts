@@ -14,6 +14,11 @@ export const useTemplateUpload = (onTemplateAdded: () => void) => {
   const [isImporting, setIsImporting] = useState(false);
   
   const fileUploadHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      toast.error('No file selected');
+      return false;
+    }
+    
     const success = await handleFileUpload(e, setContent);
     return success;
   };

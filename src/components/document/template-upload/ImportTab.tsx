@@ -65,16 +65,23 @@ nisl nisl aliquam nisl, eget aliquam nisl nisl eget nisl.`;
   };
 
   const handleFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      toast.error('No file selected');
+      return;
+    }
+    
     setIsUploading(true);
     try {
       const success = await handleFileUpload(e);
       console.log('File upload success:', success);
+      if (!success) {
+        toast.error('File upload failed');
+      }
     } catch (error) {
       console.error('Error during file upload:', error);
       toast.error('File upload failed');
     } finally {
       setIsUploading(false);
-      resetFileInput();
     }
   };
 
@@ -92,27 +99,28 @@ nisl nisl aliquam nisl, eget aliquam nisl nisl eget nisl.`;
       </TabsList>
       
       <TabsContent value="upload" className="space-y-4">
-        <Input
-          ref={fileInputRef}
-          id="file-upload"
-          type="file"
-          onChange={handleFileInputChange}
-          className="w-full"
-          accept=".txt,.doc,.docx,.rtf,.md"
-          disabled={isUploading}
-          onClick={(e) => {
-            // Reset the input value to ensure the same file can be selected again
-            (e.target as HTMLInputElement).value = '';
-          }}
-        />
-        {isUploading && (
-          <p className="text-xs text-primary animate-pulse">
-            Uploading file...
+        <div className="space-y-4">
+          <Input
+            id="file-upload"
+            type="file"
+            onChange={handleFileInputChange}
+            className="w-full cursor-pointer"
+            accept=".txt,.doc,.docx,.rtf,.md"
+            disabled={isUploading}
+            onClick={(e) => {
+              // Reset the input value to ensure the same file can be selected again
+              (e.target as HTMLInputElement).value = '';
+            }}
+          />
+          {isUploading && (
+            <p className="text-xs text-primary animate-pulse">
+              Uploading file...
+            </p>
+          )}
+          <p className="text-xs text-muted-foreground">
+            Upload a file from your computer (.txt, .doc, .docx, .rtf, .md)
           </p>
-        )}
-        <p className="text-xs text-muted-foreground">
-          Upload a file from your computer (.txt, .doc, .docx, .rtf, .md)
-        </p>
+        </div>
       </TabsContent>
       
       <TabsContent value="google" className="space-y-4">

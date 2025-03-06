@@ -93,6 +93,19 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
                 />
               </div>
             </div>
+
+            {content && (
+              <div className="grid grid-cols-4 items-start gap-4">
+                <Label className="text-right mt-2">
+                  Preview
+                </Label>
+                <div className="col-span-3">
+                  <div className="p-3 border rounded-md bg-muted/30 h-40 overflow-auto">
+                    <pre className="text-xs whitespace-pre-wrap">{content.substring(0, 500)}{content.length > 500 ? '...' : ''}</pre>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
           
           <DialogFooter>
