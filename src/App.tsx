@@ -1,3 +1,4 @@
+
 import {
   ClerkProvider,
   SignedIn,
@@ -20,8 +21,6 @@ import CaseManagement from "./pages/CaseManagement"
 import CaseAnalytics from "./pages/CaseAnalytics"
 import CaseChat from "./pages/CaseChat"
 import NotFound from "./pages/NotFound"
-// Import our new dashboard page
-import UsageDashboard from './pages/UsageDashboard';
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -61,10 +60,6 @@ function App() {
               {
                 path: '/case-chat/:caseId',
                 element: <CaseChat />
-              },
-              {
-                path: '/usage-dashboard',
-                element: <UsageDashboard />
               },
               {
                 path: '*',

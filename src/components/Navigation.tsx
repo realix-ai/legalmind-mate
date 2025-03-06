@@ -1,3 +1,4 @@
+
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { Scale, Moon, Sun } from "lucide-react"
@@ -9,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-// Update the navigation items to include the dashboard link
 export default function Navigation() {
   const { setTheme } = useTheme()
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -54,12 +54,6 @@ export default function Navigation() {
             className="transition-colors hover:text-foreground/80 text-foreground/60"
           >
             Analytics
-          </Link>
-          <Link
-            to="/usage-dashboard"
-            className="transition-colors hover:text-foreground/80 text-foreground/60"
-          >
-            Usage Dashboard
           </Link>
         </div>
 
