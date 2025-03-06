@@ -41,6 +41,10 @@ function App() {
                   element: <DocumentDrafting />
                 },
                 {
+                  path: '/document-drafting/:documentId',
+                  element: <DocumentDrafting />
+                },
+                {
                   path: '/case-management',
                   element: <CaseManagement />
                 },

@@ -40,7 +40,10 @@ export const useTemplateUpload = (onTemplateAdded: () => void) => {
       // Navigate to document editor with the new template
       // Use a short timeout to allow the dialog to close and UI to update
       console.log('Created template with ID:', template.id);
+      
+      // Wait briefly to ensure dialog is fully closed before navigation
       setTimeout(() => {
+        console.log('Navigating to:', `/document-drafting/${template.id}`);
         navigate(`/document-drafting/${template.id}`);
       }, 300);
       
