@@ -18,18 +18,20 @@ export const useLanguage = () => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('app-language', language);
       
-      // Update the HTML lang attribute
-      document.documentElement.setAttribute('lang', language);
-      
-      // Use a safer way to notify about language changes - using a timeout
-      // to ensure the UI doesn't freeze
-      setTimeout(() => {
-        const event = new CustomEvent('languageChanged', { detail: language });
-        window.dispatchEvent(event);
+      // Update the HTML lang attribute using requestAnimationFrame
+      // for better performance and UI responsiveness
+      requestAnimationFrame(() => {
+        document.documentElement.setAttribute('lang', language);
         console.log('Language changed to:', language);
-      }, 0);
+      });
     }
   }, [language]);
   
-  return { language, setLanguage };
+  return { 
+    language, 
+    setLanguage: (newLanguage: string) => {
+      // Simple direct state update without timeouts
+      setLanguage(newLanguage);
+    }
+  };
 };

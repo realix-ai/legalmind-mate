@@ -43,44 +43,38 @@ export const SettingsMenu = () => {
   const [selectedTheme, setSelectedTheme] = useState(theme);
   const [selectedLanguage, setSelectedLanguage] = useState(language);
 
-  // Initialize theme selector value when theme changes
+  // Reset local state when external values change
   useEffect(() => {
     setSelectedTheme(theme);
   }, [theme]);
   
-  // Initialize language selector when language changes
   useEffect(() => {
     setSelectedLanguage(language);
   }, [language]);
 
-  // Save settings changes - using useCallback to prevent unnecessary re-renders
+  // Save settings changes with simplified approach
   const saveSettingsChanges = useCallback(() => {
-    // Track if changes were made
-    let changesMade = false;
-    
-    // Apply theme change if needed
+    // Apply changes one at a time with minimal wrapping
     if (selectedTheme !== theme) {
       setTheme(selectedTheme);
-      changesMade = true;
     }
     
-    // Apply language change if needed
     if (selectedLanguage !== language) {
-      console.log('Changing language from', language, 'to', selectedLanguage);
       setLanguage(selectedLanguage);
-      changesMade = true;
     }
     
-    // Close dialog immediately if no changes, or after a short delay if changes were made
-    if (changesMade) {
-      // Use a slightly longer timeout to ensure state changes have time to propagate
-      setTimeout(() => {
-        setIsSettingsOpen(false);
-      }, 100);
-    } else {
-      setIsSettingsOpen(false);
-    }
+    // Close dialog - no need for timeouts here
+    setIsSettingsOpen(false);
   }, [selectedTheme, selectedLanguage, theme, language, setTheme, setLanguage]);
+
+  // Reset selected values when dialog opens
+  const handleOpenChange = (open: boolean) => {
+    setIsSettingsOpen(open);
+    if (open) {
+      setSelectedTheme(theme);
+      setSelectedLanguage(language);
+    }
+  };
 
   return (
     <>
@@ -104,7 +98,7 @@ export const SettingsMenu = () => {
       </DropdownMenu>
 
       {/* Settings Dialog */}
-      <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+      <Dialog open={isSettingsOpen} onOpenChange={handleOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Application Settings</DialogTitle>
