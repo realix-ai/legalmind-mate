@@ -1,8 +1,10 @@
 
-import { motion } from 'framer-motion';
-import QueryResponseDisplay from '@/components/QueryResponseDisplay';
-import CitationBox from '@/components/citation/CitationBox';
-import { Citation } from '@/services/citationService';
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import QueryResponseDisplay from "@/components/QueryResponseDisplay";
+import CitationBox from "@/components/citation/CitationBox";
+import { ChatBubbleIcon } from "@radix-ui/react-icons";
+import { Citation } from "@/services/citationService";
 
 interface ResponseSectionProps {
   isProcessing: boolean;
@@ -12,26 +14,55 @@ interface ResponseSectionProps {
 }
 
 const ResponseSection = ({ isProcessing, response, onShare, citations }: ResponseSectionProps) => {
+  // Only show if there's a response or we're processing
+  if (!isProcessing && !response) return null;
+  
+  // Check if OpenAI API is being used
+  const isUsingOpenAI = Boolean(localStorage.getItem('openai-api-key'));
+  
   return (
-    <>
-      <QueryResponseDisplay
+    <div className="mt-8 space-y-6">
+      <div className="flex justify-between">
+        <h2 className="text-xl font-semibold flex items-center gap-2">
+          Results
+          {isUsingOpenAI && !isProcessing && response && (
+            <Badge variant="outline" className="gap-1 text-xs py-0">
+              <ChatBubbleIcon className="h-3 w-3" />
+              ChatGPT
+            </Badge>
+          )}
+        </h2>
+        
+        {!isProcessing && response && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onShare}
+          >
+            Share Results
+          </Button>
+        )}
+      </div>
+      
+      <QueryResponseDisplay 
         isProcessing={isProcessing}
         response={response}
-        onShare={onShare}
-        showShareButton={!!response && !isProcessing}
       />
       
-      {!isProcessing && citations.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="max-w-4xl mx-auto"
-        >
-          <CitationBox citations={citations} />
-        </motion.div>
+      {!isProcessing && response && citations.length > 0 && (
+        <div className="space-y-4 mt-6">
+          <h3 className="text-lg font-medium">Related Citations</h3>
+          <div className="space-y-4">
+            {citations.map((citation) => (
+              <CitationBox 
+                key={citation.id}
+                citation={citation}
+              />
+            ))}
+          </div>
+        </div>
       )}
-    </>
+    </div>
   );
 };
 

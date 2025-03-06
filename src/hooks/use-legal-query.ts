@@ -61,7 +61,10 @@ export const useLegalQuery = (setActiveTab: (tab: string) => void) => {
         
         if (result.status === 'success') {
           setResponse(result.content);
-          toast.success('Query processed successfully');
+          
+          // Check if OpenAI API was used
+          const isUsingOpenAI = Boolean(localStorage.getItem('openai-api-key'));
+          toast.success(isUsingOpenAI ? 'Query processed with ChatGPT' : 'Query processed successfully');
           
           // Fetch citations related to the query
           const relatedCitations = await fetchRelatedCitations(query);

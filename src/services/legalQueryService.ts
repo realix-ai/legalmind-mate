@@ -1,73 +1,78 @@
 
-import { toast } from "sonner";
-import { processFileWithQuery } from "./fileProcessingService";
-import { simulateApiCall } from "./queryProcessingService";
+import { simulateApiCall } from './queryProcessingService';
+import { generateCompletion, getSystemPromptForQueryType } from './openAiService';
 
 export type QueryType = 'legal-research' | 'risk-analysis' | 'summarize' | 'data-analysis';
 
-interface QueryResponse {
+export interface QueryResult {
   content: string;
   status: 'success' | 'error';
 }
 
-// Main function to process legal queries
-export async function processLegalQuery(
-  queryText: string, 
-  queryType: QueryType,
-  files: File[]
-): Promise<QueryResponse> {
-  console.log(`LegalQueryService: Processing ${queryType} query: ${queryText}`);
-  
+export async function processLegalQuery(query: string, queryType: QueryType, files: File[] = []): Promise<QueryResult> {
   try {
-    if (files && files.length > 0) {
-      console.log(`LegalQueryService: Processing ${files.length} files`);
+    console.log("LegalQueryService: Processing", queryType, "query:", query);
+    
+    // Check if OpenAI API is configured
+    const apiKey = localStorage.getItem('openai-api-key');
+    let result = '';
+    
+    if (apiKey) {
+      console.log("LegalQueryService: Using OpenAI API");
       
-      // Process multiple files and combine results
-      const fileResults = await Promise.all(
-        files.map(file => processFileWithQuerySafe(file, queryText, queryType))
-      );
-      
-      // Combine all file results
-      const combinedResponse = fileResults.join('\n\n---\n\n');
-      console.log("LegalQueryService: All files processed");
-      
-      return {
-        content: combinedResponse,
-        status: 'success'
-      };
+      // Process with OpenAI API
+      if (files.length > 0) {
+        console.log("LegalQueryService: Processing query with files...");
+        // Process files content (in a real app, you'd extract text from files)
+        const fileContents = await Promise.all(
+          files.map(async (file) => {
+            if (file.type.includes('text') || file.name.endsWith('.txt')) {
+              return await file.text();
+            }
+            return `[Content of ${file.name}]`;
+          })
+        );
+        
+        // Include file contents in prompt
+        const filePrompt = `
+Query: ${query}
+Document Contents:
+${fileContents.join('\n\n')}
+
+Please analyze the above query and document contents.
+`;
+        
+        // Get response from OpenAI
+        const systemPrompt = getSystemPromptForQueryType(queryType);
+        const response = await generateCompletion(filePrompt, systemPrompt);
+        
+        result = response || "Failed to get response from AI. Please try again later.";
+      } else {
+        console.log("LegalQueryService: Processing query without files...");
+        
+        // Simple query without files
+        const systemPrompt = getSystemPromptForQueryType(queryType);
+        const response = await generateCompletion(query, systemPrompt);
+        
+        result = response || "Failed to get response from AI. Please try again later.";
+      }
     } else {
-      // Just process the query without file
-      console.log("LegalQueryService: Processing query without files...");
-      const response = await simulateApiCall(queryText, queryType);
-      console.log("LegalQueryService: Query processing complete");
+      console.log("LegalQueryService: Using mock response (OpenAI API not configured)");
       
-      return {
-        content: response,
-        status: 'success'
-      };
+      // Fallback to mock data
+      result = await simulateApiCall(query, queryType);
     }
-  } catch (error) {
-    console.error('LegalQueryService: Error processing query:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    toast.error(`Failed to process your legal query: ${errorMessage}`);
+    
+    console.log("LegalQueryService: Query processing complete");
     return {
-      content: `An error occurred while processing your query: ${errorMessage}`,
+      content: result,
+      status: 'success'
+    };
+  } catch (error) {
+    console.error("LegalQueryService: Error processing query:", error);
+    return {
+      content: error instanceof Error ? error.message : "An unknown error occurred",
       status: 'error'
     };
-  }
-}
-
-// Safe version of processFileWithQuery that catches individual file errors
-async function processFileWithQuerySafe(
-  file: File, 
-  queryText: string, 
-  queryType: QueryType
-): Promise<string> {
-  try {
-    const result = await processFileWithQuery(file, queryText, queryType);
-    return result;
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return `ERROR PROCESSING FILE ${file.name}: ${errorMessage}`;
   }
 }
