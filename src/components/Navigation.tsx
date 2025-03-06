@@ -18,7 +18,6 @@ export default function Navigation() {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Log to check if navigation is rendering
   console.log('Navigation component rendered');
 
   return (
@@ -62,35 +61,21 @@ export default function Navigation() {
 
         <nav className="ml-auto flex items-center">
           <DropdownMenu>
-            <DropdownMenuTrigger aria-label="Open user menu" className="bg-transparent border-none p-0 h-auto">
-              <div className="relative">
-                <button
-                  type="button"
-                  className="flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                  id="user-menu-button"
-                  aria-expanded={isMenuOpen}
-                  aria-haspopup="true"
-                  onClick={toggleMenu}
-                >
-                  <span className="sr-only">Open user menu</span>
-                  <img
-                    className="h-8 w-8 rounded-full"
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf49a45?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                    alt=""
-                  />
-                </button>
-              </div>
+            <DropdownMenuTrigger aria-label="Open theme menu" className="p-2 rounded-full hover:bg-accent">
+              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabIndex={-1}>
-              <DropdownMenuItem onClick={() => setTheme("light")} role="menuitem" >
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setTheme("light")}>
                 <Sun className="mr-2 h-4 w-4" />
                 Light
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("dark")} role="menuitem" >
+              <DropdownMenuItem onClick={() => setTheme("dark")}>
                 <Moon className="mr-2 h-4 w-4" />
                 Dark
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("system")} role="menuitem" >
+              <DropdownMenuItem onClick={() => setTheme("system")}>
                 <Scale className="mr-2 h-4 w-4" />
                 System
               </DropdownMenuItem>
