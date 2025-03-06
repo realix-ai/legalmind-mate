@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 interface ImportTabProps {
   importTab: string;
@@ -24,6 +25,7 @@ const ImportTab = ({
   setContent,
   handleFileUpload
 }: ImportTabProps) => {
+  const [uploadKey, setUploadKey] = useState(Date.now()); // To force input reset
   
   const handleGoogleDocImport = async () => {
     if (!googleDocUrl.trim()) {
@@ -70,9 +72,14 @@ nisl nisl aliquam nisl, eget aliquam nisl nisl eget nisl.`;
       
       <TabsContent value="upload" className="space-y-4">
         <Input
+          key={uploadKey}
           id="file-upload"
           type="file"
-          onChange={handleFileUpload}
+          onChange={(e) => {
+            handleFileUpload(e);
+            // Reset the input after handling
+            setUploadKey(Date.now());
+          }}
           className="w-full"
           accept=".txt,.doc,.docx,.rtf,.md"
         />

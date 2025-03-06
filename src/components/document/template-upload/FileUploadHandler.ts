@@ -7,10 +7,20 @@ export const handleFileUpload: FileUploadHandler = (e, setContent) => {
   if (e.target.files && e.target.files.length > 0) {
     const file = e.target.files[0];
     
-    // Check if the file is a text file
-    if (file.type === 'text/plain' || 
-        file.name.endsWith('.txt') || 
-        file.name.endsWith('.md')) {
+    // Check if the file is a valid document type
+    const validTypes = [
+      'text/plain',
+      'text/markdown',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/rtf',
+      'text/rtf'
+    ];
+    
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    const isValidByExtension = fileExtension && ['txt', 'md', 'doc', 'docx', 'rtf'].includes(fileExtension);
+    
+    if (validTypes.includes(file.type) || isValidByExtension) {
       const reader = new FileReader();
       
       reader.onload = (event) => {
@@ -22,11 +32,12 @@ export const handleFileUpload: FileUploadHandler = (e, setContent) => {
       
       reader.onerror = () => {
         toast.error('Error reading file');
+        console.error('FileReader error:', reader.error);
       };
       
       reader.readAsText(file);
     } else {
-      toast.error('Please upload a text file (.txt or .md)');
+      toast.error(`Unsupported file type: ${file.name}. Please upload .txt, .md, .doc, .docx, or .rtf files.`);
     }
   }
 };

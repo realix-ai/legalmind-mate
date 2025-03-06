@@ -5,22 +5,24 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter
+  DialogFooter,
+  DialogDescription
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { PlusCircle } from 'lucide-react';
 import ImportTab from './template-upload/ImportTab';
 import useTemplateUpload from './template-upload/useTemplateUpload';
+import { useState } from 'react';
 
 interface TemplateUploadDialogProps {
   onTemplateAdded: () => void;
 }
 
 const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  
   const {
-    open,
-    setOpen,
     content,
     setContent,
     importTab,
@@ -29,11 +31,22 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
     setGoogleDocUrl,
     isImporting,
     handleSubmit,
-    fileUploadHandler
+    fileUploadHandler,
+    resetForm
   } = useTemplateUpload(onTemplateAdded);
 
+  const handleOpenChange = (open: boolean) => {
+    setDialogOpen(open);
+    if (!open) {
+      // Reset the form when closing the dialog
+      setTimeout(() => {
+        resetForm();
+      }, 100);
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button 
           size="lg"
@@ -49,6 +62,9 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Import Document</DialogTitle>
+            <DialogDescription>
+              Upload a document from your computer or import from Google Docs.
+            </DialogDescription>
           </DialogHeader>
           
           <div className="grid gap-4 py-4">
@@ -71,10 +87,19 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
           </div>
           
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => handleOpenChange(false)}
+            >
               Cancel
             </Button>
-            <Button type="submit" disabled={!content.trim()}>Import</Button>
+            <Button 
+              type="submit" 
+              disabled={!content.trim()}
+            >
+              Import
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
