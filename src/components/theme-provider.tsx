@@ -50,13 +50,17 @@ export function ThemeProvider({
     }
 
     root.classList.add(theme)
+    
+    // Dispatch a custom event for theme change
+    const event = new CustomEvent('themeChanged', { detail: theme });
+    window.dispatchEvent(event);
   }, [theme])
 
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme)
-      setTheme(theme)
+      localStorage.setItem(storageKey, theme);
+      setTheme(theme);
     },
   }
 

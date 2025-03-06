@@ -1,6 +1,6 @@
 
 import { Settings, CreditCard } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useTheme } from "@/hooks/use-theme"
 import { useLanguage } from "@/hooks/use-language"
 import {
@@ -53,24 +53,34 @@ export const SettingsMenu = () => {
     setSelectedLanguage(language);
   }, [language]);
 
-  // Save settings changes
-  const saveSettingsChanges = () => {
-    // Apply theme change
+  // Save settings changes - using useCallback to prevent unnecessary re-renders
+  const saveSettingsChanges = useCallback(() => {
+    // Track if changes were made
+    let changesMade = false;
+    
+    // Apply theme change if needed
     if (selectedTheme !== theme) {
       setTheme(selectedTheme);
+      changesMade = true;
     }
     
-    // Apply language change
+    // Apply language change if needed
     if (selectedLanguage !== language) {
       console.log('Changing language from', language, 'to', selectedLanguage);
       setLanguage(selectedLanguage);
+      changesMade = true;
     }
     
-    // Close dialog after a short delay to ensure UI remains responsive
-    setTimeout(() => {
+    // Close dialog immediately if no changes, or after a short delay if changes were made
+    if (changesMade) {
+      // Use a slightly longer timeout to ensure state changes have time to propagate
+      setTimeout(() => {
+        setIsSettingsOpen(false);
+      }, 100);
+    } else {
       setIsSettingsOpen(false);
-    }, 50);
-  };
+    }
+  }, [selectedTheme, selectedLanguage, theme, language, setTheme, setLanguage]);
 
   return (
     <>
