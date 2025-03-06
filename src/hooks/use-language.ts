@@ -18,7 +18,7 @@ export const useLanguage = () => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('app-language', language);
       
-      // You would typically update the HTML lang attribute
+      // Update the HTML lang attribute
       document.documentElement.setAttribute('lang', language);
       
       // Dispatch a custom event that other components can listen for

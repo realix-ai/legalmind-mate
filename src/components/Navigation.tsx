@@ -1,10 +1,8 @@
 
 import { AppLogo } from "./navigation/AppLogo"
 import { NavigationLinks } from "./navigation/NavigationLinks"
-import { ThemeToggle } from "./navigation/ThemeToggle"
 import { SettingsMenu } from "./navigation/SettingsMenu"
 import { ProfileMenu } from "./navigation/ProfileMenu"
-import { LanguageIndicator } from "./navigation/LanguageIndicator"
 
 export default function Navigation() {
   return (
@@ -13,8 +11,6 @@ export default function Navigation() {
         <AppLogo />
         <NavigationLinks />
         <nav className="ml-auto flex items-center space-x-2">
-          <LanguageIndicator />
-          <ThemeToggle />
           <SettingsMenu />
           <ProfileMenu />
         </nav>
