@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import CaseCard from '@/components/CaseCard';
+import CaseCard from '@/components/case-card';
 import { Case as CaseType } from '@/utils/documents';
 
 interface CaseGridProps {
