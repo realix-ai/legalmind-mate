@@ -21,9 +21,13 @@ export const useLanguage = () => {
       // Update the HTML lang attribute
       document.documentElement.setAttribute('lang', language);
       
-      // Dispatch a custom event that other components can listen for
-      const event = new CustomEvent('languageChanged', { detail: language });
-      window.dispatchEvent(event);
+      // Use a safer way to notify about language changes - using a timeout
+      // to ensure the UI doesn't freeze
+      setTimeout(() => {
+        const event = new CustomEvent('languageChanged', { detail: language });
+        window.dispatchEvent(event);
+        console.log('Language changed to:', language);
+      }, 0);
     }
   }, [language]);
   

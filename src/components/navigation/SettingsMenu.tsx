@@ -8,7 +8,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter
+  DialogFooter,
+  DialogDescription
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
@@ -54,9 +55,21 @@ export const SettingsMenu = () => {
 
   // Save settings changes
   const saveSettingsChanges = () => {
-    setTheme(selectedTheme);
-    setLanguage(selectedLanguage);
-    setIsSettingsOpen(false);
+    // Apply theme change
+    if (selectedTheme !== theme) {
+      setTheme(selectedTheme);
+    }
+    
+    // Apply language change
+    if (selectedLanguage !== language) {
+      console.log('Changing language from', language, 'to', selectedLanguage);
+      setLanguage(selectedLanguage);
+    }
+    
+    // Close dialog after a short delay to ensure UI remains responsive
+    setTimeout(() => {
+      setIsSettingsOpen(false);
+    }, 50);
   };
 
   return (
@@ -85,6 +98,9 @@ export const SettingsMenu = () => {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Application Settings</DialogTitle>
+            <DialogDescription>
+              Customize your application experience
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
