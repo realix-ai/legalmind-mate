@@ -156,7 +156,7 @@ const BatchInputForm = ({ onAddQuery, isProcessing }: BatchInputFormProps) => {
             <SelectContent>
               <SelectItem value="legal-research">Legal Research</SelectItem>
               <SelectItem value="risk-analysis">Risk Analysis</SelectItem>
-              <SelectItem value="summarize">Summarize</SelectItem>
+              <SelectItem value="summarize">Draft/Summarize</SelectItem>
               <SelectItem value="data-analysis">Data Analysis</SelectItem>
             </SelectContent>
           </Select>
