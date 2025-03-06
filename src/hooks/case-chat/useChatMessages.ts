@@ -11,9 +11,10 @@ import {
   generateAIResponse as generateMockAiResponse 
 } from '@/utils/documents/chat/messageGeneration';
 import { generateCompletion } from '@/services/openAiService';
+import { ChatMessageProps } from '@/components/case/ChatMessage';
 
 export const useChatMessages = (caseId?: string, caseName?: string) => {
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<ChatMessageProps[]>([]);
   const [isAiTyping, setIsAiTyping] = useState(false);
   
   useEffect(() => {
@@ -25,11 +26,11 @@ export const useChatMessages = (caseId?: string, caseName?: string) => {
     
     // Add welcome message if no messages exist
     if (loadedMessages.length === 0) {
-      const welcomeMessage = {
+      const welcomeMessage: ChatMessageProps = {
         id: uuidv4(),
-        type: 'ai',
+        sender: 'ai',
         content: `Hello! I'm your AI assistant for the case "${caseName || 'Untitled'}". How can I help you today?`,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().getTime()
       };
       
       saveChatMessages(caseId, [welcomeMessage]);
@@ -37,15 +38,15 @@ export const useChatMessages = (caseId?: string, caseName?: string) => {
     }
   }, [caseId, caseName]);
   
-  const handleSendMessage = useCallback(async (content: string) => {
+  const handleSendMessage = useCallback(async (content: string, files?: File[]) => {
     if (!caseId || !content.trim()) return;
     
     // Add user message
-    const userMessage = {
+    const userMessage: ChatMessageProps = {
       id: uuidv4(),
-      type: 'user',
+      sender: 'user',
       content,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().getTime()
     };
     
     const updatedMessages = [...messages, userMessage];
@@ -63,7 +64,7 @@ export const useChatMessages = (caseId?: string, caseName?: string) => {
       if (apiKey) {
         // Get previous messages for context (max 5)
         const recentMessages = messages.slice(-5).map(msg => ({
-          role: msg.type === 'user' ? 'user' : 'assistant',
+          role: msg.sender === 'user' ? 'user' : 'assistant',
           content: msg.content
         }));
         
@@ -88,16 +89,22 @@ Be concise but thorough, focusing on relevant legal principles, cases, and pract
           throw new Error('Failed to generate content with ChatGPT');
         }
       } else {
-        // Use mock response
-        aiResponseContent = generateMockAiResponse(content, messages);
+        // Use mock response for files or without API key
+        if (files && files.length > 0) {
+          // Call the mock function with the correct arguments (caseId, caseName, messages, files)
+          aiResponseContent = await generateMockAiResponse(caseId, caseName || 'Untitled', updatedMessages, files);
+        } else {
+          // Call the mock function with just the basic arguments
+          aiResponseContent = await generateMockAiResponse(caseId, caseName || 'Untitled', updatedMessages);
+        }
       }
       
       // Add AI response
-      const aiMessage = {
+      const aiMessage: ChatMessageProps = {
         id: uuidv4(),
-        type: 'ai',
+        sender: 'ai',
         content: aiResponseContent,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().getTime()
       };
       
       const finalMessages = [...updatedMessages, aiMessage];
@@ -119,11 +126,11 @@ Be concise but thorough, focusing on relevant legal principles, cases, and pract
     clearChatHistory(caseId);
     
     // Add welcome message
-    const welcomeMessage = {
+    const welcomeMessage: ChatMessageProps = {
       id: uuidv4(),
-      type: 'ai',
+      sender: 'ai',
       content: `Hello! I'm your AI assistant for the case "${caseName || 'Untitled'}". How can I help you today?`,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().getTime()
     };
     
     saveChatMessages(caseId, [welcomeMessage]);

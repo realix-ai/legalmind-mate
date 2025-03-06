@@ -11,7 +11,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 interface ChatPanelProps {
   messages: ChatMessageProps[];
   isAiTyping: boolean;
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, files?: File[]) => void;
   onNewDialog: () => void;
   showDocumentPanel?: boolean;
   toggleDocumentPanel?: () => void;

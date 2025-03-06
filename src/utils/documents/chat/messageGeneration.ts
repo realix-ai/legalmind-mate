@@ -1,4 +1,3 @@
-
 import { ChatMessageProps } from '@/components/case/ChatMessage';
 import { MAX_CONTEXT_LENGTH } from './types';
 import { getCaseDocumentsContent } from '../caseManager';
@@ -38,7 +37,7 @@ export const generateAIResponse = async (
   caseName: string,
   messages: ChatMessageProps[],
   uploadedFiles?: File[]
-): Promise<ChatMessageProps> => {
+): Promise<string> => {
   // Get conversation context
   const context = getConversationContext(messages);
   
@@ -82,12 +81,7 @@ export const generateAIResponse = async (
     aiResponse = getGenericResponse(caseDocuments, caseName);
   }
   
-  return {
-    id: `msg-${Date.now()}`,
-    content: aiResponse,
-    sender: 'ai',
-    timestamp: Date.now()
-  };
+  return aiResponse;
 };
 
 // Helper function to generate file upload response
