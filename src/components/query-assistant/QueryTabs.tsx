@@ -14,6 +14,7 @@ interface QueryTabsProps {
   onShare: () => void;
   citations: any[];
   currentQuery: string;
+  onResponseEdit?: (editedResponse: string) => void;
 }
 
 const QueryTabs = ({
@@ -24,7 +25,8 @@ const QueryTabs = ({
   handleSubmit,
   onShare,
   citations,
-  currentQuery
+  currentQuery,
+  onResponseEdit
 }: QueryTabsProps) => {
   return (
     <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value)} className="mb-8">
@@ -41,6 +43,7 @@ const QueryTabs = ({
           onSubmit={handleSubmit}
           onShare={onShare}
           citations={citations}
+          onResponseEdit={onResponseEdit}
         />
       </TabsContent>
       

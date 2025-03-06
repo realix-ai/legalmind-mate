@@ -91,6 +91,12 @@ export const useLegalQuery = (setActiveTab: (tab: string) => void) => {
     }
   };
 
+  const handleResponseEdit = (editedResponse: string) => {
+    setResponse(editedResponse);
+    // In a real app, you might want to save this edited response to a database
+    console.log("Response edited:", editedResponse);
+  };
+
   return {
     isProcessing,
     response,
@@ -99,6 +105,7 @@ export const useLegalQuery = (setActiveTab: (tab: string) => void) => {
     currentQueryType,
     currentResearchTool,
     handleSubmit,
-    handleShareQuery
+    handleShareQuery,
+    handleResponseEdit
   };
 };

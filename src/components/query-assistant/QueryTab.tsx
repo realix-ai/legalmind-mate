@@ -12,6 +12,7 @@ interface QueryTabProps {
   onSubmit: (query: string, selectedOption: string, files: File[], researchTool?: ResearchToolType) => Promise<void>;
   onShare: () => void;
   citations: Citation[];
+  onResponseEdit?: (editedResponse: string) => void;
 }
 
 const containerVariants = {
@@ -34,7 +35,14 @@ const itemVariants = {
   }
 };
 
-const QueryTab = ({ isProcessing, response, onSubmit, onShare, citations }: QueryTabProps) => {
+const QueryTab = ({ 
+  isProcessing, 
+  response, 
+  onSubmit, 
+  onShare, 
+  citations,
+  onResponseEdit 
+}: QueryTabProps) => {
   return (
     <>
       <motion.div
@@ -58,6 +66,7 @@ const QueryTab = ({ isProcessing, response, onSubmit, onShare, citations }: Quer
         response={response}
         onShare={onShare}
         citations={citations}
+        onResponseEdit={onResponseEdit}
       />
     </>
   );
