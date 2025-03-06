@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { 
@@ -69,21 +68,17 @@ const SaveToCaseDialog = ({
         caseId = newCase.id;
       }
       
-      // Ensure we have a valid documentTitle
       const finalDocumentTitle = title.trim() || "Untitled Document";
       
-      // Debug output
       console.log("Original document title:", title);
       console.log("Final document title:", finalDocumentTitle);
       console.log("Document content length:", content.length);
       console.log("Current document ID:", currentDocumentId);
       console.log("Saving document to case ID:", caseId);
       
-      // Normalize the case ID before saving
       const normalizedCaseId = normalizeCaseId(caseId);
       console.log("Normalized case ID:", normalizedCaseId);
       
-      // Save document with normalized case ID
       const saved = saveDocument(finalDocumentTitle, content, currentDocumentId, normalizedCaseId);
       
       console.log("Document saved:", saved);
@@ -102,7 +97,7 @@ const SaveToCaseDialog = ({
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          size="sm"
+          size="xs"
           className="gap-1"
         >
           Save to Case

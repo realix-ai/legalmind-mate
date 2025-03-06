@@ -1,10 +1,9 @@
 
 import { useCallback } from 'react';
-import { ArrowLeft, Save, Sparkles, Share, Upload } from 'lucide-react';
+import { ArrowLeft, Save, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ExportOptions from './ExportOptions';
 import SaveToCaseDialog from './SaveToCaseDialog';
-import { toast } from 'sonner';
 import { useExportDocument } from '@/hooks/document/useExportDocument';
 
 interface DocumentToolbarProps {
@@ -40,13 +39,13 @@ const DocumentToolbar = ({
     <div className="flex justify-between items-center">
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="sm" onClick={onBack}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="mr-2 h-3.5 w-3.5" />
           Back
         </Button>
         <div className="h-4 w-px bg-border mx-1" />
         
-        <Button variant="outline" size="sm" onClick={onSaveDocument}>
-          <Save className="mr-2 h-4 w-4" />
+        <Button variant="outline" size="xs" onClick={onSaveDocument}>
+          <Save className="mr-1 h-3.5 w-3.5" />
           Save
         </Button>
       </div>
@@ -70,11 +69,11 @@ const DocumentToolbar = ({
         
         <Button
           variant={showAiPrompt ? "default" : "outline"}
-          size="sm"
+          size="xs"
           onClick={toggleAiPrompt}
           className="gap-1"
         >
-          <Sparkles className="h-4 w-4 mr-1" />
+          <Sparkles className="h-3.5 w-3.5 mr-1" />
           AI Suggestions
         </Button>
       </div>
