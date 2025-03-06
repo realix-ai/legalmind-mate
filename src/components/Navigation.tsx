@@ -100,10 +100,6 @@ export default function Navigation() {
                   <Settings className="mr-2 h-4 w-4" />
                   App Settings
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setIsProfileOpen(true)}>
-                  <User className="mr-2 h-4 w-4" />
-                  Account Settings
-                </DropdownMenuItem>
                 <DropdownMenuItem>
                   <CreditCard className="mr-2 h-4 w-4" />
                   Subscription
