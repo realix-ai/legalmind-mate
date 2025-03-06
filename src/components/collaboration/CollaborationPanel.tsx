@@ -46,13 +46,7 @@ const CollaborationPanel = () => {
     >
       {/* Collaboration overview */}
       <Card className="mb-6 border-primary/20 shadow-sm">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-xl">
-            <Users className="h-5 w-5 text-primary" />
-            Team Collaboration Hub
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-6">
             {/* Active collaborators */}
             <div className="flex-1">
