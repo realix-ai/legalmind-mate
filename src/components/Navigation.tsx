@@ -18,16 +18,19 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { useTheme } from "@/hooks/use-theme"
+import { useLanguage } from "@/hooks/use-language"
 
 export default function Navigation() {
   const { userProfile, updateUserProfile } = useUserProfile()
   const { theme, setTheme } = useTheme()
+  const { language, setLanguage } = useLanguage()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [name, setName] = useState("")
   const [role, setRole] = useState("")
   const [specialization, setSpecialization] = useState("")
   const [selectedTheme, setSelectedTheme] = useState(theme)
+  const [selectedLanguage, setSelectedLanguage] = useState(language)
 
   // Initialize form values when userProfile changes
   useEffect(() => {
@@ -40,6 +43,11 @@ export default function Navigation() {
   useEffect(() => {
     setSelectedTheme(theme)
   }, [theme])
+  
+  // Initialize language selector when language changes
+  useEffect(() => {
+    setSelectedLanguage(language)
+  }, [language])
 
   // Get initials for avatar
   const getInitials = (name: string) => {
@@ -65,6 +73,7 @@ export default function Navigation() {
   // Save settings changes
   const saveSettingsChanges = () => {
     setTheme(selectedTheme);
+    setLanguage(selectedLanguage);
     setIsSettingsOpen(false);
   };
 
@@ -72,6 +81,20 @@ export default function Navigation() {
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
   };
+
+  // Language options 
+  const languageOptions = [
+    { value: "en", label: "English" },
+    { value: "es", label: "Español (Spanish)" },
+    { value: "fr", label: "Français (French)" },
+    { value: "de", label: "Deutsch (German)" },
+    { value: "zh", label: "中文 (Chinese)" },
+    { value: "ja", label: "日本語 (Japanese)" },
+    { value: "ar", label: "العربية (Arabic)" },
+    { value: "hi", label: "हिन्दी (Hindi)" },
+    { value: "pt", label: "Português (Portuguese)" },
+    { value: "ru", label: "Русский (Russian)" },
+  ];
 
   return (
     <>
@@ -199,10 +222,17 @@ export default function Navigation() {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="language">Language</Label>
-              <select id="language" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
-                <option value="en">English</option>
-                <option value="es">Spanish</option>
-                <option value="fr">French</option>
+              <select 
+                id="language" 
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                value={selectedLanguage}
+                onChange={(e) => setSelectedLanguage(e.target.value)}
+              >
+                {languageOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
