@@ -1,41 +1,80 @@
+import {
+  ClerkProvider,
+  SignedIn,
+  SignedOut,
+  SignInButton,
+} from "@clerk/clerk-react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "@/components/theme-provider"
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Link
+} from "react-router-dom";
+import { Scale } from "lucide-react";
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from "sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import DocumentDrafting from './pages/DocumentDrafting';
-import CaseManagement from './pages/CaseManagement';
-import CaseChat from './pages/CaseChat';
-import QueryAssistant from './pages/QueryAssistant';
-import Index from './pages/Index';
-import NotFound from './pages/NotFound';
-import './App.css';
+import Index from "./pages/Index"
+import QueryAssistant from "./pages/QueryAssistant"
+import DocumentDrafting from "./pages/DocumentDrafting"
+import CaseManagement from "./pages/CaseManagement"
+import CaseAnalytics from "./pages/CaseAnalytics"
+import CaseChat from "./pages/CaseChat"
+import NotFound from "./pages/NotFound"
+// Import our new dashboard page
+import UsageDashboard from './pages/UsageDashboard';
+
+const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+if (!clerkPubKey) {
+  throw new Error("Missing Publishable Key");
+}
 
 const queryClient = new QueryClient();
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Router>
-          <Routes>
-            {/* Public routes accessible to everyone */}
-            <Route path="/" element={<Index />} />
-            
-            {/* All routes are now accessible without authentication */}
-            <Route path="/document-drafting" element={<DocumentDrafting />} />
-            <Route path="/document-drafting/:templateId" element={<DocumentDrafting />} />
-            <Route path="/document-drafting/edit/:documentId" element={<DocumentDrafting />} />
-            <Route path="/case-management" element={<CaseManagement />} />
-            <Route path="/case-chat/:caseId" element={<CaseChat />} />
-            <Route path="/query-assistant" element={<QueryAssistant />} />
-            
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <Toaster position="top-right" />
-        </Router>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <ClerkProvider publishableKey={clerkPubKey}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+          <RouterProvider router={
+            createBrowserRouter([
+              {
+                path: '/',
+                element: <Index />
+              },
+              {
+                path: '/query-assistant',
+                element: <QueryAssistant />
+              },
+              {
+                path: '/document-drafting',
+                element: <DocumentDrafting />
+              },
+              {
+                path: '/case-management',
+                element: <CaseManagement />
+              },
+              {
+                path: '/case-analytics',
+                element: <CaseAnalytics />
+              },
+              {
+                path: '/case-chat/:caseId',
+                element: <CaseChat />
+              },
+              {
+                path: '/usage-dashboard',
+                element: <UsageDashboard />
+              },
+              {
+                path: '*',
+                element: <NotFound />
+              }
+            ])
+          } />
+        </ThemeProvider>
+      </QueryClientProvider>
+    </ClerkProvider>
   );
 }
 
