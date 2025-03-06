@@ -90,7 +90,7 @@ const SettingsDialog = ({ open, onOpenChange, defaultTab = "appearance" }: Setti
                   <span className="sr-only">System</span>
                   <div className="h-16 w-full rounded-md bg-gradient-to-b from-[#FAFAFA] to-[#131313] border" />
                   <span className="mt-2">System</span>
-                </div>
+                </button>
               </div>
             </div>
           </TabsContent>
