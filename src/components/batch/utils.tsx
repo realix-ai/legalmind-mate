@@ -40,7 +40,7 @@ export const getTypeLabel = (type: QueryType): string => {
     case 'summarize':
       return 'Draft/Summarize';
     case 'data-analysis':
-      return 'Data Analysis';
+      return 'Extract Data';
     default:
       return type;
   }

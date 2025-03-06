@@ -39,8 +39,8 @@ const QueryOptions = ({ onSelect, selectedOption }: QueryOptionsProps) => {
     },
     {
       id: 'data-analysis' as QueryType,
-      title: 'Data Analysis',
-      description: 'Analyze patterns and insights in legal data',
+      title: 'Extract Data',
+      description: 'Extract and analyze data from legal documents',
       icon: <BarChart className="h-4 w-4" />,
       color: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400'
     }

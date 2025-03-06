@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { toast } from "sonner";
 import { Button } from '@/components/ui/button';
@@ -157,7 +156,7 @@ const BatchInputForm = ({ onAddQuery, isProcessing }: BatchInputFormProps) => {
               <SelectItem value="legal-research">Legal Research</SelectItem>
               <SelectItem value="risk-analysis">Risk Analysis</SelectItem>
               <SelectItem value="summarize">Draft/Summarize</SelectItem>
-              <SelectItem value="data-analysis">Data Analysis</SelectItem>
+              <SelectItem value="data-analysis">Extract Data</SelectItem>
             </SelectContent>
           </Select>
         </div>
