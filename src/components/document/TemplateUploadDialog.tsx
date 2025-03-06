@@ -68,7 +68,13 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
       </DialogTrigger>
       
       <DialogContent className="sm:max-w-[600px]">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={(e) => {
+          handleSubmit(e);
+          // Close dialog after submission
+          setTimeout(() => {
+            setDialogOpen(false);
+          }, 100);
+        }}>
           <DialogHeader>
             <DialogTitle>Import Document</DialogTitle>
             <DialogDescription>

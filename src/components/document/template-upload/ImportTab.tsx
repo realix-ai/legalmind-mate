@@ -58,13 +58,8 @@ nisl nisl aliquam nisl, eget aliquam nisl nisl eget nisl.`;
     }
   };
 
-  const resetFileInput = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
   const handleFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("File input change detected", e.target.files);
     if (!e.target.files || e.target.files.length === 0) {
       toast.error('No file selected');
       return;
