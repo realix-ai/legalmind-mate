@@ -33,7 +33,7 @@ const CollaborationPanel = () => {
     setActivityItems(getActivityItems());
   }, []);
 
-  // Filter active collaborators
+  // Filter active collaborators - check if status exists before comparing
   const activeCollaborators = teamMembers.filter(member => 
     member.status === 'online' || member.status === 'active'
   );
@@ -93,7 +93,9 @@ const CollaborationPanel = () => {
                   {activityItems.slice(0, 2).map(item => (
                     <li key={item.id} className="flex items-center gap-2 text-muted-foreground">
                       <UserCircle2 className="h-3.5 w-3.5 flex-shrink-0" />
-                      <span className="truncate">{item.title}</span>
+                      <span className="truncate">
+                        {item.title || `${item.userName} ${item.action}`}
+                      </span>
                     </li>
                   ))}
                 </ul>

@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { 
   Bold,
@@ -42,7 +41,6 @@ const DocumentEditor = ({
   const [sections, setSections] = useState<DocumentSection[]>([]);
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
 
-  // Initialize real-time editing hooks
   const { 
     editors, 
     updateCursorPosition, 
@@ -51,20 +49,16 @@ const DocumentEditor = ({
     isEditing
   } = useRealtimeEditing(documentId);
 
-  // Initialize section comments hook
   const {
     getCommentsForSection,
     addSectionComment
   } = useSectionComments(documentId);
 
-  // Parse sections from content
   useEffect(() => {
-    // Simple section detection (e.g., headings or manually marked sections)
     const parsedSections: DocumentSection[] = [];
     const lines = documentContent.split('\n');
     
     lines.forEach((line, index) => {
-      // Detect headings (e.g., # Heading, ## Subheading)
       if (line.startsWith('#')) {
         const level = line.indexOf(' ');
         if (level > 0) {
@@ -72,7 +66,6 @@ const DocumentEditor = ({
           const sectionId = `section-${index}`;
           const startPosition = documentContent.indexOf(line);
           
-          // Find the end of this section (next heading or end of document)
           let endPosition = documentContent.length;
           for (let i = index + 1; i < lines.length; i++) {
             if (lines[i].startsWith('#')) {
@@ -96,36 +89,34 @@ const DocumentEditor = ({
     setSections(parsedSections);
   }, [documentContent]);
 
-  // Keyboard shortcut handler
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Check if Ctrl/Cmd key is pressed
     if (e.ctrlKey || e.metaKey) {
       switch (e.key.toLowerCase()) {
-        case 'b': // Bold
+        case 'b':
           e.preventDefault();
           applyStyle('bold');
           break;
-        case 'i': // Italic
+        case 'i':
           e.preventDefault();
           applyStyle('italic');
           break;
-        case '1': // Heading 1
+        case '1':
           e.preventDefault();
           applyStyle('h1');
           break;
-        case '2': // Heading 2
+        case '2':
           e.preventDefault();
           applyStyle('h2');
           break;
-        case '3': // Heading 3
+        case '3':
           e.preventDefault();
           applyStyle('h3');
           break;
-        case 'k': // Show keyboard shortcuts
+        case 'k':
           e.preventDefault();
           setShowKeyboardShortcuts(prev => !prev);
           break;
-        case '/': // Show comment dialog
+        case '/':
           e.preventDefault();
           if (selectedSection) {
             setShowCommentDialog(true);
@@ -137,11 +128,9 @@ const DocumentEditor = ({
     }
   }, [selectedSection]);
 
-  // Handle editor events
   const handleEditorChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setDocumentContent(e.target.value);
     
-    // Update cursor position for real-time collaboration
     const cursorPosition = e.target.selectionStart;
     const selectionEnd = e.target.selectionEnd;
     
@@ -156,7 +145,6 @@ const DocumentEditor = ({
     const editor = e.currentTarget;
     const cursorPosition = editor.selectionStart;
     
-    // Find if user clicked in a specific section
     const clickedSection = sections.find(
       section => cursorPosition >= section.startPosition && cursorPosition <= section.endPosition
     );
@@ -167,7 +155,6 @@ const DocumentEditor = ({
       setSelectedSection(null);
     }
     
-    // Update cursor position
     updateCursorPosition(cursorPosition);
   };
 
@@ -186,7 +173,6 @@ const DocumentEditor = ({
     }
   };
 
-  // Style and formatting handlers
   const applyStyle = (style: string) => {
     if (!editorRef.current) return;
     
@@ -230,7 +216,6 @@ const DocumentEditor = ({
     
     setDocumentContent(newContent);
     
-    // Reset cursor position
     setTimeout(() => {
       editor.focus();
       editor.setSelectionRange(newCursorPos, newCursorPos);
@@ -238,7 +223,6 @@ const DocumentEditor = ({
     }, 0);
   };
 
-  // Display other editors' cursors
   const renderEditorCursors = () => {
     return (
       <div className="relative">
@@ -487,7 +471,6 @@ const DocumentEditor = ({
           placeholder="Start typing or use formatting options above..."
         />
         
-        {/* Show section markers */}
         {sections.map(section => (
           <div 
             key={section.id}

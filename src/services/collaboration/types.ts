@@ -8,6 +8,7 @@ export interface TeamMember {
   initials: string;
   email: string;
   avatar?: string;
+  status?: 'online' | 'active' | 'away' | 'offline';
 }
 
 export interface SharedQuery {
@@ -27,4 +28,5 @@ export interface ActivityItem {
   action: string;
   target?: string;
   timestamp: number;
+  title?: string; // Add title field to ActivityItem
 }

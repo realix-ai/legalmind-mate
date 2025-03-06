@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -6,7 +5,7 @@ import { useRealtimeEditing } from '@/hooks/document/useRealtimeEditing';
 import { formatDistanceToNow } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { CursorText, Users } from 'lucide-react';
+import { Pencil, Users } from 'lucide-react';
 
 interface ActiveEditorsListProps {
   documentId: string | null;
@@ -108,7 +107,7 @@ const EditorCard = ({ editor, isActive }: EditorCardProps) => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span>
-                    <CursorText 
+                    <Pencil 
                       className="h-3.5 w-3.5" 
                       style={{ color: editor.color }}
                     />

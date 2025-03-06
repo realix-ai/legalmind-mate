@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import {
@@ -7,6 +8,9 @@ import {
   unregisterEditor,
   updateEditorPresence
 } from '@/services/collaboration/realtimeService';
+
+// Export the EditorPresence type
+export type { EditorPresence };
 
 export function useRealtimeEditing(documentId: string | null) {
   const [editors, setEditors] = useState<EditorPresence[]>([]);
