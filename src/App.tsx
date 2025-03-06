@@ -22,11 +22,8 @@ import CaseAnalytics from "./pages/CaseAnalytics"
 import CaseChat from "./pages/CaseChat"
 import NotFound from "./pages/NotFound"
 
-const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-
-if (!clerkPubKey) {
-  throw new Error("Missing Publishable Key");
-}
+// Use a default key for development if the environment variable isn't set
+const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_placeholder_key";
 
 const queryClient = new QueryClient();
 
