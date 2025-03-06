@@ -1,80 +1,40 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { v4 as uuidv4 } from 'uuid';
-
-export interface EditorPresence {
-  id: string;
-  name: string;
-  cursor: {
-    position: number;
-    selection?: {
-      start: number;
-      end: number;
-    };
-  };
-  lastActive: number;
-  isActive?: boolean;
-}
+import {
+  EditorPresence,
+  getDocumentEditors,
+  registerEditor,
+  unregisterEditor,
+  updateEditorPresence
+} from '@/services/collaboration/realtimeService';
 
 export function useRealtimeEditing(documentId: string | null) {
   const [editors, setEditors] = useState<EditorPresence[]>([]);
   const [currentEditor, setCurrentEditor] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  // Initialize editors
+  // Initialize editors and current editor
   useEffect(() => {
     if (!documentId) return;
 
-    // Load active editors from localStorage
-    const storedEditors = localStorage.getItem(`document_editors_${documentId}`);
-    if (storedEditors) {
-      try {
-        const parsedEditors = JSON.parse(storedEditors);
-        
-        // Filter out stale editors (inactive for more than 5 minutes)
-        const activeEditors = parsedEditors.filter((editor: EditorPresence) => 
-          Date.now() - editor.lastActive < 5 * 60 * 1000
-        );
-        
-        setEditors(activeEditors);
-      } catch (error) {
-        console.error('Error parsing stored editors:', error);
-        setEditors([]);
-      }
-    } else {
-      setEditors([]);
-    }
-
-    // Create a unique ID for the current editor
-    const editorId = uuidv4();
+    // Load active editors
+    const loadedEditors = getDocumentEditors(documentId);
+    setEditors(loadedEditors);
+    
+    // Register current user as an editor
+    const editorId = registerEditor(documentId);
     setCurrentEditor(editorId);
 
-    // Add current user as an editor
-    const newEditor: EditorPresence = {
-      id: editorId,
-      name: 'You',
-      cursor: {
-        position: 0
-      },
-      lastActive: Date.now(),
-      isActive: true // Set the current user as active
-    };
-
-    setEditors(prevEditors => {
-      const updatedEditors = [...prevEditors, newEditor];
-      localStorage.setItem(`document_editors_${documentId}`, JSON.stringify(updatedEditors));
-      return updatedEditors;
-    });
-
+    // Set up interval to refresh editors list
+    const interval = setInterval(() => {
+      setEditors(getDocumentEditors(documentId));
+    }, 10000); // Refresh every 10 seconds
+    
     // Cleanup on unmount
     return () => {
+      clearInterval(interval);
       if (documentId && currentEditor) {
-        // Remove current editor when leaving
-        setEditors(prevEditors => {
-          const remainingEditors = prevEditors.filter(editor => editor.id !== editorId);
-          localStorage.setItem(`document_editors_${documentId}`, JSON.stringify(remainingEditors));
-          return remainingEditors;
-        });
+        unregisterEditor(documentId, currentEditor);
       }
     };
   }, [documentId]);
@@ -82,74 +42,33 @@ export function useRealtimeEditing(documentId: string | null) {
   // Update editor cursor position
   const updateCursorPosition = (position: number, selection?: { start: number; end: number }) => {
     if (!documentId || !currentEditor) return;
-
-    setEditors(prevEditors => {
-      const updatedEditors = prevEditors.map(editor => {
-        if (editor.id === currentEditor) {
-          return {
-            ...editor,
-            cursor: {
-              position,
-              selection
-            },
-            lastActive: Date.now(),
-            isActive: true // Set this editor as active when updating cursor
-          };
-        }
-        return editor;
-      });
-
-      localStorage.setItem(`document_editors_${documentId}`, JSON.stringify(updatedEditors));
-      return updatedEditors;
-    });
+    
+    updateEditorPresence(documentId, currentEditor, isEditing, position, selection);
+    
+    // Update local editors list
+    setEditors(getDocumentEditors(documentId));
   };
 
   // Begin editing
   const beginEditing = () => {
     if (!documentId || !currentEditor) return;
-
-    // Update status to editing
-    setIsEditing(true);
     
-    // Update last active timestamp
-    setEditors(prevEditors => {
-      const updatedEditors = prevEditors.map(editor => {
-        if (editor.id === currentEditor) {
-          return {
-            ...editor,
-            lastActive: Date.now(),
-            isActive: true // Set this editor as active when beginning editing
-          };
-        }
-        return editor;
-      });
-
-      localStorage.setItem(`document_editors_${documentId}`, JSON.stringify(updatedEditors));
-      return updatedEditors;
-    });
+    setIsEditing(true);
+    updateEditorPresence(documentId, currentEditor, true);
+    
+    // Update local editors list
+    setEditors(getDocumentEditors(documentId));
   };
 
   // End editing
   const endEditing = () => {
-    setIsEditing(false);
+    if (!documentId || !currentEditor) return;
     
-    // Update editor status to inactive
-    if (documentId && currentEditor) {
-      setEditors(prevEditors => {
-        const updatedEditors = prevEditors.map(editor => {
-          if (editor.id === currentEditor) {
-            return {
-              ...editor,
-              isActive: false // Set this editor as inactive when ending editing
-            };
-          }
-          return editor;
-        });
-
-        localStorage.setItem(`document_editors_${documentId}`, JSON.stringify(updatedEditors));
-        return updatedEditors;
-      });
-    }
+    setIsEditing(false);
+    updateEditorPresence(documentId, currentEditor, false);
+    
+    // Update local editors list
+    setEditors(getDocumentEditors(documentId));
   };
 
   // Heartbeat to keep editor presence active
@@ -157,21 +76,8 @@ export function useRealtimeEditing(documentId: string | null) {
     if (!documentId || !currentEditor) return;
 
     const interval = setInterval(() => {
-      setEditors(prevEditors => {
-        const updatedEditors = prevEditors.map(editor => {
-          if (editor.id === currentEditor) {
-            return {
-              ...editor,
-              lastActive: Date.now(),
-              isActive: isEditing // Set active status based on current editing state
-            };
-          }
-          return editor;
-        });
-
-        localStorage.setItem(`document_editors_${documentId}`, JSON.stringify(updatedEditors));
-        return updatedEditors;
-      });
+      updateEditorPresence(documentId, currentEditor, isEditing);
+      setEditors(getDocumentEditors(documentId));
     }, 30000); // Update every 30 seconds
 
     return () => clearInterval(interval);

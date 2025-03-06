@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Share2, Users } from 'lucide-react';
+import { Share2, Users, History, UserCircle2 } from 'lucide-react';
 import { 
   getTeamMembers, 
   getSharedQueries, 
@@ -13,12 +13,13 @@ import {
   SharedQuery
 } from '@/services/collaborationService';
 
-// Import the new component files
+// Import the component files
 import ShareQueryTab from './ShareQueryTab';
 import TeamMembersTab from './TeamMembersTab';
 import ActivityFeed from './ActivityFeed';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 const CollaborationPanel = () => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -32,12 +33,10 @@ const CollaborationPanel = () => {
     setActivityItems(getActivityItems());
   }, []);
 
-  // Mock active collaborators
-  const activeCollaborators = [
-    { id: '1', name: 'John Doe', isActive: true },
-    { id: '2', name: 'Jane Smith', isActive: true },
-    { id: '3', name: 'Mark Johnson', isActive: false }
-  ];
+  // Filter active collaborators
+  const activeCollaborators = teamMembers.filter(member => 
+    member.status === 'online' || member.status === 'active'
+  );
   
   return (
     <motion.div
@@ -45,43 +44,78 @@ const CollaborationPanel = () => {
       animate={{ opacity: 1 }}
       className="max-w-4xl mx-auto"
     >
-      {/* Prominently display active collaborators */}
-      <Card className="mb-6 border-primary/20 bg-primary/5">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-primary">
-            <Users className="h-5 w-5" />
-            Active Collaborators
+      {/* Collaboration overview */}
+      <Card className="mb-6 border-primary/20 shadow-sm">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <Users className="h-5 w-5 text-primary" />
+            Team Collaboration Hub
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="flex -space-x-2">
-              {activeCollaborators.map(collaborator => (
-                <Avatar key={collaborator.id} className="border-2 border-background">
-                  <AvatarFallback className={collaborator.isActive ? "bg-primary/10" : "bg-muted"}>
-                    {collaborator.name.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-              ))}
+          <div className="flex flex-col md:flex-row gap-6">
+            {/* Active collaborators */}
+            <div className="flex-1">
+              <h3 className="text-sm font-medium mb-3 flex items-center">
+                <Badge className="bg-green-500 h-2 w-2 p-0 rounded-full mr-2" />
+                Active collaborators ({activeCollaborators.length})
+              </h3>
+              
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                {activeCollaborators.length > 0 ? (
+                  activeCollaborators.map(collaborator => (
+                    <div key={collaborator.id} className="flex items-center bg-primary/5 rounded-full px-2 py-1">
+                      <Avatar className="h-6 w-6 mr-2">
+                        <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                          {collaborator.initials}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm">{collaborator.name}</span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">No active team members</p>
+                )}
+              </div>
             </div>
-            <Badge variant="outline" className="bg-primary/10 text-primary">
-              {activeCollaborators.filter(c => c.isActive).length} online now
-            </Badge>
+            
+            {/* Recent activity summary */}
+            <Separator orientation="vertical" className="hidden md:block" />
+            
+            <div className="flex-1">
+              <h3 className="text-sm font-medium mb-3 flex items-center">
+                <History className="h-4 w-4 mr-2" />
+                Recent activity
+              </h3>
+              
+              {activityItems.length > 0 ? (
+                <ul className="space-y-1 text-sm">
+                  {activityItems.slice(0, 2).map(item => (
+                    <li key={item.id} className="flex items-center gap-2 text-muted-foreground">
+                      <UserCircle2 className="h-3.5 w-3.5 flex-shrink-0" />
+                      <span className="truncate">{item.title}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-muted-foreground italic">No recent activity</p>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
-          <Card>
+          <Card className="shadow-sm">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Share2 className="h-5 w-5" />
-                Share & Collaborate
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Share2 className="h-5 w-5 text-primary" />
+                Collaboration Tools
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="share">
+              <Tabs defaultValue="share" className="mt-2">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="share">Share Results</TabsTrigger>
                   <TabsTrigger value="team">Team Members</TabsTrigger>
@@ -107,7 +141,17 @@ const CollaborationPanel = () => {
         </div>
         
         <div>
-          <ActivityFeed activityItems={activityItems} />
+          <Card className="shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <History className="h-5 w-5 text-primary" />
+                Activity Feed
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ActivityFeed activityItems={activityItems} />
+            </CardContent>
+          </Card>
         </div>
       </div>
     </motion.div>
