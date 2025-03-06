@@ -8,8 +8,8 @@ import {
   clearChatHistory 
 } from '@/utils/documents/chat';
 import { 
-  generateAIResponse as generateMockAiResponse 
-} from '@/utils/documents/chat/messageGeneration';
+  generateAIResponse 
+} from '@/utils/documents/chat/messageGenerator';
 import { generateCompletion } from '@/services/openAiService';
 import { ChatMessageProps } from '@/components/case/ChatMessage';
 import { getCaseDocumentsContent } from '@/utils/documents/caseManager';
@@ -107,10 +107,10 @@ When documents are provided, reference them specifically in your response.`;
         // Use mock response for files or without API key
         if (files && files.length > 0) {
           // Call the mock function with the correct arguments (caseId, caseName, messages, files)
-          aiResponseContent = await generateMockAiResponse(caseId, caseName || 'Untitled', updatedMessages, files);
+          aiResponseContent = await generateAIResponse(caseId, caseName || 'Untitled', updatedMessages, files);
         } else {
           // Call the mock function with just the basic arguments
-          aiResponseContent = await generateMockAiResponse(caseId, caseName || 'Untitled', updatedMessages);
+          aiResponseContent = await generateAIResponse(caseId, caseName || 'Untitled', updatedMessages);
         }
       }
       
