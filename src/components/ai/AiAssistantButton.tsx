@@ -1,6 +1,5 @@
-
 import { useState, useRef } from 'react';
-import { Sparkles, X, FileUp } from 'lucide-react';
+import { Sparkles, X, FileUp, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
@@ -35,7 +34,6 @@ const AiAssistantButton = ({
     if (e.target.files && e.target.files.length > 0) {
       const files = Array.from(e.target.files);
       
-      // Check file sizes (max 10MB per file)
       const oversizedFiles = files.filter(file => file.size > 10 * 1024 * 1024);
       
       if (oversizedFiles.length > 0) {
@@ -62,10 +60,8 @@ const AiAssistantButton = ({
     toast.loading('Processing your request...');
 
     try {
-      // Check if OpenAI API key is configured
       const apiKey = localStorage.getItem('openai-api-key');
       
-      // If there is a key configured, use actual OpenAI service
       if (apiKey) {
         const systemPrompt = `You are an AI legal assistant helping with legal tasks. 
           Context about current view: ${context || 'No specific context provided.'}`;
@@ -73,27 +69,22 @@ const AiAssistantButton = ({
         let response = '';
         
         if (uploadedFiles.length > 0) {
-          // Handle file processing with OpenAI
           const fileContents = await Promise.all(
             uploadedFiles.map(async (file) => {
               if (file.type.includes('text') || file.name.endsWith('.txt')) {
                 return await file.text();
               } else {
-                // For other file types, just use the file name in the prompt
                 return `[File: ${file.name}, Size: ${Math.round(file.size / 1024)}KB]`;
               }
             })
           );
           
-          // Import and use the generateCompletion function
           const { generateCompletion } = await import('@/services/openAiService');
           
-          // Create a prompt that includes file content
           const enhancedPrompt = `${prompt || 'Please analyze these files:'}\n\nFiles:\n${fileContents.join('\n\n')}`;
           
           response = await generateCompletion(enhancedPrompt, systemPrompt) || '';
         } else {
-          // Regular prompt without files
           const { generateCompletion } = await import('@/services/openAiService');
           response = await generateCompletion(prompt, systemPrompt) || '';
         }
@@ -110,7 +101,6 @@ const AiAssistantButton = ({
           throw new Error('Failed to get response');
         }
       } else {
-        // Mock response for demo purposes
         setTimeout(() => {
           let mockResponse = '';
           
@@ -195,7 +185,7 @@ const AiAssistantButton = ({
               disabled={isProcessing}
               className="gap-1"
             >
-              <FileUp className="h-4 w-4" />
+              <Upload className="h-4 w-4" />
               Upload Files
             </Button>
             
@@ -222,7 +212,6 @@ const AiAssistantButton = ({
   );
 };
 
-// Helper function to generate mock AI responses
 const getMockAiResponse = (prompt: string, context: string): string => {
   const promptLower = prompt?.toLowerCase() || '';
   
