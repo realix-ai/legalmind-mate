@@ -30,6 +30,7 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
     googleDocUrl,
     setGoogleDocUrl,
     isImporting,
+    setIsImporting,
     handleSubmit,
     fileUploadHandler,
     resetForm
@@ -51,7 +52,7 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
       // Clean up any pending timeouts when component unmounts
       resetForm();
     };
-  }, []);
+  }, [resetForm]);
 
   return (
     <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>

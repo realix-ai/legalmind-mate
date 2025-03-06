@@ -13,7 +13,7 @@ interface ImportTabProps {
   setGoogleDocUrl: (url: string) => void;
   isImporting: boolean;
   setContent: (content: string) => void;
-  handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => Promise<boolean>;
 }
 
 const ImportTab = ({
@@ -26,6 +26,7 @@ const ImportTab = ({
   handleFileUpload
 }: ImportTabProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
   
   const handleGoogleDocImport = async () => {
     if (!googleDocUrl.trim()) {
@@ -63,6 +64,20 @@ nisl nisl aliquam nisl, eget aliquam nisl nisl eget nisl.`;
     }
   };
 
+  const handleFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsUploading(true);
+    try {
+      const success = await handleFileUpload(e);
+      console.log('File upload success:', success);
+    } catch (error) {
+      console.error('Error during file upload:', error);
+      toast.error('File upload failed');
+    } finally {
+      setIsUploading(false);
+      resetFileInput();
+    }
+  };
+
   return (
     <Tabs value={importTab} onValueChange={setImportTab} className="w-full">
       <TabsList className="grid grid-cols-2 mb-4">
@@ -81,17 +96,20 @@ nisl nisl aliquam nisl, eget aliquam nisl nisl eget nisl.`;
           ref={fileInputRef}
           id="file-upload"
           type="file"
-          onChange={(e) => {
-            handleFileUpload(e);
-            resetFileInput();
-          }}
+          onChange={handleFileInputChange}
           className="w-full"
           accept=".txt,.doc,.docx,.rtf,.md"
+          disabled={isUploading}
           onClick={(e) => {
             // Reset the input value to ensure the same file can be selected again
             (e.target as HTMLInputElement).value = '';
           }}
         />
+        {isUploading && (
+          <p className="text-xs text-primary animate-pulse">
+            Uploading file...
+          </p>
+        )}
         <p className="text-xs text-muted-foreground">
           Upload a file from your computer (.txt, .doc, .docx, .rtf, .md)
         </p>

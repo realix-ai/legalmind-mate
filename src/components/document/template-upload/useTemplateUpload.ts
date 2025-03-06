@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { saveCustomTemplate } from '@/utils/documents';
@@ -13,11 +13,12 @@ export const useTemplateUpload = (onTemplateAdded: () => void) => {
   const [googleDocUrl, setGoogleDocUrl] = useState('');
   const [isImporting, setIsImporting] = useState(false);
   
-  const fileUploadHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleFileUpload(e, setContent);
+  const fileUploadHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const success = await handleFileUpload(e, setContent);
+    return success;
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!content.trim()) {
@@ -26,31 +27,36 @@ export const useTemplateUpload = (onTemplateAdded: () => void) => {
     }
     
     try {
-      // Generate default title from timestamp or file info
-      const title = `Imported Document ${new Date().toLocaleString()}`;
+      // Generate title from file info or timestamp
+      const timestamp = new Date().toLocaleString();
+      const title = `Imported Document ${timestamp}`;
       const description = 'Imported document';
       
       const template = saveCustomTemplate(title, description, content, 'Custom');
       toast.success('Template uploaded successfully');
       onTemplateAdded();
       setOpen(false);
-      resetForm();
       
       // Navigate to document editor with the new template
+      // Use a short timeout to allow the dialog to close and UI to update
+      console.log('Created template with ID:', template.id);
       setTimeout(() => {
         navigate(`/document-drafting/${template.id}`);
-      }, 500);
+      }, 300);
+      
+      resetForm();
     } catch (error) {
       console.error('Error saving template:', error);
       toast.error('Failed to save template');
     }
   };
   
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setContent('');
     setGoogleDocUrl('');
     setImportTab('upload');
-  };
+    setIsImporting(false);
+  }, []);
 
   return {
     open,

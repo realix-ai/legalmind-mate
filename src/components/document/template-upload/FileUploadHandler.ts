@@ -1,12 +1,12 @@
 
 import { toast } from 'sonner';
 
-type FileUploadHandler = (e: React.ChangeEvent<HTMLInputElement>, setContent: (content: string) => void) => void;
+type FileUploadHandler = (e: React.ChangeEvent<HTMLInputElement>, setContent: (content: string) => void) => Promise<boolean>;
 
-export const handleFileUpload: FileUploadHandler = (e, setContent) => {
+export const handleFileUpload: FileUploadHandler = async (e, setContent) => {
   if (!e.target.files || e.target.files.length === 0) {
     toast.error('No file selected');
-    return;
+    return false;
   }
   
   const file = e.target.files[0];
@@ -25,23 +25,36 @@ export const handleFileUpload: FileUploadHandler = (e, setContent) => {
   const isValidByExtension = fileExtension && ['txt', 'md', 'doc', 'docx', 'rtf'].includes(fileExtension);
   
   if (validTypes.includes(file.type) || isValidByExtension) {
-    const reader = new FileReader();
-    
-    reader.onload = (event) => {
-      if (event.target && typeof event.target.result === 'string') {
-        setContent(event.target.result);
-        toast.success(`File uploaded: ${file.name}`);
-      }
-    };
-    
-    reader.onerror = () => {
+    try {
+      const content = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        
+        reader.onload = (event) => {
+          if (event.target && typeof event.target.result === 'string') {
+            resolve(event.target.result);
+          } else {
+            reject(new Error('Failed to read file content'));
+          }
+        };
+        
+        reader.onerror = () => {
+          reject(new Error(`FileReader error: ${reader.error}`));
+        };
+        
+        reader.readAsText(file);
+      });
+      
+      setContent(content);
+      toast.success(`File uploaded: ${file.name}`);
+      return true;
+    } catch (error) {
+      console.error('Error reading file:', error);
       toast.error('Error reading file');
-      console.error('FileReader error:', reader.error);
-    };
-    
-    reader.readAsText(file);
+      return false;
+    }
   } else {
     toast.error(`Unsupported file type: ${file.name}. Please upload .txt, .md, .doc, .docx, or .rtf files.`);
+    return false;
   }
 };
 
