@@ -57,11 +57,27 @@ export const useUserProfile = () => {
     };
   }, []);
 
+  // Update user profile
+  const updateUserProfile = (newProfile: Partial<UserProfile>) => {
+    const updatedProfile = { ...userProfile, ...newProfile };
+    setUserProfile(updatedProfile);
+    
+    // Save to localStorage
+    localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+    
+    // Dispatch event for other components to react
+    const event = new CustomEvent('profileUpdated', { detail: updatedProfile });
+    window.dispatchEvent(event);
+    
+    return updatedProfile;
+  };
+
   // Return the full profile and just userName for backward compatibility
   return { 
     userProfile, 
     userName: userProfile.name,
     role: userProfile.role,
-    specialization: userProfile.specialization
+    specialization: userProfile.specialization,
+    updateUserProfile
   };
 };
