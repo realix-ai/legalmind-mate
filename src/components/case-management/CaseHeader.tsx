@@ -1,9 +1,10 @@
 
 import { useState, Dispatch, SetStateAction } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Users } from 'lucide-react';
 import AiAssistantButton from '@/components/ai/AiAssistantButton';
 import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 
 interface CaseHeaderProps {
   onCreateCase?: () => void;
@@ -33,6 +34,9 @@ const CaseHeader = ({
     }
   };
 
+  // Mock collaborators data
+  const collaboratorsCount = 3;
+
   return (
     <div className="flex justify-between items-center mb-6">
       <div>
@@ -42,7 +46,13 @@ const CaseHeader = ({
         </h1>
         <p className="text-muted-foreground mt-1">Organize and manage your legal cases</p>
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-center">
+        {/* Collaboration indicator */}
+        <Badge variant="outline" className="flex items-center gap-2 py-1.5">
+          <Users className="h-4 w-4 text-primary" />
+          <span>{collaboratorsCount} collaborators</span>
+        </Badge>
+        
         <AiAssistantButton 
           context="Case Management page. The user can organize and manage legal cases."
           onAssistantResponse={handleAssistantResponse}
