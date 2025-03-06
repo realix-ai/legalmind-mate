@@ -1,4 +1,3 @@
-
 import { Settings, CreditCard, KeyRound } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import { useTheme } from "@/hooks/use-theme"
@@ -10,10 +9,6 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-  DialogTabs,
-  DialogTabsContent,
-  DialogTabsList,
-  DialogTabsTrigger
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"

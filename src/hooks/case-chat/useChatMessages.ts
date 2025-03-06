@@ -4,11 +4,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
 import { 
   getChatMessages, 
-  saveChatMessage, 
+  saveChatMessages, 
   clearChatHistory 
 } from '@/utils/documents/chat';
 import { 
-  generateAiResponse as generateMockAiResponse 
+  generateAIResponse as generateMockAiResponse 
 } from '@/utils/documents/chat/messageGeneration';
 import { generateCompletion } from '@/services/openAiService';
 
@@ -32,7 +32,7 @@ export const useChatMessages = (caseId?: string, caseName?: string) => {
         timestamp: new Date().toISOString()
       };
       
-      saveChatMessage(caseId, welcomeMessage);
+      saveChatMessages(caseId, [welcomeMessage]);
       setMessages([welcomeMessage]);
     }
   }, [caseId, caseName]);
@@ -48,8 +48,9 @@ export const useChatMessages = (caseId?: string, caseName?: string) => {
       timestamp: new Date().toISOString()
     };
     
-    saveChatMessage(caseId, userMessage);
-    setMessages(prev => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    saveChatMessages(caseId, updatedMessages);
+    setMessages(updatedMessages);
     
     // Generate AI response
     setIsAiTyping(true);
@@ -99,8 +100,9 @@ Be concise but thorough, focusing on relevant legal principles, cases, and pract
         timestamp: new Date().toISOString()
       };
       
-      saveChatMessage(caseId, aiMessage);
-      setMessages(prev => [...prev, aiMessage]);
+      const finalMessages = [...updatedMessages, aiMessage];
+      saveChatMessages(caseId, finalMessages);
+      setMessages(finalMessages);
       
     } catch (error) {
       console.error('Error generating AI response:', error);
@@ -124,7 +126,7 @@ Be concise but thorough, focusing on relevant legal principles, cases, and pract
       timestamp: new Date().toISOString()
     };
     
-    saveChatMessage(caseId, welcomeMessage);
+    saveChatMessages(caseId, [welcomeMessage]);
     setMessages([welcomeMessage]);
     
     toast.success('Started new conversation');
