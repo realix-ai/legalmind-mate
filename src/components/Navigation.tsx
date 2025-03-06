@@ -1,8 +1,6 @@
 
-import { useState } from "react"
 import { Link } from "react-router-dom"
-import { Scale, Moon, Sun, User, Settings } from "lucide-react"
-import { useTheme } from "@/hooks/use-theme"
+import { Scale, User, Settings } from "lucide-react"
 import { useUserProfile } from "@/hooks/use-user-profile"
 import {
   DropdownMenu,
@@ -13,15 +11,10 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 
 export default function Navigation() {
-  const { setTheme } = useTheme()
   const { userProfile } = useUserProfile()
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
 
   // Get initials for avatar
   const getInitials = (name: string) => {
@@ -41,44 +34,40 @@ export default function Navigation() {
       <div className="container flex h-14 max-w-screen-2xl items-center justify-between">
         <div className="mr-4 flex">
           <Link to="/" className="mr-2 flex items-center space-x-2">
-            <Scale className="h-6 w-6" />
+            <div className="flex items-center justify-center w-10 h-10 rounded-md bg-blue-500 text-white">
+              <span className="text-xl font-bold">R</span>
+            </div>
             <span className="font-bold sm:inline-block">
               Realix.ai
             </span>
           </Link>
         </div>
 
-        <div className="hidden md:flex items-center gap-6 text-sm">
-          <Link
-            to="/query-assistant"
-            className="transition-colors hover:text-foreground/80 text-foreground/60"
-          >
-            Query Assistant
+        <div className="flex items-center gap-2">
+          <Link to="/query-assistant">
+            <Button variant="secondary" className="flex items-center rounded-full">
+              <span className="mr-2">🔍</span>
+              Query Assistant
+            </Button>
           </Link>
-          <Link
-            to="/document-drafting"
-            className="transition-colors hover:text-foreground/80 text-foreground/60"
-          >
-            Document Drafting
+          <Link to="/document-drafting" className="ml-4">
+            <Button variant="ghost" className="flex items-center">
+              <span className="mr-2">📄</span>
+              Document Drafting
+            </Button>
           </Link>
-          <Link
-            to="/case-management"
-            className="transition-colors hover:text-foreground/80 text-foreground/60"
-          >
-            Case Management
-          </Link>
-          <Link
-            to="/case-analytics"
-            className="transition-colors hover:text-foreground/80 text-foreground/60"
-          >
-            Analytics
+          <Link to="/case-management" className="ml-4">
+            <Button variant="ghost" className="flex items-center">
+              <span className="mr-2">📁</span>
+              Case Management
+            </Button>
           </Link>
         </div>
 
         <nav className="ml-auto flex items-center space-x-4">
           {/* Settings Button */}
           <DropdownMenu>
-            <DropdownMenuTrigger aria-label="Open settings menu" className="p-2 rounded-full hover:bg-accent">
+            <DropdownMenuTrigger aria-label="Open settings menu">
               <Settings className="h-5 w-5" />
               <span className="sr-only">Settings</span>
             </DropdownMenuTrigger>
@@ -94,16 +83,13 @@ export default function Navigation() {
               <DropdownMenuItem>
                 Subscription
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                Theme Settings
-              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
           {/* Profile Button */}
           <DropdownMenu>
             <DropdownMenuTrigger aria-label="Open profile menu" className="focus:outline-none">
-              <Avatar className="h-8 w-8 cursor-pointer">
+              <Avatar className="h-10 w-10 cursor-pointer bg-blue-100 text-blue-800">
                 <AvatarFallback>{userInitials}</AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
