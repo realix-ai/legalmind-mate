@@ -14,16 +14,22 @@ import { toast } from 'sonner';
 export type ExportFormat = 'pdf' | 'docx' | 'html' | 'txt' | 'md';
 
 interface ExportOptionsProps {
-  onExport: (format: ExportFormat) => void;
-  documentTitle: string;
+  title: string;
+  content: string;
+  onExportPdf: () => void;
+  onExportDocx: () => void;
+  onExportTxt: () => void;
+  onPrint: () => void;
 }
 
-const ExportOptions: React.FC<ExportOptionsProps> = ({ onExport, documentTitle }) => {
-  const handleExport = (format: ExportFormat) => {
-    onExport(format);
-    toast.success(`Exporting "${documentTitle}" as ${format.toUpperCase()}`);
-  };
-
+const ExportOptions: React.FC<ExportOptionsProps> = ({ 
+  title, 
+  content, 
+  onExportPdf, 
+  onExportDocx, 
+  onExportTxt, 
+  onPrint 
+}) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -33,23 +39,20 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({ onExport, documentTitle }
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[200px]">
-        <DropdownMenuItem onClick={() => handleExport('pdf')}>
+        <DropdownMenuItem onClick={onExportPdf}>
           <FileText className="h-4 w-4 mr-2" />
           Export as PDF
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleExport('docx')}>
+        <DropdownMenuItem onClick={onExportDocx}>
           <File className="h-4 w-4 mr-2" />
           Export as DOCX
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => handleExport('html')}>
-          Export as HTML
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleExport('txt')}>
+        <DropdownMenuItem onClick={onExportTxt}>
           Export as TXT
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleExport('md')}>
-          Export as Markdown
+        <DropdownMenuItem onClick={onPrint}>
+          Print Document
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { 
@@ -23,17 +22,15 @@ import {
 } from '@/utils/documents';
 
 interface SaveToCaseDialogProps {
-  documentTitle: string;
-  documentContent: string;
-  documentCategory: string; // Add the documentCategory prop
+  title: string;
+  content: string;
   currentDocumentId: string | null;
   onSaved: (documentId: string) => void;
 }
 
 const SaveToCaseDialog = ({ 
-  documentTitle, 
-  documentContent,
-  documentCategory, // Include in destructuring
+  title, 
+  content,
   currentDocumentId,
   onSaved
 }: SaveToCaseDialogProps) => {
@@ -72,22 +69,21 @@ const SaveToCaseDialog = ({
       }
       
       // Ensure we have a valid documentTitle
-      const finalDocumentTitle = documentTitle.trim() || "Untitled Document";
+      const finalDocumentTitle = title.trim() || "Untitled Document";
       
       // Debug output
-      console.log("Original document title:", documentTitle);
+      console.log("Original document title:", title);
       console.log("Final document title:", finalDocumentTitle);
-      console.log("Document content length:", documentContent.length);
+      console.log("Document content length:", content.length);
       console.log("Current document ID:", currentDocumentId);
       console.log("Saving document to case ID:", caseId);
-      console.log("Document category:", documentCategory); // Log the category
       
       // Normalize the case ID before saving
       const normalizedCaseId = normalizeCaseId(caseId);
       console.log("Normalized case ID:", normalizedCaseId);
       
-      // Save document with normalized case ID and category
-      const saved = saveDocument(finalDocumentTitle, documentContent, currentDocumentId, normalizedCaseId, documentCategory);
+      // Save document with normalized case ID
+      const saved = saveDocument(finalDocumentTitle, content, currentDocumentId, normalizedCaseId);
       
       console.log("Document saved:", saved);
       toast.success(`Document saved to ${isCreatingCase ? `new case "${newCaseName}"` : 'the selected case'}`);

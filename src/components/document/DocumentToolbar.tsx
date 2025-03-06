@@ -17,7 +17,7 @@ interface DocumentToolbarProps {
   documentContent: string;
   documentCategory: string;
   currentDocumentId: string | null;
-  onDocumentSaved: () => void;
+  onDocumentSaved: (id: string) => void;
 }
 
 const DocumentToolbar = ({
