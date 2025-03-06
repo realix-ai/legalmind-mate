@@ -96,6 +96,7 @@ nisl nisl aliquam nisl, eget aliquam nisl nisl eget nisl.`;
       <TabsContent value="upload" className="space-y-4">
         <div className="space-y-4">
           <Input
+            ref={fileInputRef}
             id="file-upload"
             type="file"
             onChange={handleFileInputChange}
@@ -104,7 +105,8 @@ nisl nisl aliquam nisl, eget aliquam nisl nisl eget nisl.`;
             disabled={isUploading}
             onClick={(e) => {
               // Reset the input value to ensure the same file can be selected again
-              (e.target as HTMLInputElement).value = '';
+              const target = e.target as HTMLInputElement;
+              target.value = '';
             }}
           />
           {isUploading && (

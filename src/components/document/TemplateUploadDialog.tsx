@@ -54,6 +54,12 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
     };
   }, [resetForm]);
 
+  const onFormSubmit = (e: React.FormEvent) => {
+    console.log("Form submitted, content length:", content.length);
+    handleSubmit(e);
+    // Dialog will be closed by the navigation in useTemplateUpload
+  };
+
   return (
     <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
@@ -68,13 +74,7 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
       </DialogTrigger>
       
       <DialogContent className="sm:max-w-[600px]">
-        <form onSubmit={(e) => {
-          handleSubmit(e);
-          // Close dialog after submission
-          setTimeout(() => {
-            setDialogOpen(false);
-          }, 100);
-        }}>
+        <form onSubmit={onFormSubmit}>
           <DialogHeader>
             <DialogTitle>Import Document</DialogTitle>
             <DialogDescription>

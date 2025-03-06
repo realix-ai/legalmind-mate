@@ -19,12 +19,20 @@ export const useTemplateUpload = (onTemplateAdded: () => void) => {
       return false;
     }
     
-    const success = await handleFileUpload(e, setContent);
-    return success;
+    try {
+      const success = await handleFileUpload(e, setContent);
+      console.log('File upload handler result:', success);
+      return success;
+    } catch (error) {
+      console.error('Error in fileUploadHandler:', error);
+      toast.error('File upload failed');
+      return false;
+    }
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Submitting form, content length:', content.length);
     
     if (!content.trim()) {
       toast.error('Please import content first');
@@ -38,17 +46,22 @@ export const useTemplateUpload = (onTemplateAdded: () => void) => {
       const description = 'Imported document';
       
       const template = saveCustomTemplate(title, description, content, 'Custom');
+      console.log('Template created:', template);
       toast.success('Template uploaded successfully');
       onTemplateAdded();
-      setOpen(false);
       
       // Navigate to document editor with the new template
       console.log('Created template with ID:', template.id);
+      console.log('About to navigate to:', `/document-drafting/${template.id}`);
       
-      // Navigate immediately instead of using setTimeout
-      navigate(`/document-drafting/${template.id}`);
+      // Force navigation to happen after current execution
+      setTimeout(() => {
+        navigate(`/document-drafting/${template.id}`);
+      }, 0);
       
+      // Reset form and close dialog
       resetForm();
+      setOpen(false);
     } catch (error) {
       console.error('Error saving template:', error);
       toast.error('Failed to save template');

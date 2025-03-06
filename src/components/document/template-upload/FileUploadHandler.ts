@@ -10,6 +10,7 @@ export const handleFileUpload: FileUploadHandler = async (e, setContent) => {
   }
   
   const file = e.target.files[0];
+  console.log('Processing file:', file.name, file.type, file.size);
   
   // Check if the file is a valid document type
   const validTypes = [
@@ -46,10 +47,12 @@ export const handleFileUpload: FileUploadHandler = async (e, setContent) => {
       
       // Make sure content is not empty
       if (!content.trim()) {
+        console.error('File content is empty');
         toast.error(`File is empty: ${file.name}`);
         return false;
       }
       
+      console.log('File content loaded successfully, length:', content.length);
       setContent(content);
       toast.success(`File uploaded: ${file.name}`);
       return true;
@@ -59,6 +62,7 @@ export const handleFileUpload: FileUploadHandler = async (e, setContent) => {
       return false;
     }
   } else {
+    console.error('Unsupported file type:', file.type);
     toast.error(`Unsupported file type: ${file.name}. Please upload .txt, .md, .doc, .docx, or .rtf files.`);
     return false;
   }
