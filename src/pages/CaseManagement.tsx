@@ -120,8 +120,10 @@ const CaseManagement = () => {
           animate="visible"
         >
           <CaseHeader 
+            casesCount={filteredCases.length}
             setIsCreateCaseDialogOpen={setIsCreateCaseDialogOpen}
             isCreateCaseDialogOpen={isCreateCaseDialogOpen}
+            onCreateCase={handleCreateNewCase}
           />
           
           <SearchAndFilters 

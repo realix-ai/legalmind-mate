@@ -1,21 +1,36 @@
 
-import { useState } from 'react';
+import { useState, Dispatch, SetStateAction } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import AiAssistantButton from '@/components/ai/AiAssistantButton';
 import { toast } from 'sonner';
 
 interface CaseHeaderProps {
-  onCreateCase: () => void;
-  casesCount: number;
+  onCreateCase?: () => void;
+  casesCount?: number;
+  setIsCreateCaseDialogOpen: Dispatch<SetStateAction<boolean>>;
+  isCreateCaseDialogOpen: boolean;
 }
 
-const CaseHeader = ({ onCreateCase, casesCount }: CaseHeaderProps) => {
+const CaseHeader = ({ 
+  onCreateCase, 
+  casesCount = 0, 
+  setIsCreateCaseDialogOpen, 
+  isCreateCaseDialogOpen 
+}: CaseHeaderProps) => {
   const handleAssistantResponse = (response: string) => {
     toast.info('AI Tip', {
       description: response,
       duration: 8000,
     });
+  };
+
+  const handleCreateCase = () => {
+    if (onCreateCase) {
+      onCreateCase();
+    } else {
+      setIsCreateCaseDialogOpen(true);
+    }
   };
 
   return (
@@ -33,7 +48,7 @@ const CaseHeader = ({ onCreateCase, casesCount }: CaseHeaderProps) => {
           onAssistantResponse={handleAssistantResponse}
           buttonText="Case Tips"
         />
-        <Button onClick={onCreateCase} className="ml-2">
+        <Button onClick={handleCreateCase} className="ml-2">
           <Plus className="mr-2 h-4 w-4" /> New Case
         </Button>
       </div>
