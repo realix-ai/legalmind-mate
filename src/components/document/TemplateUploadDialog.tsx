@@ -20,8 +20,10 @@ interface TemplateUploadDialogProps {
 }
 
 const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) => {
+  // Track dialog open state locally
   const [dialogOpen, setDialogOpen] = useState(false);
   
+  // Initialize hook outside of any conditional logic
   const {
     content,
     setContent,
@@ -36,6 +38,7 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
     resetForm
   } = useTemplateUpload(onTemplateAdded);
 
+  // Handle dialog state changes
   const handleOpenChange = (open: boolean) => {
     setDialogOpen(open);
     if (!open) {
@@ -46,20 +49,24 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
     }
   };
 
-  // Effect to handle dialog auto-close after successful submission
+  // Clean up on unmount
   useEffect(() => {
     return () => {
-      // Clean up any pending timeouts when component unmounts
       resetForm();
     };
   }, [resetForm]);
 
+  // Handle form submission
   const onFormSubmit = (e: React.FormEvent) => {
     console.log("Form submitted, content length:", content.length);
-    // Submit the form and let handleSubmit handle the redirect
-    handleSubmit(e);
-    // Auto-close the dialog to prevent interference with the redirect
+    
+    // Close dialog first to avoid React state update issues during navigation
     setDialogOpen(false);
+    
+    // Then submit the form after dialog is closed
+    setTimeout(() => {
+      handleSubmit(e);
+    }, 50);
   };
 
   return (

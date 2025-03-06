@@ -5,11 +5,12 @@ import { saveCustomTemplate } from '@/utils/documents';
 import handleFileUpload from './FileUploadHandler';
 
 export const useTemplateUpload = (onTemplateAdded: () => void) => {
-  const [open, setOpen] = useState(false);
-  const [content, setContent] = useState('');
-  const [importTab, setImportTab] = useState('upload');
-  const [googleDocUrl, setGoogleDocUrl] = useState('');
-  const [isImporting, setIsImporting] = useState(false);
+  // Using plain useState hooks without dependencies to avoid React queue issues
+  const [open, setOpen] = useState<boolean>(false);
+  const [content, setContent] = useState<string>('');
+  const [importTab, setImportTab] = useState<string>('upload');
+  const [googleDocUrl, setGoogleDocUrl] = useState<string>('');
+  const [isImporting, setIsImporting] = useState<boolean>(false);
   
   const fileUploadHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) {
@@ -46,22 +47,20 @@ export const useTemplateUpload = (onTemplateAdded: () => void) => {
       const template = saveCustomTemplate(title, description, content, 'Custom');
       console.log('Template created:', template);
       
-      // Important! Call onTemplateAdded() first
+      // Call onTemplateAdded before attempting to navigate
       onTemplateAdded();
       
       toast.success('Template uploaded successfully');
       
-      // Absolute URL with origin to ensure proper navigation
+      // Create absolute URL and use window.location.replace for cleaner navigation
       const baseUrl = window.location.origin;
       const targetUrl = `${baseUrl}/document-drafting/${template.id}`;
       
       console.log('Created template with ID:', template.id);
-      console.log('Redirecting to absolute URL:', targetUrl);
+      console.log('Redirecting to:', targetUrl);
       
-      // Force a complete page navigation with setTimeout to ensure the redirect happens
-      setTimeout(() => {
-        window.location.href = targetUrl;
-      }, 100);
+      // Use replace instead of setting href directly to avoid adding to history
+      window.location.replace(targetUrl);
     } catch (error) {
       console.error('Error saving template:', error);
       toast.error('Failed to save template');
