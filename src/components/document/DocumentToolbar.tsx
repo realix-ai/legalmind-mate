@@ -2,7 +2,6 @@
 import { useCallback } from 'react';
 import { ArrowLeft, Save, Sparkles, Share, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import AiAssistantButton from '@/components/ai/AiAssistantButton';
 import ExportOptions from './ExportOptions';
 import SaveToCaseDialog from './SaveToCaseDialog';
 import { toast } from 'sonner';
@@ -36,12 +35,6 @@ const DocumentToolbar = ({
   const toggleAiPrompt = useCallback(() => {
     setShowAiPrompt(!showAiPrompt);
   }, [showAiPrompt, setShowAiPrompt]);
-  
-  const handleAiAssistantResponse = useCallback((response: string) => {
-    // You can process the AI assistant response here
-    // For example, you might want to insert it into the document
-    toast.info("AI Assistant responded successfully");
-  }, []);
   
   return (
     <div className="flex justify-between items-center">
@@ -81,17 +74,9 @@ const DocumentToolbar = ({
           onClick={toggleAiPrompt}
           className="gap-1"
         >
-          <Sparkles className="h-4 w-4" />
+          <Sparkles className="h-4 w-4 mr-1" />
           AI Suggestions
         </Button>
-        
-        <AiAssistantButton 
-          context={`Document editing for: ${documentTitle}. Category: ${documentCategory}`}
-          onAssistantResponse={handleAiAssistantResponse}
-          placeholder="Ask for help with your document..."
-          buttonText="AI Helper"
-          showUploadButton={true}
-        />
       </div>
     </div>
   );

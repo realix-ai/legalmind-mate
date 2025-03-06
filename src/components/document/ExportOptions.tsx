@@ -8,7 +8,7 @@ import {
   DropdownMenu
 } from '@/components/ui/dropdown-menu';
 import { FileText, File, Download } from 'lucide-react';
-import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 
 // Define export format types
 export type ExportFormat = 'pdf' | 'docx' | 'html' | 'txt' | 'md';
@@ -33,10 +33,10 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md hover:bg-muted">
-          <Download className="h-4 w-4" />
+        <Button variant="outline" size="sm" className="gap-1">
+          <Download className="h-4 w-4 mr-1" />
           Export
-        </button>
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[200px]">
         <DropdownMenuItem onClick={onExportPdf}>

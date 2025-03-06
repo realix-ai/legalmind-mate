@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { 
@@ -102,7 +103,7 @@ const SaveToCaseDialog = ({
         <Button
           variant="outline"
           size="sm"
-          className="gap-1 text-xs"
+          className="gap-1"
         >
           Save to Case
         </Button>
