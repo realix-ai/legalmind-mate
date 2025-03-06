@@ -1,12 +1,10 @@
 
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
 import { saveCustomTemplate } from '@/utils/documents';
 import handleFileUpload from './FileUploadHandler';
 
 export const useTemplateUpload = (onTemplateAdded: () => void) => {
-  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [content, setContent] = useState('');
   const [importTab, setImportTab] = useState('upload');
@@ -51,17 +49,19 @@ export const useTemplateUpload = (onTemplateAdded: () => void) => {
       // Important! Call onTemplateAdded() first
       onTemplateAdded();
       
-      // Create the target URL for redirection
-      const targetUrl = `/document-drafting/${template.id}`;
-      console.log('Created template with ID:', template.id);
-      console.log('About to navigate to:', targetUrl);
-      
-      // Use the most direct approach: change the entire window location
-      // This is more reliable than window.location.replace()
-      window.location.href = targetUrl;
-      
-      // Toast before redirect (may not be seen due to page reload)
       toast.success('Template uploaded successfully');
+      
+      // Absolute URL with origin to ensure proper navigation
+      const baseUrl = window.location.origin;
+      const targetUrl = `${baseUrl}/document-drafting/${template.id}`;
+      
+      console.log('Created template with ID:', template.id);
+      console.log('Redirecting to absolute URL:', targetUrl);
+      
+      // Force a complete page navigation with setTimeout to ensure the redirect happens
+      setTimeout(() => {
+        window.location.href = targetUrl;
+      }, 100);
     } catch (error) {
       console.error('Error saving template:', error);
       toast.error('Failed to save template');

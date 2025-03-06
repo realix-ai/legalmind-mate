@@ -58,6 +58,8 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
     console.log("Form submitted, content length:", content.length);
     // Submit the form and let handleSubmit handle the redirect
     handleSubmit(e);
+    // Auto-close the dialog to prevent interference with the redirect
+    setDialogOpen(false);
   };
 
   return (
