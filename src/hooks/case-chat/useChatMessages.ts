@@ -12,6 +12,7 @@ import {
 } from '@/utils/documents/chat/messageGeneration';
 import { generateCompletion } from '@/services/openAiService';
 import { ChatMessageProps } from '@/components/case/ChatMessage';
+import { getCaseDocumentsContent } from '@/utils/documents/caseManager';
 
 export const useChatMessages = (caseId?: string, caseName?: string) => {
   const [messages, setMessages] = useState<ChatMessageProps[]>([]);
@@ -68,18 +69,32 @@ export const useChatMessages = (caseId?: string, caseName?: string) => {
           content: msg.content
         }));
         
+        // Get case documents content
+        const caseDocuments = getCaseDocumentsContent(caseId);
+        
+        // Create document context information
+        let documentContext = '';
+        if (caseDocuments.length > 0) {
+          documentContext = `\nCase documents (${caseDocuments.length}):\n`;
+          caseDocuments.forEach((doc, index) => {
+            documentContext += `Document ${index + 1}: "${doc.title}"\n`;
+            documentContext += `Content: ${doc.content.substring(0, 500)}${doc.content.length > 500 ? '...' : ''}\n\n`;
+          });
+        }
+        
         // Create context-aware prompt
         const contextPrompt = `
 You are an AI legal assistant helping with a case named "${caseName || 'Untitled'}".
 Previous conversation:
 ${recentMessages.map(msg => `${msg.role.toUpperCase()}: ${msg.content}`).join('\n')}
-
+${documentContext}
 USER: ${content}
 `;
 
         const systemPrompt = `You are a knowledgeable legal assistant with expertise in case management, legal research, and document preparation. 
 Provide helpful, accurate, and professional responses to legal questions. 
-Be concise but thorough, focusing on relevant legal principles, cases, and practical advice.`;
+Be concise but thorough, focusing on relevant legal principles, cases, and practical advice.
+When documents are provided, reference them specifically in your response.`;
         
         const openAiResponse = await generateCompletion(contextPrompt, systemPrompt);
         
