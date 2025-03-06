@@ -5,6 +5,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { useLanguage } from "@/hooks/use-language";
 import { OpenAIKeySettings } from "./OpenAIKeySettings";
 import { useEffect, useState } from "react";
+import FeedbackPanel from "./FeedbackPanel";
 
 interface SettingsDialogProps {
   open: boolean;
@@ -32,10 +33,11 @@ const SettingsDialog = ({ open, onOpenChange, defaultTab = "appearance" }: Setti
         </DialogHeader>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-3 mb-4">
+          <TabsList className="grid grid-cols-4 mb-4">
             <TabsTrigger value="appearance">Appearance</TabsTrigger>
             <TabsTrigger value="language">Language</TabsTrigger>
             <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            <TabsTrigger value="feedback">Feedback</TabsTrigger>
           </TabsList>
           
           <TabsContent value="appearance" className="space-y-4">
@@ -114,6 +116,10 @@ const SettingsDialog = ({ open, onOpenChange, defaultTab = "appearance" }: Setti
           
           <TabsContent value="integrations" className="space-y-6">
             <OpenAIKeySettings />
+          </TabsContent>
+          
+          <TabsContent value="feedback" className="space-y-4">
+            <FeedbackPanel />
           </TabsContent>
         </Tabs>
       </DialogContent>

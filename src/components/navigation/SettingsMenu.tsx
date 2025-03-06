@@ -1,4 +1,5 @@
-import { Settings, CreditCard, KeyRound } from "lucide-react"
+
+import { Settings, CreditCard, KeyRound, MessageSquarePlus } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import { useTheme } from "@/hooks/use-theme"
 import { useLanguage } from "@/hooks/use-language"
@@ -22,6 +23,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
+import FeedbackPanel from "@/components/settings/FeedbackPanel"
 
 // Language options for the settings menu
 const languageOptions = [
@@ -110,6 +112,13 @@ export const SettingsMenu = () => {
             <KeyRound className="mr-2 h-4 w-4" />
             OpenAI Integration
           </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => {
+            setActiveTab('feedback');
+            handleOpenChange(true);
+          }}>
+            <MessageSquarePlus className="mr-2 h-4 w-4" />
+            Feedback
+          </DropdownMenuItem>
           <DropdownMenuItem>
             <CreditCard className="mr-2 h-4 w-4" />
             Subscription
@@ -128,9 +137,10 @@ export const SettingsMenu = () => {
           </DialogHeader>
           
           <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid grid-cols-2 mb-4">
+            <TabsList className="grid grid-cols-3 mb-4">
               <TabsTrigger value="appearance">Appearance</TabsTrigger>
               <TabsTrigger value="integrations">Integrations</TabsTrigger>
+              <TabsTrigger value="feedback">Feedback</TabsTrigger>
             </TabsList>
             
             <TabsContent value="appearance" className="space-y-4">
@@ -169,6 +179,10 @@ export const SettingsMenu = () => {
             
             <TabsContent value="integrations">
               <OpenAIKeySettings />
+            </TabsContent>
+
+            <TabsContent value="feedback">
+              <FeedbackPanel />
             </TabsContent>
           </Tabs>
         </DialogContent>

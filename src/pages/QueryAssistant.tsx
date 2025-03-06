@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navigation from '@/components/Navigation';
@@ -7,7 +8,6 @@ import { useLegalQuery } from '@/hooks/use-legal-query';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import SettingsDialog from '@/components/settings/SettingsDialog';
 import AiAssistantButton from '@/components/ai/AiAssistantButton';
-import FeedbackButton from '@/components/feedback/FeedbackButton';
 import { toast } from 'sonner';
 
 const QueryAssistant = () => {
@@ -34,7 +34,6 @@ const QueryAssistant = () => {
 
   useEffect(() => {
     console.log("QueryAssistant component mounted, userName:", userName);
-    console.log("Feedback button should be visible in the bottom-right corner");
   }, [userName]);
 
   return (
@@ -65,9 +64,8 @@ const QueryAssistant = () => {
         defaultTab={settingsTab}
       />
 
-      {/* Fixed position buttons - revised for better visibility */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3 items-end">
-        <FeedbackButton className="shadow-lg bg-white dark:bg-gray-800" />
+      {/* Fixed position assistant button */}
+      <div className="fixed bottom-6 right-6 z-50">
         <AiAssistantButton 
           context="Query Assistant page. The user can ask legal research questions."
           onAssistantResponse={handleAssistantResponse}
