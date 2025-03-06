@@ -27,26 +27,26 @@ const FiltersPanel = ({
       animate={{ opacity: 1, height: 'auto' }}
       exit={{ opacity: 0, height: 0 }}
       transition={{ duration: 0.2 }}
-      className="mb-8 border rounded-lg p-4"
+      className="mb-4 border rounded-lg p-3"
     >
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-medium">Filters</h3>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-medium">Filters</h3>
         <button
-          className="text-sm text-muted-foreground hover:text-foreground"
+          className="text-xs text-muted-foreground hover:text-foreground"
           onClick={resetFilters}
         >
           Reset all
         </button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 gap-3">
         <div>
-          <h4 className="text-sm font-medium mb-2">Status</h4>
-          <div className="flex flex-wrap gap-2">
+          <h4 className="text-xs font-medium mb-1.5">Status</h4>
+          <div className="flex flex-wrap gap-1.5">
             {['active', 'pending', 'closed'].map((status) => (
               <button
                 key={status}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                className={`px-2 py-0.5 rounded-full text-xs font-medium transition-colors ${
                   statusFilter.includes(status)
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
@@ -66,12 +66,12 @@ const FiltersPanel = ({
         </div>
         
         <div>
-          <h4 className="text-sm font-medium mb-2">Priority</h4>
-          <div className="flex flex-wrap gap-2">
+          <h4 className="text-xs font-medium mb-1.5">Priority</h4>
+          <div className="flex flex-wrap gap-1.5">
             {['high', 'medium', 'low'].map((priority) => (
               <button
                 key={priority}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                className={`px-2 py-0.5 rounded-full text-xs font-medium transition-colors ${
                   priorityFilter.includes(priority)
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
