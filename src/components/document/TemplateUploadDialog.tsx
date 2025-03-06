@@ -1,4 +1,3 @@
-
 import { 
   Dialog,
   DialogContent,
@@ -56,8 +55,9 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
 
   const onFormSubmit = (e: React.FormEvent) => {
     console.log("Form submitted, content length:", content.length);
-    // Don't close dialog here - the handleSubmit will handle closing after successful import
+    // We'll let handleSubmit take care of everything
     handleSubmit(e);
+    // Note: We don't close the dialog here as the redirect will handle that
   };
 
   return (

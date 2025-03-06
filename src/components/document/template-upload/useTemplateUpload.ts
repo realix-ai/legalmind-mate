@@ -47,20 +47,20 @@ export const useTemplateUpload = (onTemplateAdded: () => void) => {
       
       const template = saveCustomTemplate(title, description, content, 'Custom');
       console.log('Template created:', template);
-      toast.success('Template uploaded successfully');
+      
+      // Important! Call onTemplateAdded() first
       onTemplateAdded();
       
-      // First execute the navigation, then reset form state and close dialog
+      // Force browser refresh and navigation
       const targetUrl = `/document-drafting/${template.id}`;
       console.log('Created template with ID:', template.id);
       console.log('About to navigate to:', targetUrl);
       
-      // Force navigation with window.location instead of React Router
-      window.location.href = targetUrl;
+      // Use direct window.location.replace for navigation - this is a hard redirect
+      window.location.replace(targetUrl);
       
-      // The form reset and dialog closing will happen before navigation completes
-      resetForm();
-      setOpen(false);
+      // No need to reset form or close dialog as we're redirecting the page
+      toast.success('Template uploaded successfully');
     } catch (error) {
       console.error('Error saving template:', error);
       toast.error('Failed to save template');
