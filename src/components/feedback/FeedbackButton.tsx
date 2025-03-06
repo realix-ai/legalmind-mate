@@ -10,13 +10,15 @@ interface FeedbackButtonProps {
 
 const FeedbackButton = ({ className }: FeedbackButtonProps) => {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  
+  console.log("FeedbackButton rendering with className:", className);
 
   return (
     <>
       <Button
-        variant="outline"
+        variant="secondary"
         size="sm"
-        className={className}
+        className={`${className} flex items-center font-medium`}
         onClick={() => setFeedbackOpen(true)}
       >
         <MessageSquarePlus className="h-4 w-4 mr-2" />

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navigation from '@/components/Navigation';
@@ -35,6 +34,7 @@ const QueryAssistant = () => {
 
   useEffect(() => {
     console.log("QueryAssistant component mounted, userName:", userName);
+    console.log("Feedback button should be visible in the bottom-right corner");
   }, [userName]);
 
   return (
@@ -65,9 +65,9 @@ const QueryAssistant = () => {
         defaultTab={settingsTab}
       />
 
-      {/* Fixed position buttons */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2 items-end">
-        <FeedbackButton className="shadow-md" />
+      {/* Fixed position buttons - revised for better visibility */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3 items-end">
+        <FeedbackButton className="shadow-lg bg-white dark:bg-gray-800" />
         <AiAssistantButton 
           context="Query Assistant page. The user can ask legal research questions."
           onAssistantResponse={handleAssistantResponse}

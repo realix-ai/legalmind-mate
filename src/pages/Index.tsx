@@ -10,6 +10,7 @@ const Index = () => {
   // Log to check if the component is rendering
   useEffect(() => {
     console.log('Index component rendered');
+    console.log('Feedback button should be visible in the bottom-right corner');
   }, []);
 
   return (
@@ -21,9 +22,9 @@ const Index = () => {
       </main>
       <FooterSection />
       
-      {/* Fixed position feedback button */}
+      {/* Fixed position feedback button - improved visibility */}
       <div className="fixed bottom-6 right-6 z-50">
-        <FeedbackButton className="shadow-md" />
+        <FeedbackButton className="shadow-lg bg-white dark:bg-gray-800" />
       </div>
     </div>
   );
