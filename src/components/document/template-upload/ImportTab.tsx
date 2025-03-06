@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 interface ImportTabProps {
   importTab: string;
@@ -25,7 +25,7 @@ const ImportTab = ({
   setContent,
   handleFileUpload
 }: ImportTabProps) => {
-  const [uploadKey, setUploadKey] = useState(Date.now()); // To force input reset
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleGoogleDocImport = async () => {
     if (!googleDocUrl.trim()) {
@@ -57,6 +57,12 @@ nisl nisl aliquam nisl, eget aliquam nisl nisl eget nisl.`;
     }
   };
 
+  const resetFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <Tabs value={importTab} onValueChange={setImportTab} className="w-full">
       <TabsList className="grid grid-cols-2 mb-4">
@@ -72,16 +78,19 @@ nisl nisl aliquam nisl, eget aliquam nisl nisl eget nisl.`;
       
       <TabsContent value="upload" className="space-y-4">
         <Input
-          key={uploadKey}
+          ref={fileInputRef}
           id="file-upload"
           type="file"
           onChange={(e) => {
             handleFileUpload(e);
-            // Reset the input after handling
-            setUploadKey(Date.now());
+            resetFileInput();
           }}
           className="w-full"
           accept=".txt,.doc,.docx,.rtf,.md"
+          onClick={(e) => {
+            // Reset the input value to ensure the same file can be selected again
+            (e.target as HTMLInputElement).value = '';
+          }}
         />
         <p className="text-xs text-muted-foreground">
           Upload a file from your computer (.txt, .doc, .docx, .rtf, .md)

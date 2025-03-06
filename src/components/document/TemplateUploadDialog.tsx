@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { PlusCircle } from 'lucide-react';
 import ImportTab from './template-upload/ImportTab';
 import useTemplateUpload from './template-upload/useTemplateUpload';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface TemplateUploadDialogProps {
   onTemplateAdded: () => void;
@@ -44,6 +44,14 @@ const TemplateUploadDialog = ({ onTemplateAdded }: TemplateUploadDialogProps) =>
       }, 100);
     }
   };
+
+  // Effect to handle dialog auto-close after successful submission
+  useEffect(() => {
+    return () => {
+      // Clean up any pending timeouts when component unmounts
+      resetForm();
+    };
+  }, []);
 
   return (
     <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>

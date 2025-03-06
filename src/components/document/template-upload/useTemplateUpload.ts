@@ -1,10 +1,12 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import { saveCustomTemplate } from '@/utils/documents';
 import handleFileUpload from './FileUploadHandler';
 
 export const useTemplateUpload = (onTemplateAdded: () => void) => {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [content, setContent] = useState('');
   const [importTab, setImportTab] = useState('upload');
@@ -28,11 +30,16 @@ export const useTemplateUpload = (onTemplateAdded: () => void) => {
       const title = `Imported Document ${new Date().toLocaleString()}`;
       const description = 'Imported document';
       
-      saveCustomTemplate(title, description, content, 'Custom');
+      const template = saveCustomTemplate(title, description, content, 'Custom');
       toast.success('Template uploaded successfully');
       onTemplateAdded();
       setOpen(false);
       resetForm();
+      
+      // Navigate to document editor with the new template
+      setTimeout(() => {
+        navigate(`/document-drafting/${template.id}`);
+      }, 500);
     } catch (error) {
       console.error('Error saving template:', error);
       toast.error('Failed to save template');
