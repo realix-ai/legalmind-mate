@@ -1,5 +1,5 @@
 
-import { Loader2, FileText, Download, Mail, Link, Share2, Edit } from 'lucide-react';
+import { Loader2, FileText, Download, Mail, Link, Share2, Edit, MoreHorizontal } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { toast } from "sonner";
@@ -121,7 +121,7 @@ const QueryResponseDisplay = ({ isProcessing, response, onShare, onEdit, showSha
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm" className="h-8">
-                      <Download className="h-3.5 w-3.5 mr-1" />
+                      <MoreHorizontal className="h-3.5 w-3.5 mr-1" />
                       Actions
                     </Button>
                   </DropdownMenuTrigger>
