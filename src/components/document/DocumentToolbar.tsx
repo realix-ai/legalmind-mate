@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react';
-import { ArrowLeft, FileText, Save, Sparkles, Share, Upload } from 'lucide-react';
+import { ArrowLeft, Save, Sparkles, Share, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AiAssistantButton from '@/components/ai/AiAssistantButton';
 import ExportOptions from './ExportOptions';
@@ -31,7 +31,7 @@ const DocumentToolbar = ({
   currentDocumentId,
   onDocumentSaved
 }: DocumentToolbarProps) => {
-  const { exportDocument, isExporting } = useExportDocument();
+  const exportDocumentUtils = useExportDocument();
   
   const toggleAiPrompt = useCallback(() => {
     setShowAiPrompt(!showAiPrompt);
@@ -60,16 +60,18 @@ const DocumentToolbar = ({
       
       <div className="flex items-center gap-2">
         <ExportOptions
-          documentTitle={documentTitle}
-          documentContent={documentContent}
-          onExport={exportDocument}
-          isExporting={isExporting}
+          title={documentTitle}
+          content={documentContent}
+          onExportPdf={() => exportDocumentUtils.exportAsPdf(documentTitle, documentContent)}
+          onExportDocx={() => exportDocumentUtils.exportAsDocx(documentTitle, documentContent)}
+          onExportTxt={() => exportDocumentUtils.exportAsTxt(documentTitle, documentContent)}
+          onPrint={() => exportDocumentUtils.printDocument(documentTitle, documentContent)}
         />
         
         <SaveToCaseDialog
-          documentTitle={documentTitle}
-          documentContent={documentContent}
-          documentId={currentDocumentId}
+          title={documentTitle}
+          content={documentContent}
+          currentDocumentId={currentDocumentId}
           onSaved={onDocumentSaved}
         />
         
