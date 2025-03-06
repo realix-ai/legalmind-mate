@@ -28,6 +28,8 @@ const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_place
 const queryClient = new QueryClient();
 
 function App() {
+  console.log('App component rendered');
+  
   return (
     <ClerkProvider publishableKey={clerkPubKey}>
       <QueryClientProvider client={queryClient}>

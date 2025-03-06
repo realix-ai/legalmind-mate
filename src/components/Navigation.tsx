@@ -18,6 +18,9 @@ export default function Navigation() {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  // Log to check if navigation is rendering
+  console.log('Navigation component rendered');
+
   return (
     <header className="fixed w-full top-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-30">
       <div className="container flex h-14 max-w-screen-2xl items-center justify-between">

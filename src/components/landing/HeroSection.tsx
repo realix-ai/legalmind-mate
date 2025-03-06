@@ -10,6 +10,8 @@ const HeroSection = () => {
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
+    console.log('HeroSection component rendered');
+    
     const handleScroll = () => {
       setScrollY(window.scrollY);
     };
