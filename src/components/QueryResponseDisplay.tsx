@@ -1,5 +1,5 @@
 
-import { Loader2, FileText, Download, Mail, Link, Share2 } from 'lucide-react';
+import { Loader2, FileText, Download, Mail, Link, Share2, Edit } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { toast } from "sonner";
@@ -15,6 +15,7 @@ interface QueryResponseDisplayProps {
   isProcessing: boolean;
   response: string | null;
   onShare?: () => void;
+  onEdit?: () => void;
   showShareButton?: boolean;
 }
 
@@ -25,7 +26,7 @@ const processingStages = [
   "Generating response..."
 ];
 
-const QueryResponseDisplay = ({ isProcessing, response, onShare, showShareButton }: QueryResponseDisplayProps) => {
+const QueryResponseDisplay = ({ isProcessing, response, onShare, onEdit, showShareButton }: QueryResponseDisplayProps) => {
   const [copied, setCopied] = useState(false);
   
   // Don't show anything if we're not processing and have no response
@@ -125,6 +126,12 @@ const QueryResponseDisplay = ({ isProcessing, response, onShare, showShareButton
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    {onEdit && (
+                      <DropdownMenuItem onClick={onEdit}>
+                        <Edit className="h-4 w-4 mr-2" />
+                        Revise Results
+                      </DropdownMenuItem>
+                    )}
                     {onShare && (
                       <DropdownMenuItem onClick={onShare}>
                         <Share2 className="h-4 w-4 mr-2" />

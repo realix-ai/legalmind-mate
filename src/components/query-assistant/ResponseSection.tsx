@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import QueryResponseDisplay from "@/components/QueryResponseDisplay";
 import CitationBox from "@/components/citation/CitationBox";
-import { Edit, Check } from "lucide-react";
 import { Citation } from "@/services/citationService";
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
@@ -55,31 +54,6 @@ const ResponseSection = ({
         <h2 className="text-xl font-semibold flex items-center gap-2">
           Results
         </h2>
-        
-        <div className="flex gap-2">
-          {!isProcessing && response && (
-            <>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleEditToggle}
-                className="flex items-center gap-1.5"
-              >
-                {isEditing ? (
-                  <>
-                    <Check className="h-4 w-4" />
-                    Save Revisions
-                  </>
-                ) : (
-                  <>
-                    <Edit className="h-4 w-4" />
-                    Revise Results
-                  </>
-                )}
-              </Button>
-            </>
-          )}
-        </div>
       </div>
       
       {isEditing ? (
@@ -89,12 +63,18 @@ const ResponseSection = ({
             onChange={(e) => setEditedResponse(e.target.value)}
             className="min-h-[400px] font-mono text-sm"
           />
+          <div className="flex justify-end mt-4">
+            <Button onClick={handleEditToggle}>
+              Save Revisions
+            </Button>
+          </div>
         </div>
       ) : (
         <QueryResponseDisplay 
           isProcessing={isProcessing}
           response={response}
           onShare={onShare}
+          onEdit={handleEditToggle}
         />
       )}
       
