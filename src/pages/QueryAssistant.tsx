@@ -6,12 +6,13 @@ import UserWelcome from '@/components/query-assistant/UserWelcome';
 import { useLegalQuery } from '@/hooks/use-legal-query';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { Button } from '@/components/ui/button';
-import { Settings } from 'lucide-react';
+import { Settings, KeyRound } from 'lucide-react';
 import SettingsDialog from '@/components/settings/SettingsDialog';
 
 const QueryAssistant = () => {
   const [activeTab, setActiveTab] = useState('query');
   const [openSettings, setOpenSettings] = useState(false);
+  const [settingsTab, setSettingsTab] = useState('integrations');
   const { userName } = useUserProfile();
   const { 
     isProcessing, 
@@ -29,6 +30,11 @@ const QueryAssistant = () => {
   // Check if OpenAI API key is configured
   const isOpenAIConfigured = Boolean(localStorage.getItem('openai-api-key'));
 
+  const handleConfigureOpenAI = () => {
+    setSettingsTab('integrations');
+    setOpenSettings(true);
+  };
+
   return (
     <div className="flex flex-col min-h-screen w-full">
       <Navigation />
@@ -45,11 +51,11 @@ const QueryAssistant = () => {
               </div>
               <Button 
                 variant="outline"
-                onClick={() => setOpenSettings(true)}
+                onClick={handleConfigureOpenAI}
                 className="gap-1"
               >
-                <Settings className="h-4 w-4" />
-                Settings
+                <KeyRound className="h-4 w-4" />
+                Configure API Key
               </Button>
             </div>
           )}
@@ -72,6 +78,7 @@ const QueryAssistant = () => {
       <SettingsDialog 
         open={openSettings} 
         onOpenChange={setOpenSettings}
+        defaultTab={settingsTab}
       />
     </div>
   );

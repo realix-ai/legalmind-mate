@@ -4,15 +4,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "@/hooks/use-theme";
 import { useLanguage } from "@/hooks/use-language";
 import { OpenAIKeySettings } from "./OpenAIKeySettings";
+import { useEffect, useState } from "react";
 
 interface SettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  defaultTab?: string;
 }
 
-const SettingsDialog = ({ open, onOpenChange }: SettingsDialogProps) => {
+const SettingsDialog = ({ open, onOpenChange, defaultTab = "appearance" }: SettingsDialogProps) => {
   const { theme, setTheme } = useTheme();
   const { language, setLanguage } = useLanguage();
+  const [activeTab, setActiveTab] = useState(defaultTab);
+  
+  // Update active tab when defaultTab prop changes
+  useEffect(() => {
+    if (defaultTab) {
+      setActiveTab(defaultTab);
+    }
+  }, [defaultTab]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -21,7 +31,7 @@ const SettingsDialog = ({ open, onOpenChange }: SettingsDialogProps) => {
           <DialogTitle>Settings</DialogTitle>
         </DialogHeader>
         
-        <Tabs defaultValue="appearance" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-3 mb-4">
             <TabsTrigger value="appearance">Appearance</TabsTrigger>
             <TabsTrigger value="language">Language</TabsTrigger>

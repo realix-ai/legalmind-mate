@@ -1,11 +1,12 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { PanelRightClose, PanelRightOpen } from 'lucide-react';
+import { PanelRightClose, PanelRightOpen, MessageSquare } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import DocumentToolbar from '@/components/document/DocumentToolbar';
 import TemplateList from '@/components/document/TemplateList';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useDocumentState } from '@/hooks/document/useDocumentState';
 import { useAiAssistant } from '@/hooks/document/useAiAssistant';
 import { useCollaboratorManagement } from '@/hooks/document/useCollaboratorManagement';
@@ -15,6 +16,12 @@ import DocumentRightPanel from '@/components/document/DocumentRightPanel';
 const DocumentDrafting = () => {
   const { documentId } = useParams<{ documentId: string }>();
   const [showRightPanel, setShowRightPanel] = useState(true);
+  const [isUsingOpenAI, setIsUsingOpenAI] = useState(false);
+  
+  useEffect(() => {
+    // Check if OpenAI API is configured
+    setIsUsingOpenAI(Boolean(localStorage.getItem('openai-api-key')));
+  }, []);
   
   const {
     showTemplates,
@@ -71,6 +78,15 @@ const DocumentDrafting = () => {
               currentDocumentId={currentDocumentId}
               onDocumentSaved={handleDocumentSaved}
             />
+            
+            {isUsingOpenAI && (
+              <div className="flex items-center mb-2">
+                <Badge variant="outline" className="gap-1 text-xs">
+                  <MessageSquare className="h-3 w-3" />
+                  ChatGPT Enabled
+                </Badge>
+              </div>
+            )}
             
             <div className="flex gap-6 relative">
               {/* Document editor section - expands to full width when right panel is hidden */}

@@ -1,5 +1,5 @@
 
-import { Settings, CreditCard } from "lucide-react"
+import { Settings, CreditCard, KeyRound } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import { useTheme } from "@/hooks/use-theme"
 import { useLanguage } from "@/hooks/use-language"
@@ -9,10 +9,16 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogDescription
+  DialogDescription,
+  DialogTabs,
+  DialogTabsContent,
+  DialogTabsList,
+  DialogTabsTrigger
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { OpenAIKeySettings } from "@/components/settings/OpenAIKeySettings"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,6 +48,7 @@ export const SettingsMenu = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState(theme);
   const [selectedLanguage, setSelectedLanguage] = useState(language);
+  const [activeTab, setActiveTab] = useState('appearance');
 
   // Reset local states when external values change
   useEffect(() => {
@@ -94,9 +101,19 @@ export const SettingsMenu = () => {
         <DropdownMenuContent align="end" className="w-56">
           <DropdownMenuLabel>Settings</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => handleOpenChange(true)}>
+          <DropdownMenuItem onClick={() => {
+            setActiveTab('appearance');
+            handleOpenChange(true);
+          }}>
             <Settings className="mr-2 h-4 w-4" />
-            App Settings
+            Appearance
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => {
+            setActiveTab('integrations');
+            handleOpenChange(true);
+          }}>
+            <KeyRound className="mr-2 h-4 w-4" />
+            OpenAI Integration
           </DropdownMenuItem>
           <DropdownMenuItem>
             <CreditCard className="mr-2 h-4 w-4" />
@@ -114,39 +131,51 @@ export const SettingsMenu = () => {
               Customize your application experience
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="theme">Theme</Label>
-              <select 
-                id="theme" 
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                value={selectedTheme}
-                onChange={(e) => setSelectedTheme(e.target.value as "light" | "dark" | "system")}
-              >
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-                <option value="system">System</option>
-              </select>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="language">Language</Label>
-              <select 
-                id="language" 
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                value={selectedLanguage}
-                onChange={(e) => setSelectedLanguage(e.target.value)}
-              >
-                {languageOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button onClick={handleSaveSettings}>Save changes</Button>
-          </DialogFooter>
+          
+          <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid grid-cols-2 mb-4">
+              <TabsTrigger value="appearance">Appearance</TabsTrigger>
+              <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="appearance" className="space-y-4">
+              <div className="grid gap-2">
+                <Label htmlFor="theme">Theme</Label>
+                <select 
+                  id="theme" 
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                  value={selectedTheme}
+                  onChange={(e) => setSelectedTheme(e.target.value as "light" | "dark" | "system")}
+                >
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                  <option value="system">System</option>
+                </select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="language">Language</Label>
+                <select 
+                  id="language" 
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                  value={selectedLanguage}
+                  onChange={(e) => setSelectedLanguage(e.target.value)}
+                >
+                  {languageOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <DialogFooter>
+                <Button onClick={handleSaveSettings}>Save changes</Button>
+              </DialogFooter>
+            </TabsContent>
+            
+            <TabsContent value="integrations">
+              <OpenAIKeySettings />
+            </TabsContent>
+          </Tabs>
         </DialogContent>
       </Dialog>
     </>
