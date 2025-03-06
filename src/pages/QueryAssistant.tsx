@@ -9,8 +9,6 @@ import { useUserProfile } from '@/hooks/use-user-profile';
 import SettingsDialog from '@/components/settings/SettingsDialog';
 import AiAssistantButton from '@/components/ai/AiAssistantButton';
 import { toast } from 'sonner';
-import { Users } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 
 const QueryAssistant = () => {
   const [activeTab, setActiveTab] = useState('query');
@@ -33,12 +31,6 @@ const QueryAssistant = () => {
     });
   };
 
-  // Mock real-time collaborators data
-  const activeCollaborators = [
-    { id: '1', name: 'John Doe', isActive: true },
-    { id: '2', name: 'Jane Smith', isActive: true },
-  ];
-
   useEffect(() => {
     console.log("QueryAssistant component mounted, userName:", userName);
   }, [userName]);
@@ -49,18 +41,6 @@ const QueryAssistant = () => {
       
       <main className="flex-1 w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-16">
         <div className="w-full">
-          {/* Collaboration indicator */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-4 flex justify-end"
-          >
-            <Badge variant="outline" className="flex items-center gap-2 py-1.5 px-3">
-              <Users className="h-4 w-4 text-primary" />
-              <span>{activeCollaborators.length} collaborators online</span>
-            </Badge>
-          </motion.div>
-
           <QueryTabs
             activeTab={activeTab}
             setActiveTab={setActiveTab}
