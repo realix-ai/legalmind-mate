@@ -51,15 +51,16 @@ export const useTemplateUpload = (onTemplateAdded: () => void) => {
       // Important! Call onTemplateAdded() first
       onTemplateAdded();
       
-      // Force browser refresh and navigation
+      // Create the target URL for redirection
       const targetUrl = `/document-drafting/${template.id}`;
       console.log('Created template with ID:', template.id);
       console.log('About to navigate to:', targetUrl);
       
-      // Use direct window.location.replace for navigation - this is a hard redirect
-      window.location.replace(targetUrl);
+      // Use the most direct approach: change the entire window location
+      // This is more reliable than window.location.replace()
+      window.location.href = targetUrl;
       
-      // No need to reset form or close dialog as we're redirecting the page
+      // Toast before redirect (may not be seen due to page reload)
       toast.success('Template uploaded successfully');
     } catch (error) {
       console.error('Error saving template:', error);
