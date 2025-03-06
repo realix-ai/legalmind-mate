@@ -27,10 +27,13 @@ const CaseHeader = ({
   };
 
   const handleCreateCase = () => {
+    // Always open the dialog first
+    setIsCreateCaseDialogOpen(true);
+    
+    // If onCreateCase is provided, call it (though this may be unnecessary and causing issues)
+    // Remove this if it causes problems
     if (onCreateCase) {
       onCreateCase();
-    } else {
-      setIsCreateCaseDialogOpen(true);
     }
   };
 

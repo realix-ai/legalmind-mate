@@ -69,6 +69,9 @@ const CaseManagementContainer = () => {
   }, [loadCases]);
   
   const handleCreateNewCase = () => {
+    if (!newCaseName.trim()) {
+      return; // Don't create case if name is empty
+    }
     handleCreateCase(newCaseName);
     setNewCaseName('');
     setIsCreateCaseDialogOpen(false);
@@ -87,6 +90,8 @@ const CaseManagementContainer = () => {
       resetEditCaseForm();
     }
   };
+
+  console.log("Create case dialog state:", isCreateCaseDialogOpen);
 
   return (
     <div className="min-h-screen pb-16">
@@ -117,7 +122,14 @@ const CaseManagementContainer = () => {
         />
       </main>
 
-      <Dialog open={isCreateCaseDialogOpen} onOpenChange={setIsCreateCaseDialogOpen}>
+      {/* Force Dialog to be controlled only by state */}
+      <Dialog 
+        open={isCreateCaseDialogOpen} 
+        onOpenChange={(open) => {
+          console.log("Dialog onOpenChange:", open);
+          setIsCreateCaseDialogOpen(open);
+        }}
+      >
         <CreateCaseDialog 
           newCaseName={newCaseName}
           setNewCaseName={setNewCaseName}
@@ -125,7 +137,10 @@ const CaseManagementContainer = () => {
         />
       </Dialog>
 
-      <Dialog open={isEditCaseDialogOpen} onOpenChange={setIsEditCaseDialogOpen}>
+      <Dialog 
+        open={isEditCaseDialogOpen} 
+        onOpenChange={setIsEditCaseDialogOpen}
+      >
         <EditCaseDialog 
           isEditCaseDialogOpen={isEditCaseDialogOpen}
           setIsEditCaseDialogOpen={setIsEditCaseDialogOpen}

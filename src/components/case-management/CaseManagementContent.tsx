@@ -79,7 +79,7 @@ const CaseManagementContent = ({
         casesCount={filteredCases.length}
         setIsCreateCaseDialogOpen={setIsCreateCaseDialogOpen}
         isCreateCaseDialogOpen={isCreateCaseDialogOpen}
-        onCreateCase={handleCreateNewCase}
+        // Don't pass onCreateCase to avoid triggering both actions
       />
       
       <SearchAndFilters 
