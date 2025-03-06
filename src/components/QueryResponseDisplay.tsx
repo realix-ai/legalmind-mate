@@ -1,3 +1,4 @@
+
 import { Loader2, FileText, Download, Mail, Link, Share2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
@@ -124,6 +125,12 @@ const QueryResponseDisplay = ({ isProcessing, response, onShare, showShareButton
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    {onShare && (
+                      <DropdownMenuItem onClick={onShare}>
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share Results
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem onClick={handleExportPDF}>
                       <Download className="h-4 w-4 mr-2" />
                       Save as PDF

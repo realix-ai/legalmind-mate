@@ -1,9 +1,8 @@
 
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import QueryResponseDisplay from "@/components/QueryResponseDisplay";
 import CitationBox from "@/components/citation/CitationBox";
-import { MessageSquare, Edit, Check } from "lucide-react";
+import { Edit, Check } from "lucide-react";
 import { Citation } from "@/services/citationService";
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
