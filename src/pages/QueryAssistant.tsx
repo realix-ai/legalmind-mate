@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from 'uuid';
@@ -22,6 +23,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useTheme } from "@/hooks/use-theme";
 import { cn } from "@/lib/utils";
 import { SettingsDialog } from "@/components/settings/SettingsDialog";
+import { Loader } from "lucide-react";
 
 const QueryAssistant = () => {
   const { theme } = useTheme();
@@ -191,7 +193,7 @@ const QueryAssistant = () => {
             ))}
             {isLoading && (
               <div className="flex justify-center">
-                <BeatLoader color={theme === "dark" ? "#fff" : "#000"} size={12} />
+                <Loader className="h-8 w-8 animate-spin text-primary" />
               </div>
             )}
             {error && (
