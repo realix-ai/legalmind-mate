@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { KeyRound, Save, CheckCircle, XCircle } from 'lucide-react';
+import { KeyRound, Save, ExternalLink, CheckCircle, XCircle } from 'lucide-react';
+import { Label } from '@/components/ui/label';
 
 export function OpenAIKeySettings() {
   const [apiKey, setApiKey] = useState<string>(localStorage.getItem('openai-api-key') || '');
@@ -60,13 +61,11 @@ export function OpenAIKeySettings() {
       </div>
       
       <div className="space-y-2">
-        <p className="text-sm text-muted-foreground">
-          Enter your OpenAI API key to enable ChatGPT integration. Your key is stored locally in your browser.
-        </p>
-        
+        <Label htmlFor="openai-key">API Key</Label>
         {isEditing ? (
           <div className="space-y-2">
             <Input
+              id="openai-key"
               type="password"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
@@ -89,11 +88,16 @@ export function OpenAIKeySettings() {
                 disabled={isTesting || !apiKey.trim()}
                 className="gap-1"
               >
-                {isTesting ? (
-                  <>Testing...</>
-                ) : (
-                  <>Test Key</>
-                )}
+                {isTesting ? "Testing..." : "Test Key"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open('https://platform.openai.com/account/api-keys', '_blank')}
+                className="gap-1 ml-auto"
+              >
+                <ExternalLink className="h-4 w-4" />
+                OpenAI Dashboard
               </Button>
             </div>
           </div>
@@ -117,6 +121,9 @@ export function OpenAIKeySettings() {
             </div>
           </div>
         )}
+        <p className="text-sm text-muted-foreground mt-2">
+          Your OpenAI API key is stored locally in your browser and is used for AI-powered features.
+        </p>
       </div>
     </div>
   );

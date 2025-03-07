@@ -1,10 +1,9 @@
-
 import { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Menu, Settings } from 'lucide-react';
 import NavItems from './NavItems';
-import SettingsDialog from '../settings/SettingsDialog';
+import SettingsDialog from '@/components/settings/SettingsDialog';
 import { Button } from '@/components/ui/button';
 import UserProfileButton from '../profile/UserProfileButton';
 
