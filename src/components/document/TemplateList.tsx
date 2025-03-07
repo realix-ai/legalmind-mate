@@ -1,4 +1,3 @@
-
 import { motion } from 'framer-motion';
 import DocumentTemplate from '@/components/DocumentTemplate';
 import { Button } from '@/components/ui/button';
@@ -114,7 +113,7 @@ const TemplateList = ({ onSelectTemplate }: TemplateListProps) => {
           size="lg" 
           onClick={handleCreateBlank}
         >
-          Create Blank Document
+          Create Document
         </Button>
         
         <TemplateUploadDialog onTemplateAdded={handleTemplateAdded} />

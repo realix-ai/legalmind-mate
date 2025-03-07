@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import ExportOptions from './ExportOptions';
 import SaveToCaseDialog from './SaveToCaseDialog';
 import SaveToIManageDialog from './SaveToIManageDialog';
-import GetFromIManageDialog from './GetFromIManageDialog';
 import { useExportDocument } from '@/hooks/document/useExportDocument';
 import { SavedDocument } from '@/utils/documents/types';
 
@@ -53,11 +52,6 @@ const DocumentToolbar = ({
           <Save className="mr-1 h-3.5 w-3.5" />
           Save
         </Button>
-        
-        {/* Moved GetFromIManage next to the save button */}
-        {onDocumentLoaded && (
-          <GetFromIManageDialog onDocumentSelected={onDocumentLoaded} />
-        )}
       </div>
       
       <div className="flex items-center gap-2">
