@@ -7,8 +7,8 @@ export const AppLogo = () => {
   
   return (
     <div className="mr-4 flex">
-      <Link to="/" className="flex items-center group">
-        <div className="flex items-center justify-center transition-transform duration-300 group-hover:scale-105 -mr-2">
+      <Link to="/" className="flex items-center gap-2 group">
+        <div className="flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
           <img 
             src="/lovable-uploads/a6a6474a-8323-47ad-847f-a072100060b7.png" 
             alt="Realix.ai Logo" 
