@@ -1,4 +1,3 @@
-
 import { Settings, CreditCard, KeyRound, MessageSquarePlus, Cloud, Mail } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import { useTheme } from "@/hooks/use-theme"
@@ -27,6 +26,7 @@ import {
 import FeedbackPanel from "@/components/settings/FeedbackPanel"
 import IManageConfigDialog from "@/components/document/IManageConfigDialog"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
 
 // Language options for the settings menu
 const languageOptions = [
@@ -131,7 +131,7 @@ export const SettingsMenu = () => {
 
       {/* Settings Dialog */}
       <Dialog open={isSettingsOpen} onOpenChange={handleOpenChange}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[625px] h-[600px] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Application Settings</DialogTitle>
             <DialogDescription>
@@ -140,7 +140,7 @@ export const SettingsMenu = () => {
           </DialogHeader>
           
           <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid grid-cols-3 mb-4">
+            <TabsList className="grid grid-cols-3 mb-6">
               <TabsTrigger value="appearance">Appearance</TabsTrigger>
               <TabsTrigger value="integrations">Integrations</TabsTrigger>
               <TabsTrigger value="feedback">Feedback</TabsTrigger>
@@ -180,52 +180,81 @@ export const SettingsMenu = () => {
               </DialogFooter>
             </TabsContent>
             
-            <TabsContent value="integrations" className="space-y-4">
-              <div className="space-y-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center">
-                      <KeyRound className="h-4 w-4 mr-2 text-primary" />
-                      <CardTitle className="text-sm">OpenAI Integration</CardTitle>
-                    </div>
-                    <CardDescription className="text-xs">
-                      Configure your OpenAI API key
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <OpenAIKeySettings />
-                  </CardContent>
-                </Card>
+            <TabsContent value="integrations" className="space-y-6">
+              <div className="mb-4">
+                <h2 className="text-xl font-semibold mb-1">External Integrations</h2>
+                <p className="text-sm text-muted-foreground">Connect your favorite services to enhance your workflow</p>
+              </div>
+              
+              <div className="grid gap-6">
+                <div className="bg-primary/5 rounded-lg p-4">
+                  <h3 className="text-lg font-medium mb-3 flex items-center">
+                    <KeyRound className="h-5 w-5 mr-2 text-primary" />
+                    API Integrations
+                  </h3>
+                  <Separator className="mb-4" />
+                  
+                  <Card className="border-0 shadow-sm bg-card/50">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center">
+                        <KeyRound className="h-4 w-4 mr-2 text-primary" />
+                        <CardTitle className="text-base">OpenAI Integration</CardTitle>
+                      </div>
+                      <CardDescription className="text-xs">
+                        Configure your OpenAI API key for AI-powered features
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <OpenAIKeySettings />
+                    </CardContent>
+                  </Card>
+                </div>
                 
-                <Card>
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center">
-                      <Cloud className="h-4 w-4 mr-2 text-primary" />
-                      <CardTitle className="text-sm">iManage Integration</CardTitle>
-                    </div>
-                    <CardDescription className="text-xs">
-                      Configure your iManage connection
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <IManageConfigDialog inSettings={true} />
-                  </CardContent>
-                </Card>
+                <div className="bg-primary/5 rounded-lg p-4">
+                  <h3 className="text-lg font-medium mb-3 flex items-center">
+                    <Cloud className="h-5 w-5 mr-2 text-primary" />
+                    Document Management
+                  </h3>
+                  <Separator className="mb-4" />
+                  
+                  <Card className="border-0 shadow-sm bg-card/50">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center">
+                        <Cloud className="h-4 w-4 mr-2 text-primary" />
+                        <CardTitle className="text-base">iManage Integration</CardTitle>
+                      </div>
+                      <CardDescription className="text-xs">
+                        Configure your connection to iManage Work document management system
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <IManageConfigDialog inSettings={true} />
+                    </CardContent>
+                  </Card>
+                </div>
 
-                <Card>
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center">
-                      <Mail className="h-4 w-4 mr-2 text-primary" />
-                      <CardTitle className="text-sm">Outlook Integration</CardTitle>
-                    </div>
-                    <CardDescription className="text-xs">
-                      Connect your Microsoft Outlook email
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <OutlookIntegration />
-                  </CardContent>
-                </Card>
+                <div className="bg-primary/5 rounded-lg p-4">
+                  <h3 className="text-lg font-medium mb-3 flex items-center">
+                    <Mail className="h-5 w-5 mr-2 text-primary" />
+                    Communication Tools
+                  </h3>
+                  <Separator className="mb-4" />
+                  
+                  <Card className="border-0 shadow-sm bg-card/50">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center">
+                        <Mail className="h-4 w-4 mr-2 text-primary" />
+                        <CardTitle className="text-base">Outlook Integration</CardTitle>
+                      </div>
+                      <CardDescription className="text-xs">
+                        Connect your Microsoft Outlook account for document sharing
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <OutlookIntegration />
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             </TabsContent>
 
