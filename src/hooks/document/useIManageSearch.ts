@@ -35,7 +35,7 @@ export function useIManageSearch(onDocumentSelected: (document: SavedDocument) =
     }
   };
   
-  const handleDocumentSelect = async (documentId: string) => {
+  const handleDocumentSelect = async (documentId: string): Promise<boolean> => {
     setSelectedDocumentId(documentId);
     setIsLoading(true);
     
@@ -65,6 +65,7 @@ export function useIManageSearch(onDocumentSelected: (document: SavedDocument) =
     searchQuery,
     setSearchQuery,
     searchResults,
+    setSearchResults,
     isSearching,
     isLoading,
     selectedDocumentId,

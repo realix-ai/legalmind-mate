@@ -27,17 +27,6 @@ const GetFromIManageDialog = ({
 }: GetFromIManageDialogProps) => {
   const [open, setOpen] = useState(false);
 
-  // Reset state when dialog closes
-  useEffect(() => {
-    if (!open) {
-      setSearchQuery('');
-      setSearchResults([]);
-    }
-  }, [open]);
-  
-  // Connection management
-  const { isConnected } = useIManageConnection(open);
-  
   // Search functionality
   const {
     searchQuery,
@@ -50,13 +39,25 @@ const GetFromIManageDialog = ({
     handleSearch,
     handleDocumentSelect
   } = useIManageSearch(onDocumentSelected);
+  
+  // Reset state when dialog closes
+  useEffect(() => {
+    if (!open) {
+      setSearchQuery('');
+      setSearchResults([]);
+    }
+  }, [open, setSearchQuery, setSearchResults]);
+  
+  // Connection management
+  const { isConnected } = useIManageConnection(open);
 
   // Handle document selection and close dialog if successful
-  const handleSelectDocument = async (documentId: string) => {
+  const handleSelectDocument = async (documentId: string): Promise<boolean> => {
     const success = await handleDocumentSelect(documentId);
     if (success) {
       setOpen(false);
     }
+    return success;
   };
 
   // Adjust the button size and appearance based on where it's used

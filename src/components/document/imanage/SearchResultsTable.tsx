@@ -7,7 +7,7 @@ interface SearchResultsTableProps {
   results: SavedDocument[];
   isLoading: boolean;
   selectedDocumentId: string | null;
-  onDocumentSelect: (documentId: string) => void;
+  onDocumentSelect: (documentId: string) => Promise<boolean | undefined>;
 }
 
 const SearchResultsTable = ({ 
