@@ -7,11 +7,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenu
 } from '@/components/ui/dropdown-menu';
-import { FileText, File, Download } from 'lucide-react';
+import { FileText, File, Download, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 // Define export format types
-export type ExportFormat = 'pdf' | 'docx' | 'html' | 'txt' | 'md';
+export type ExportFormat = 'pdf' | 'docx' | 'html' | 'txt' | 'md' | 'email';
 
 interface ExportOptionsProps {
   title: string;
@@ -20,6 +20,7 @@ interface ExportOptionsProps {
   onExportDocx: () => void;
   onExportTxt: () => void;
   onPrint: () => void;
+  onEmailDocument: () => void;
 }
 
 const ExportOptions: React.FC<ExportOptionsProps> = ({ 
@@ -28,7 +29,8 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({
   onExportPdf, 
   onExportDocx, 
   onExportTxt, 
-  onPrint 
+  onPrint,
+  onEmailDocument 
 }) => {
   return (
     <DropdownMenu>
@@ -39,6 +41,10 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[200px]">
+        <DropdownMenuItem onClick={onEmailDocument}>
+          <Mail className="h-4 w-4 mr-2" />
+          Email Document
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={onExportPdf}>
           <FileText className="h-4 w-4 mr-2" />
           Export as PDF

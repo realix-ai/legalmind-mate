@@ -58,6 +58,7 @@ const DocumentToolbar = ({
         <ExportOptions
           title={documentTitle}
           content={documentContent}
+          onEmailDocument={() => exportDocumentUtils.emailDocument(documentTitle, documentContent)}
           onExportPdf={() => exportDocumentUtils.exportAsPdf(documentTitle, documentContent)}
           onExportDocx={() => exportDocumentUtils.exportAsDocx(documentTitle, documentContent)}
           onExportTxt={() => exportDocumentUtils.exportAsTxt(documentTitle, documentContent)}

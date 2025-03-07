@@ -6,6 +6,27 @@ import { toast } from 'sonner';
 // we'll simulate the export functionality
 
 export const useExportDocument = () => {
+  // Email Document
+  const emailDocument = useCallback((title: string, content: string) => {
+    try {
+      console.log(`Emailing document "${title}"`);
+      
+      // This would typically open a modal or dialog to compose an email
+      // For now, we'll simulate by opening the default mail client
+      
+      const subject = encodeURIComponent(`Document: ${title}`);
+      const body = encodeURIComponent(`Please find attached the document "${title}".\n\n${content}`);
+      
+      // Open default mail client with pre-filled subject and body
+      window.open(`mailto:?subject=${subject}&body=${body}`);
+      
+      toast.success('Email client opened');
+    } catch (error) {
+      console.error('Email error:', error);
+      toast.error('Failed to open email client');
+    }
+  }, []);
+  
   // PDF Export
   const exportAsPdf = useCallback((title: string, content: string) => {
     try {
@@ -154,6 +175,7 @@ export const useExportDocument = () => {
   }, []);
   
   return {
+    emailDocument,
     exportAsPdf,
     exportAsDocx,
     exportAsTxt,
