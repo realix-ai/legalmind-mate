@@ -78,6 +78,12 @@ const QueryTextarea = ({
     }
   };
 
+  const handleDocumentSelected = (doc: any) => {
+    const prefix = query.trim() ? `${query}\n\nReferencing document: ` : `Referencing document: `;
+    onChange({ target: { value: `${prefix}${doc.title}` } } as React.ChangeEvent<HTMLTextAreaElement>);
+    toast.success(`Document "${doc.title}" referenced in your query`);
+  };
+
   return (
     <TooltipProvider>
       <div 
@@ -102,11 +108,7 @@ const QueryTextarea = ({
         )}
         <div className="absolute bottom-3 right-3 flex space-x-2">
           <GetFromIManageDialog
-            onDocumentSelected={(doc) => {
-              const prefix = query.trim() ? `${query}\n\nReferencing document: ` : `Referencing document: `;
-              onChange({ target: { value: `${prefix}${doc.title}` } } as React.ChangeEvent<HTMLTextAreaElement>);
-              toast.success(`Document "${doc.title}" referenced in your query`);
-            }}
+            onDocumentSelected={handleDocumentSelected}
             buttonSize="icon"
             buttonLabel="iManage"
           />

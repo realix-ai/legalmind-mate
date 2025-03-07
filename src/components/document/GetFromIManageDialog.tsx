@@ -64,7 +64,7 @@ const GetFromIManageDialog = ({
   };
 
   // Render the appropriate button based on size
-  const renderButton = () => {
+  const renderTriggerContent = () => {
     if (buttonSize === 'icon') {
       return (
         <Button
@@ -92,20 +92,22 @@ const GetFromIManageDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {buttonSize === 'icon' ? (
-          <Tooltip>
-            <TooltipTrigger>
-              {renderButton()}
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{buttonLabel}</p>
-            </TooltipContent>
-          </Tooltip>
-        ) : (
-          renderButton()
-        )}
-      </DialogTrigger>
+      {buttonSize === 'icon' ? (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DialogTrigger asChild>
+              {renderTriggerContent()}
+            </DialogTrigger>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{buttonLabel}</p>
+          </TooltipContent>
+        </Tooltip>
+      ) : (
+        <DialogTrigger asChild>
+          {renderTriggerContent()}
+        </DialogTrigger>
+      )}
       
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
