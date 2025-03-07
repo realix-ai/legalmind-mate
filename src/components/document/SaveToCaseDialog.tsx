@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Briefcase } from 'lucide-react';
 import { 
   Dialog,
   DialogContent,
@@ -113,6 +113,7 @@ const SaveToCaseDialog = ({
           size="xs"
           className="gap-1"
         >
+          <Briefcase className="mr-1 h-3.5 w-3.5" />
           Save to Case
         </Button>
       </DialogTrigger>
