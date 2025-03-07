@@ -6,6 +6,9 @@ import CTASection from '@/components/landing/CTASection';
 import FooterSection from '@/components/landing/FooterSection';
 import { Badge } from '@/components/ui/badge';
 
+// Update this with your actual API URL
+const API_URL = 'https://your-backend-server.com/api';
+
 const Index = () => {
   // Log to check if the component is rendering
   useEffect(() => {
@@ -18,13 +21,16 @@ const Index = () => {
   useEffect(() => {
     const checkApiConnection = async () => {
       try {
-        // In a real app, this would be a real API endpoint
-        // const response = await fetch('https://api.realix.example/v1/status');
-        // const isConnected = response.ok;
+        // Make a real API call to check connection
+        const response = await fetch(`${API_URL}/status`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('auth-token') || ''}`,
+          },
+          // Add a timeout to prevent long waits
+          signal: AbortSignal.timeout(5000)
+        });
         
-        // For demo purposes, we'll simulate the API being disconnected
-        const isConnected = false;
-        
+        const isConnected = response.ok;
         setApiStatus(isConnected ? 'connected' : 'disconnected');
       } catch (error) {
         console.error('Error checking API connection:', error);

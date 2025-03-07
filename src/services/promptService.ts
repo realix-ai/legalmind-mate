@@ -1,17 +1,17 @@
 
 import { Prompt, PromptResponse } from '@/types/prompt';
+import { toast } from 'sonner';
 
-// API base URL - in a real app, this would be your API endpoint
-const API_URL = 'https://api.realix.example/v1';
+// Update this to your actual backend API URL
+const API_URL = 'https://your-backend-server.com/api';
 
 // Fallback to local storage when API is unavailable
 const LOCAL_STORAGE_KEY = 'userPrompts';
 
-// Helper to check if we're in API mode or local storage mode
+// Set this to true to enable API mode
 const isApiAvailable = (): boolean => {
-  // For development, we'll use a feature flag to toggle API mode
-  // In production, you might check for API connectivity
-  return false;
+  // You can add more sophisticated detection logic here if needed
+  return true; // Change to true to enable API mode
 }
 
 /**
@@ -20,11 +20,17 @@ const isApiAvailable = (): boolean => {
 export const getPrompts = async (): Promise<PromptResponse> => {
   try {
     if (isApiAvailable()) {
-      // Real API call
-      const response = await fetch(`${API_URL}/prompts`);
+      // Real API call with authentication header
+      const response = await fetch(`${API_URL}/prompts`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth-token') || ''}`,
+        }
+      });
+      
       if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
       }
+      
       const data = await response.json();
       return { success: true, data };
     } else {
@@ -35,6 +41,7 @@ export const getPrompts = async (): Promise<PromptResponse> => {
     }
   } catch (error) {
     console.error('Failed to fetch prompts:', error);
+    toast.error('Failed to load prompts');
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Unknown error fetching prompts' 
@@ -55,17 +62,18 @@ export const createPrompt = async (text: string): Promise<PromptResponse> => {
     };
 
     if (isApiAvailable()) {
-      // Real API call
+      // Real API call with authentication
       const response = await fetch(`${API_URL}/prompts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth-token') || ''}`,
         },
-        body: JSON.stringify(newPrompt),
+        body: JSON.stringify({ text: newPrompt.text }),
       });
       
       if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
       }
       
       const createdPrompt = await response.json();
@@ -79,6 +87,7 @@ export const createPrompt = async (text: string): Promise<PromptResponse> => {
     }
   } catch (error) {
     console.error('Failed to create prompt:', error);
+    toast.error('Failed to save prompt');
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Unknown error creating prompt' 

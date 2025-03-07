@@ -1,15 +1,25 @@
 
 import { ChatMessageProps } from '@/components/case/ChatMessage';
 import { ChatSession } from './types';
+import { toast } from 'sonner';
 
-const API_URL = 'https://api.realix.example/v1';
+// Update this to your actual backend API URL
+const API_URL = 'https://your-backend-server.com/api';
 
-// Helper to check if we're in API mode or local storage mode
+// Set this to true to enable API mode
 const isApiAvailable = (): boolean => {
-  // For development, we'll use a feature flag to toggle API mode
-  // In production, you might check for API connectivity
-  return false;
+  // You can add more sophisticated detection logic here if needed
+  // For example, checking connection status or feature flags
+  return true; // Change to true to enable API mode
 }
+
+// Helper to handle API response errors
+const handleApiError = (error: any, fallbackMessage: string): never => {
+  const errorMessage = error instanceof Error ? error.message : fallbackMessage;
+  console.error(errorMessage, error);
+  toast.error(errorMessage);
+  throw new Error(errorMessage);
+};
 
 // Fetch chat messages from the API
 export const fetchChatMessages = async (caseId: string, sessionId?: string): Promise<ChatMessageProps[]> => {
@@ -22,13 +32,21 @@ export const fetchChatMessages = async (caseId: string, sessionId?: string): Pro
       ? `${API_URL}/cases/${caseId}/sessions/${sessionId}/messages` 
       : `${API_URL}/cases/${caseId}/messages`;
     
-    const response = await fetch(endpoint);
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('auth-token') || ''}`,
+      },
+    });
+    
     if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
     
     return await response.json();
   } catch (error) {
+    // Log the error but don't throw - this allows fallback to local storage
     console.error('Error fetching chat messages:', error);
     return [];
   }
@@ -53,11 +71,16 @@ export const saveChatMessagesToApi = async (
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('auth-token') || ''}`,
       },
       body: JSON.stringify(messages),
     });
     
-    return response.ok;
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+    
+    return true;
   } catch (error) {
     console.error('Error saving chat messages:', error);
     return false;
@@ -83,11 +106,16 @@ export const addChatMessageToApi = async (
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('auth-token') || ''}`,
       },
       body: JSON.stringify(message),
     });
     
-    return response.ok;
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+    
+    return true;
   } catch (error) {
     console.error('Error adding chat message:', error);
     return false;
@@ -103,9 +131,16 @@ export const clearChatHistoryApi = async (caseId: string): Promise<boolean> => {
   try {
     const response = await fetch(`${API_URL}/cases/${caseId}/messages`, {
       method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('auth-token') || ''}`,
+      },
     });
     
-    return response.ok;
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+    
+    return true;
   } catch (error) {
     console.error('Error clearing chat history:', error);
     return false;
@@ -119,9 +154,14 @@ export const fetchSessionsList = async (caseId: string): Promise<ChatSession[]> 
   }
 
   try {
-    const response = await fetch(`${API_URL}/cases/${caseId}/sessions`);
+    const response = await fetch(`${API_URL}/cases/${caseId}/sessions`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('auth-token') || ''}`,
+      },
+    });
+    
     if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
     
     return await response.json();
