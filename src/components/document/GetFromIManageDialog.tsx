@@ -23,7 +23,7 @@ interface GetFromIManageDialogProps {
 
 const GetFromIManageDialog = ({ 
   onDocumentSelected,
-  buttonSize = 'default'  // Changed default from 'xs' to 'default'
+  buttonSize = 'xs'  // Reset to 'xs' to match other buttons
 }: GetFromIManageDialogProps) => {
   const [open, setOpen] = useState(false);
 
@@ -60,16 +60,15 @@ const GetFromIManageDialog = ({
     return success;
   };
 
-  // Simplified button styling
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           variant="outline"
           size={buttonSize}
-          className="gap-2"
+          className={buttonSize === 'lg' ? 'gap-2' : 'gap-1'}
         >
-          <Cloud className="h-4 w-4" />
+          <Cloud className={buttonSize === 'lg' ? 'h-4 w-4' : 'h-3.5 w-3.5'} />
           Get from iManage
         </Button>
       </DialogTrigger>
