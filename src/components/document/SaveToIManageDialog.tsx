@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { saveDocumentToIManage, checkIManageConnection } from '@/services/iManageService';
+import { saveDocumentToIManage, checkIManageConnection } from '@/services/imanage';
 import { saveDocument } from '@/utils/documents';
 
 interface SaveToIManageDialogProps {

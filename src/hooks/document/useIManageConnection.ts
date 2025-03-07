@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { checkIManageConnection } from '@/services/iManageService';
+import { checkIManageConnection } from '@/services/imanage';
 
 export function useIManageConnection(isDialogOpen: boolean) {
   const [isConnected, setIsConnected] = useState(false);

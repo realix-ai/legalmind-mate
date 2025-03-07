@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Cloud, Link2, Link2Off } from 'lucide-react';
 import { 
@@ -19,7 +18,7 @@ import {
   clearIManageCredentials,
   getIManageUrl,
   checkIManageConnection,
-} from '@/services/iManageService';
+} from '@/services/imanage';
 
 const IManageConfigDialog = () => {
   const [open, setOpen] = useState(false);

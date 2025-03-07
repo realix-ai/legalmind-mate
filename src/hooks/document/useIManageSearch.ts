@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { searchIManageDocuments, fetchDocumentFromIManage } from '@/services/iManageService';
+import { searchIManageDocuments, fetchDocumentFromIManage } from '@/services/imanage';
 import { SavedDocument } from '@/utils/documents/types';
 
 export function useIManageSearch(onDocumentSelected: (document: SavedDocument) => void) {

@@ -1,11 +1,10 @@
-
 import React, { useEffect, useState } from 'react';
 import HeroSection from '@/components/landing/HeroSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import CTASection from '@/components/landing/CTASection';
 import FooterSection from '@/components/landing/FooterSection';
 import { Badge } from '@/components/ui/badge';
-import { checkIManageConnection } from '@/services/iManageService';
+import { checkIManageConnection } from '@/services/imanage';
 
 // Update this with your actual API URL
 const API_URL = 'https://your-backend-server.com/api';
