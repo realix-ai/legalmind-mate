@@ -27,15 +27,12 @@ const DocumentsPanel = ({ caseNumber, caseName, documents: initialDocuments }: D
   
   useEffect(() => {
     if (caseNumber) {
-      // Extract case ID from the displayed case number
       let caseIdFromNumber = caseNumber;
       
-      // Ensure we have a properly formatted case ID
       caseIdFromNumber = normalizeCaseId(caseIdFromNumber);
       
       console.log("Loading documents for case ID:", caseIdFromNumber);
       
-      // Get documents using the normalized case ID
       const docs = getCaseDocuments(caseIdFromNumber);
       console.log("Retrieved documents:", docs);
       
@@ -52,7 +49,6 @@ const DocumentsPanel = ({ caseNumber, caseName, documents: initialDocuments }: D
     setRefreshTrigger(prev => prev + 1);
   };
   
-  // Derive normalized case ID for upload button
   const normalizedCaseId = caseNumber ? normalizeCaseId(caseNumber) : '';
   
   return (
