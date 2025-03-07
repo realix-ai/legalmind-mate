@@ -23,7 +23,7 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section className="relative h-screen flex items-center justify-center overflow-hidden px-4">
+    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden px-4">
       <div 
         className="absolute inset-0 -z-10 bg-gradient-radial from-white to-gray-50 dark:from-gray-900 dark:to-gray-950"
         style={{ 
@@ -38,6 +38,22 @@ const HeroSection = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="flex justify-center mb-6"
+        >
+          <img 
+            src="/lovable-uploads/a6a6474a-8323-47ad-847f-a072100060b7.png" 
+            alt="Realix.ai Logo" 
+            className="h-20 w-auto mb-4"
+            style={{ 
+              filter: `drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.2))`
+            }}
+          />
+        </motion.div>
+        
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
