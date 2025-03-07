@@ -12,10 +12,10 @@ export const AppLogo = () => {
           <img 
             src="/lovable-uploads/302e2cd3-1590-4b14-bb63-2a91d96145d9.png" 
             alt="Realix.ai Logo" 
-            className={`h-9 w-auto ${theme === 'dark' ? 'filter brightness-110' : ''} drop-shadow-sm`}
+            className={`h-12 w-auto ${theme === 'dark' ? 'filter brightness-110' : ''} drop-shadow-md`}
           />
         </div>
-        <span className="font-bold text-lg sm:inline-block bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent transition-all duration-300 group-hover:opacity-90">
+        <span className="font-bold text-xl sm:inline-block bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent transition-all duration-300 group-hover:opacity-90">
           Realix.ai
         </span>
       </Link>

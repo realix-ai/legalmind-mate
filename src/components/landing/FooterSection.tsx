@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Twitter, Linkedin, Facebook, Instagram } from 'lucide-react';
@@ -52,14 +53,14 @@ const FooterSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-1 rounded-lg bg-gradient-to-br from-primary/20 to-blue-500/20 flex items-center justify-center shadow-sm">
+              <div className="rounded-lg flex items-center justify-center shadow-sm">
                 <img 
                   src="/lovable-uploads/302e2cd3-1590-4b14-bb63-2a91d96145d9.png" 
                   alt="Realix.ai Logo" 
-                  className={`h-9 w-auto ${theme === 'dark' ? 'filter brightness-110' : ''}`}
+                  className={`h-12 w-auto ${theme === 'dark' ? 'filter brightness-110' : ''} drop-shadow-md`}
                 />
               </div>
-              <span className="font-bold text-xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">Realix.ai</span>
+              <span className="font-bold text-2xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">Realix.ai</span>
             </div>
             
             <p className="text-muted-foreground mb-6 max-w-md">
