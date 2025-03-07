@@ -7,7 +7,7 @@ export const AppLogo = () => {
   
   return (
     <div className="mr-4 flex">
-      <Link to="/" className="mr-2 flex items-center space-x-2 group">
+      <Link to="/" className="mr-2 flex items-center space-x-1 group">
         <div className="flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
           <img 
             src="/lovable-uploads/a6a6474a-8323-47ad-847f-a072100060b7.png" 
