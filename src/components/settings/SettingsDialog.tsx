@@ -4,12 +4,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "@/hooks/use-theme";
 import { useLanguage } from "@/hooks/use-language";
 import { OpenAIKeySettings } from "./OpenAIKeySettings";
+import { OutlookIntegration } from "./OutlookIntegration";
 import { useEffect, useState } from "react";
 import FeedbackPanel from "./FeedbackPanel";
 import IManageConfigDialog from "@/components/document/IManageConfigDialog";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { KeyRound, Cloud } from "lucide-react";
+import { KeyRound, Cloud, Mail } from "lucide-react";
 
 interface SettingsDialogProps {
   open: boolean;
@@ -165,6 +166,21 @@ const SettingsDialog = ({ open, onOpenChange, defaultTab = "appearance" }: Setti
                 </CardHeader>
                 <CardContent>
                   <IManageConfigDialog inSettings={true} />
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center">
+                    <Mail className="h-5 w-5 mr-2 text-primary" />
+                    <CardTitle>Outlook Integration</CardTitle>
+                  </div>
+                  <CardDescription>
+                    Connect your Microsoft Outlook account for document sharing and emails
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <OutlookIntegration />
                 </CardContent>
               </Card>
             </div>

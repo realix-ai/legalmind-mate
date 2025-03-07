@@ -11,7 +11,7 @@ import { FileText, File, Download, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 // Define export format types
-export type ExportFormat = 'pdf' | 'docx' | 'html' | 'txt' | 'md' | 'email';
+export type ExportFormat = 'pdf' | 'docx' | 'html' | 'txt' | 'md' | 'email' | 'outlook';
 
 interface ExportOptionsProps {
   title: string;
@@ -32,6 +32,24 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({
   onPrint,
   onEmailDocument 
 }) => {
+  const isOutlookConnected = localStorage.getItem('outlook-connected') === 'true';
+  const outlookEmail = localStorage.getItem('outlook-email') || '';
+  
+  const handleExportToOutlook = () => {
+    try {
+      // This would typically use the Microsoft Graph API in a real implementation
+      // For our simulation, we'll use the standard mailto: approach
+      const subject = encodeURIComponent(`Document: ${title}`);
+      const body = encodeURIComponent(`Please find attached the document "${title}".\n\n${content}`);
+      
+      window.open(`mailto:${outlookEmail}?subject=${subject}&body=${body}`);
+      
+      console.log(`Sending document "${title}" via Outlook to ${outlookEmail}`);
+    } catch (error) {
+      console.error('Outlook export error:', error);
+    }
+  };
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -45,6 +63,14 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({
           <Mail className="h-4 w-4 mr-2" />
           Email Document
         </DropdownMenuItem>
+        
+        {isOutlookConnected && (
+          <DropdownMenuItem onClick={handleExportToOutlook}>
+            <Mail className="h-4 w-4 mr-2" />
+            Send via Outlook
+          </DropdownMenuItem>
+        )}
+        
         <DropdownMenuItem onClick={onExportPdf}>
           <FileText className="h-4 w-4 mr-2" />
           Export as PDF
