@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Twitter, Linkedin, Facebook, Instagram } from 'lucide-react';
@@ -50,9 +49,11 @@ const FooterSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md">
-                <span className="text-white font-semibold text-xl">R</span>
-              </div>
+              <img 
+                src="/lovable-uploads/302e2cd3-1590-4b14-bb63-2a91d96145d9.png" 
+                alt="Realix.ai Logo" 
+                className="h-10 w-auto"
+              />
               <span className="font-bold text-xl">Realix.ai</span>
             </div>
             
