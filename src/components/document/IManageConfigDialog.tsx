@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Cloud, Link2, Link2Off } from 'lucide-react';
 import { 
@@ -20,7 +21,11 @@ import {
   checkIManageConnection,
 } from '@/services/imanage';
 
-const IManageConfigDialog = () => {
+interface IManageConfigDialogProps {
+  inSettings?: boolean;
+}
+
+const IManageConfigDialog = ({ inSettings = false }: IManageConfigDialogProps) => {
   const [open, setOpen] = useState(false);
   const [url, setUrl] = useState('');
   const [token, setToken] = useState('');
@@ -73,17 +78,35 @@ const IManageConfigDialog = () => {
     toast.success("Disconnected from iManage");
   };
 
+  const renderTriggerButton = () => {
+    if (inSettings) {
+      return (
+        <Button
+          variant="outline"
+          size="default"
+          className="w-full"
+        >
+          {isConnected ? "Manage iManage Connection" : "Connect to iManage"}
+        </Button>
+      );
+    }
+    
+    return (
+      <Button
+        variant="outline"
+        size="xs"
+        className="gap-1"
+      >
+        <Cloud className="h-3.5 w-3.5" />
+        iManage
+      </Button>
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="xs"
-          className="gap-1"
-        >
-          <Cloud className="h-3.5 w-3.5" />
-          iManage
-        </Button>
+        {renderTriggerButton()}
       </DialogTrigger>
       
       <DialogContent className="sm:max-w-[450px]">

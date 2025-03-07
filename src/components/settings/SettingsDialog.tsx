@@ -6,6 +6,7 @@ import { useLanguage } from "@/hooks/use-language";
 import { OpenAIKeySettings } from "./OpenAIKeySettings";
 import { useEffect, useState } from "react";
 import FeedbackPanel from "./FeedbackPanel";
+import IManageConfigDialog from "@/components/document/IManageConfigDialog";
 
 interface SettingsDialogProps {
   open: boolean;
@@ -134,6 +135,17 @@ const SettingsDialog = ({ open, onOpenChange, defaultTab = "appearance" }: Setti
           
           <TabsContent value="integrations" className="space-y-6">
             <OpenAIKeySettings />
+            
+            <div className="space-y-4 border-t pt-4">
+              <h3 className="text-lg font-medium">iManage Integration</h3>
+              <p className="text-sm text-muted-foreground">
+                Configure your connection to iManage Work document management system.
+              </p>
+              
+              <div className="pt-2">
+                <IManageConfigDialog />
+              </div>
+            </div>
           </TabsContent>
           
           <TabsContent value="feedback" className="space-y-4">

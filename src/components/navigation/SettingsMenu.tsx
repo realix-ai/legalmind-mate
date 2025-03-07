@@ -1,5 +1,5 @@
 
-import { Settings, CreditCard, KeyRound, MessageSquarePlus } from "lucide-react"
+import { Settings, CreditCard, KeyRound, MessageSquarePlus, Cloud } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import { useTheme } from "@/hooks/use-theme"
 import { useLanguage } from "@/hooks/use-language"
@@ -24,6 +24,7 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
 import FeedbackPanel from "@/components/settings/FeedbackPanel"
+import IManageConfigDialog from "@/components/document/IManageConfigDialog"
 
 // Language options for the settings menu
 const languageOptions = [
@@ -110,7 +111,7 @@ export const SettingsMenu = () => {
             handleOpenChange(true);
           }}>
             <KeyRound className="mr-2 h-4 w-4" />
-            OpenAI Integration
+            Integrations
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => {
             setActiveTab('feedback');
@@ -177,8 +178,19 @@ export const SettingsMenu = () => {
               </DialogFooter>
             </TabsContent>
             
-            <TabsContent value="integrations">
+            <TabsContent value="integrations" className="space-y-4">
               <OpenAIKeySettings />
+              
+              <div className="space-y-4 border-t pt-4 mt-4">
+                <h3 className="text-sm font-medium">iManage Integration</h3>
+                <p className="text-xs text-muted-foreground">
+                  Configure your connection to iManage Work document management system.
+                </p>
+                
+                <div>
+                  <IManageConfigDialog />
+                </div>
+              </div>
             </TabsContent>
 
             <TabsContent value="feedback">
