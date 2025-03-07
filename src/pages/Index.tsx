@@ -5,6 +5,7 @@ import FeaturesSection from '@/components/landing/FeaturesSection';
 import CTASection from '@/components/landing/CTASection';
 import FooterSection from '@/components/landing/FooterSection';
 import { Badge } from '@/components/ui/badge';
+import { checkIManageConnection } from '@/services/iManageService';
 
 // Update this with your actual API URL
 const API_URL = 'https://your-backend-server.com/api';
@@ -16,6 +17,7 @@ const Index = () => {
   }, []);
 
   const [apiStatus, setApiStatus] = useState<'connected' | 'disconnected' | 'checking'>('checking');
+  const [imanageStatus, setImanageStatus] = useState<'connected' | 'disconnected' | 'checking'>('checking');
 
   // Check API connection on load
   useEffect(() => {
@@ -40,11 +42,26 @@ const Index = () => {
 
     checkApiConnection();
   }, []);
+  
+  // Check iManage connection on load
+  useEffect(() => {
+    const checkImanageStatus = async () => {
+      try {
+        const isConnected = await checkIManageConnection();
+        setImanageStatus(isConnected ? 'connected' : 'disconnected');
+      } catch (error) {
+        console.error('Error checking iManage connection:', error);
+        setImanageStatus('disconnected');
+      }
+    };
+
+    checkImanageStatus();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* API Status Indicator */}
-      <div className="fixed top-4 right-4 z-50">
+      {/* API Status Indicators */}
+      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
         <Badge variant={apiStatus === 'connected' ? 'default' : 'outline'} className="bg-opacity-70 backdrop-blur-sm">
           {apiStatus === 'checking' ? (
             'Checking API connection...'
@@ -57,6 +74,22 @@ const Index = () => {
             <span className="flex items-center gap-1">
               <span className="h-2 w-2 rounded-full bg-red-500"></span>
               API Disconnected (Using Local Storage)
+            </span>
+          )}
+        </Badge>
+        
+        <Badge variant={imanageStatus === 'connected' ? 'default' : 'outline'} className="bg-opacity-70 backdrop-blur-sm">
+          {imanageStatus === 'checking' ? (
+            'Checking iManage connection...'
+          ) : imanageStatus === 'connected' ? (
+            <span className="flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-green-500"></span>
+              iManage Connected
+            </span>
+          ) : (
+            <span className="flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-red-500"></span>
+              iManage Disconnected
             </span>
           )}
         </Badge>

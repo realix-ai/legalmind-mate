@@ -23,7 +23,9 @@ export interface SavedDocument {
   content: string;
   lastModified: number;
   caseId?: string;
-  category?: string; // Added category field
+  category?: string;
+  externalSystem?: string; // Added for external DMS integration
+  externalId?: string;    // External system document ID
 }
 
 export interface Case {

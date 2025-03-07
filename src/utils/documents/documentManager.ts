@@ -14,13 +14,19 @@ export const saveDocument = (title: string, content: string, id?: string | null,
   // Ensure title is never empty
   const documentTitle = title.trim() ? title.trim() : "Untitled Document";
   
+  // Check for existing external system references
+  const externalSystem = id ? localStorage.getItem(`doc-${id}-external-system`) : undefined;
+  const externalId = id ? localStorage.getItem(`doc-${id}-external-id`) : undefined;
+  
   const newDocument: SavedDocument = {
     id: id || `doc-${Date.now()}`,
     title: documentTitle,
     content,
     lastModified: Date.now(),
     caseId: normalizedCaseId,
-    category: category || 'general' // Use provided category or default to 'general'
+    category: category || 'general', // Use provided category or default to 'general'
+    externalSystem: externalSystem || undefined,
+    externalId: externalId || undefined
   };
   
   const existingIndex = id ? savedDocuments.findIndex(doc => doc.id === id) : -1;
@@ -37,6 +43,15 @@ export const saveDocument = (title: string, content: string, id?: string | null,
     // Preserve existing category if not changing it
     if (category === undefined && savedDocuments[existingIndex].category) {
       newDocument.category = savedDocuments[existingIndex].category;
+    }
+    
+    // Preserve external system references if they exist
+    if (savedDocuments[existingIndex].externalSystem && !newDocument.externalSystem) {
+      newDocument.externalSystem = savedDocuments[existingIndex].externalSystem;
+    }
+    
+    if (savedDocuments[existingIndex].externalId && !newDocument.externalId) {
+      newDocument.externalId = savedDocuments[existingIndex].externalId;
     }
     
     savedDocuments[existingIndex] = newDocument;
@@ -111,6 +126,37 @@ export const updateDocumentCategory = (documentId: string, category: string): Sa
 export const getDocumentsByCategory = (category: string): SavedDocument[] => {
   const documents = getSavedDocuments();
   return documents.filter(doc => doc.category === category);
+};
+
+// Get documents from external system 
+export const getDocumentsByExternalSystem = (externalSystem: string): SavedDocument[] => {
+  const documents = getSavedDocuments();
+  return documents.filter(doc => doc.externalSystem === externalSystem);
+};
+
+// Update document with external system reference
+export const updateDocumentExternalReference = (
+  documentId: string, 
+  externalSystem: string, 
+  externalId: string
+): SavedDocument | null => {
+  const documents = getSavedDocuments();
+  const index = documents.findIndex(doc => doc.id === documentId);
+  
+  if (index === -1) return null;
+  
+  documents[index] = {
+    ...documents[index],
+    externalSystem,
+    externalId
+  };
+  
+  // Also store in localStorage for backup
+  localStorage.setItem(`doc-${documentId}-external-system`, externalSystem);
+  localStorage.setItem(`doc-${documentId}-external-id`, externalId);
+  
+  localStorage.setItem('savedDocuments', JSON.stringify(documents));
+  return documents[index];
 };
 
 // Helper function to normalize case IDs
