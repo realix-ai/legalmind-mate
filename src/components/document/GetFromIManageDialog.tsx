@@ -18,9 +18,13 @@ import { SavedDocument } from '@/utils/documents/types';
 
 interface GetFromIManageDialogProps {
   onDocumentSelected: (document: SavedDocument) => void;
+  buttonSize?: 'xs' | 'sm' | 'default' | 'lg';
 }
 
-const GetFromIManageDialog = ({ onDocumentSelected }: GetFromIManageDialogProps) => {
+const GetFromIManageDialog = ({ 
+  onDocumentSelected,
+  buttonSize = 'xs'  // Default for the toolbar
+}: GetFromIManageDialogProps) => {
   const [open, setOpen] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -97,16 +101,19 @@ const GetFromIManageDialog = ({ onDocumentSelected }: GetFromIManageDialogProps)
     }
   };
 
+  // Adjust the button size and appearance based on where it's used
+  const buttonClassName = buttonSize === 'lg' ? 'gap-2' : 'gap-1';
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          variant="outline"
-          size="xs"
-          className="gap-1"
+          variant={buttonSize === 'lg' ? 'outline' : 'outline'}
+          size={buttonSize}
+          className={buttonClassName}
         >
-          <Cloud className="h-3.5 w-3.5 mr-1" />
-          Get from iManage
+          <Cloud className={buttonSize === 'lg' ? 'h-4 w-4' : 'h-3.5 w-3.5 mr-1'} />
+          {buttonSize === 'lg' ? 'Get from iManage' : 'Get from iManage'}
         </Button>
       </DialogTrigger>
       

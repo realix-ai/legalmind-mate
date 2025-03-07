@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import DocumentTemplate from '@/components/DocumentTemplate';
 import { Button } from '@/components/ui/button';
 import TemplateUploadDialog from './TemplateUploadDialog';
+import GetFromIManageDialog from './GetFromIManageDialog';
 import { getSavedDocuments } from '@/utils/documents';
 import { useEffect, useState } from 'react';
 import { SavedDocument, CustomTemplate } from '@/utils/documents/types';
@@ -44,6 +45,11 @@ const TemplateList = ({ onSelectTemplate }: TemplateListProps) => {
   const handleTemplateAdded = () => {
     // Refresh templates
     setCustomTemplates(getCustomTemplates());
+  };
+  
+  const handleDocumentLoaded = (document: SavedDocument) => {
+    // When a document is loaded from iManage, select it as a template
+    onSelectTemplate(document.id);
   };
   
   const containerVariants = {
@@ -108,6 +114,9 @@ const TemplateList = ({ onSelectTemplate }: TemplateListProps) => {
         </Button>
         
         <TemplateUploadDialog onTemplateAdded={handleTemplateAdded} />
+        
+        {/* Add Get from iManage button next to Upload Files */}
+        <GetFromIManageDialog onDocumentSelected={handleDocumentLoaded} />
       </motion.div>
 
       <motion.div variants={itemVariants} className="mb-8">
