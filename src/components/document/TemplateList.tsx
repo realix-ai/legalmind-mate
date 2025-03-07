@@ -17,6 +17,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 const CATEGORIES = [
   { id: 'all', name: 'All' },
   { id: 'template', name: 'Template' },
+  { id: 'imanage', name: 'iManage' }, // Added iManage category
   ...DOCUMENT_CATEGORIES
 ];
 
@@ -76,6 +77,9 @@ const TemplateList = ({ onSelectTemplate }: TemplateListProps) => {
   const filterByCategory = (items: any[], category: string) => {
     if (category === 'all') return items;
     if (category === 'template') return items.filter(item => !item.hasOwnProperty('lastModified')); // Template filter
+    if (category === 'imanage') return items.filter(item => 
+      item.externalSystem === 'imanage' || (item.id && item.id.startsWith('imanage-'))
+    ); // iManage filter
     return items.filter(item => 
       (item.category || 'general').toLowerCase() === category.toLowerCase()
     );
@@ -115,8 +119,8 @@ const TemplateList = ({ onSelectTemplate }: TemplateListProps) => {
         
         <TemplateUploadDialog onTemplateAdded={handleTemplateAdded} />
         
-        {/* Add Get from iManage button next to Upload Files */}
-        <GetFromIManageDialog onDocumentSelected={handleDocumentLoaded} />
+        {/* Add Get from iManage button with the same size as other buttons */}
+        <GetFromIManageDialog onDocumentSelected={handleDocumentLoaded} buttonSize="lg" />
       </motion.div>
 
       <motion.div variants={itemVariants} className="mb-8">
