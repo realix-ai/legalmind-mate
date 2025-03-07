@@ -34,6 +34,12 @@ const PromptManager = ({ onSelectPrompt }: PromptManagerProps) => {
     setSelectedPromptId(promptId);
     onSelectPrompt(promptText);
   };
+  
+  // Wrapper function to handle the async addPrompt
+  const handleAddPrompt = async (text: string) => {
+    const result = await addPrompt(text);
+    return result;
+  };
 
   // Filter prompts based on search query
   const filteredPrompts = prompts.filter(prompt => 
@@ -54,7 +60,7 @@ const PromptManager = ({ onSelectPrompt }: PromptManagerProps) => {
 
       {showAddPrompt && (
         <PromptForm 
-          onAddPrompt={addPrompt} 
+          onAddPrompt={handleAddPrompt}
           onClose={() => setShowAddPrompt(false)} 
         />
       )}

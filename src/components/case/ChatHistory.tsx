@@ -23,17 +23,21 @@ const ChatHistory = ({ messages, onSelectMessage }: ChatHistoryProps) => {
   useEffect(() => {
     if (caseId) {
       // Load all available sessions for this case
-      const availableSessions = getSessionsList(caseId);
-      setSessions(availableSessions);
+      const loadSessions = async () => {
+        const availableSessions = await getSessionsList(caseId);
+        setSessions(availableSessions);
+      };
+      
+      loadSessions();
     }
   }, [caseId, messages]);
   
   // Load messages for a specific session when clicked
-  const handleSessionClick = (sessionId: string) => {
+  const handleSessionClick = async (sessionId: string) => {
     if (!caseId) return;
     
     setActiveSessionId(sessionId);
-    const messagesForSession = getChatMessages(caseId, sessionId);
+    const messagesForSession = await getChatMessages(caseId, sessionId);
     setSessionMessages(messagesForSession);
   };
   

@@ -22,21 +22,25 @@ export const useChatMessages = (caseId?: string, caseName?: string) => {
     if (!caseId) return;
     
     // Load messages from storage
-    const loadedMessages = getChatMessages(caseId);
-    setMessages(loadedMessages);
-    
-    // Add welcome message if no messages exist
-    if (loadedMessages.length === 0) {
-      const welcomeMessage: ChatMessageProps = {
-        id: uuidv4(),
-        sender: 'ai',
-        content: `Hello! I'm your AI assistant for the case "${caseName || 'Untitled'}". How can I help you today?`,
-        timestamp: new Date().getTime()
-      };
+    const loadMessages = async () => {
+      const loadedMessages = await getChatMessages(caseId);
+      setMessages(loadedMessages);
       
-      saveChatMessages(caseId, [welcomeMessage]);
-      setMessages([welcomeMessage]);
-    }
+      // Add welcome message if no messages exist
+      if (loadedMessages.length === 0) {
+        const welcomeMessage: ChatMessageProps = {
+          id: uuidv4(),
+          sender: 'ai',
+          content: `Hello! I'm your AI assistant for the case "${caseName || 'Untitled'}". How can I help you today?`,
+          timestamp: new Date().getTime()
+        };
+        
+        await saveChatMessages(caseId, [welcomeMessage]);
+        setMessages([welcomeMessage]);
+      }
+    };
+    
+    loadMessages();
   }, [caseId, caseName]);
   
   const handleSendMessage = useCallback(async (content: string, files?: File[]) => {
@@ -51,7 +55,7 @@ export const useChatMessages = (caseId?: string, caseName?: string) => {
     };
     
     const updatedMessages = [...messages, userMessage];
-    saveChatMessages(caseId, updatedMessages);
+    await saveChatMessages(caseId, updatedMessages);
     setMessages(updatedMessages);
     
     // Generate AI response
@@ -137,7 +141,7 @@ If you're asked about documents, always acknowledge their content and provide re
       };
       
       const finalMessages = [...updatedMessages, aiMessage];
-      saveChatMessages(caseId, finalMessages);
+      await saveChatMessages(caseId, finalMessages);
       setMessages(finalMessages);
       
     } catch (error) {
@@ -148,11 +152,11 @@ If you're asked about documents, always acknowledge their content and provide re
     }
   }, [caseId, caseName, messages]);
   
-  const handleNewDialog = useCallback(() => {
+  const handleNewDialog = useCallback(async () => {
     if (!caseId) return;
     
     // Clear chat history and start new
-    clearChatHistory(caseId);
+    await clearChatHistory(caseId);
     
     // Add welcome message
     const welcomeMessage: ChatMessageProps = {
@@ -162,7 +166,7 @@ If you're asked about documents, always acknowledge their content and provide re
       timestamp: new Date().getTime()
     };
     
-    saveChatMessages(caseId, [welcomeMessage]);
+    await saveChatMessages(caseId, [welcomeMessage]);
     setMessages([welcomeMessage]);
     
     toast.success('Started new conversation');
