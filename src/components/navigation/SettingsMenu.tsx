@@ -1,4 +1,3 @@
-
 import { Settings, CreditCard, KeyRound, MessageSquarePlus, Cloud, Mail } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import { useTheme } from "@/hooks/use-theme"
@@ -29,7 +28,6 @@ import IManageConfigDialog from "@/components/document/IManageConfigDialog"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 
-// Language options for the settings menu
 const languageOptions = [
   { value: "en", label: "English" },
   { value: "es", label: "Español (Spanish)" },
@@ -51,7 +49,6 @@ export const SettingsMenu = () => {
   const [selectedLanguage, setSelectedLanguage] = useState(language);
   const [activeTab, setActiveTab] = useState('appearance');
 
-  // Reset local states when external values change
   useEffect(() => {
     setSelectedTheme(theme);
   }, [theme]);
@@ -60,24 +57,19 @@ export const SettingsMenu = () => {
     setSelectedLanguage(language);
   }, [language]);
 
-  // Handle dialog open state change with proper timing
   const handleOpenChange = useCallback((open: boolean) => {
     if (open) {
-      // Reset selections to current values when opening
       setSelectedTheme(theme);
       setSelectedLanguage(language);
       setIsSettingsOpen(true);
     } else {
-      // Small delay to ensure animations complete before state changes
       setTimeout(() => {
         setIsSettingsOpen(false);
       }, 10);
     }
   }, [theme, language]);
 
-  // Save settings - split into separate handlers for better performance
   const handleSaveSettings = useCallback(() => {
-    // Apply changes first
     if (selectedTheme !== theme) {
       setTheme(selectedTheme);
     }
@@ -86,7 +78,6 @@ export const SettingsMenu = () => {
       setLanguage(selectedLanguage);
     }
     
-    // Close dialog with a small delay to ensure proper closing
     setTimeout(() => {
       setIsSettingsOpen(false);
     }, 10);
@@ -130,7 +121,6 @@ export const SettingsMenu = () => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Settings Dialog */}
       <Dialog open={isSettingsOpen} onOpenChange={handleOpenChange}>
         <DialogContent className="sm:max-w-[625px] h-[600px] overflow-y-auto">
           <DialogHeader>
@@ -196,13 +186,7 @@ export const SettingsMenu = () => {
                   <Separator className="mb-4" />
                   
                   <Card className="border-0 shadow-sm bg-card/50">
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center">
-                        <KeyRound className="h-4 w-4 mr-2 text-primary" />
-                        <CardTitle className="text-base">OpenAI</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
+                    <CardContent className="pt-4">
                       <OpenAIKeySettings />
                     </CardContent>
                   </Card>
@@ -236,13 +220,7 @@ export const SettingsMenu = () => {
                   <Separator className="mb-4" />
                   
                   <Card className="border-0 shadow-sm bg-card/50">
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center">
-                        <Mail className="h-4 w-4 mr-2 text-primary" />
-                        <CardTitle className="text-base">Outlook</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
+                    <CardContent className="pt-4">
                       <OutlookIntegration />
                     </CardContent>
                   </Card>
