@@ -1,9 +1,23 @@
 
 import { ChatMessageProps } from '@/components/case/ChatMessage';
 import { ChatSession } from './types';
+import { 
+  fetchChatMessages, 
+  saveChatMessagesToApi, 
+  addChatMessageToApi, 
+  clearChatHistoryApi, 
+  fetchSessionsList 
+} from './api';
 
 // Get stored chat messages for a specific case and session
-export const getChatMessages = (caseId: string, sessionId?: string): ChatMessageProps[] => {
+export const getChatMessages = async (caseId: string, sessionId?: string): Promise<ChatMessageProps[]> => {
+  // Try to get messages from the API first
+  const apiMessages = await fetchChatMessages(caseId, sessionId);
+  if (apiMessages.length > 0) {
+    return apiMessages;
+  }
+  
+  // If API fails or returns empty, fall back to localStorage
   // If a sessionId is provided, try to get messages for that session first
   if (sessionId) {
     const sessionMessages = localStorage.getItem(`chat_${caseId}_${sessionId}`);
@@ -29,8 +43,11 @@ export const getChatMessages = (caseId: string, sessionId?: string): ChatMessage
 };
 
 // Save chat messages for a specific case
-export const saveChatMessages = (caseId: string, messages: ChatMessageProps[], sessionId?: string): void => {
-  // Always save to the main storage
+export const saveChatMessages = async (caseId: string, messages: ChatMessageProps[], sessionId?: string): Promise<void> => {
+  // Try to save to API first
+  const apiSuccess = await saveChatMessagesToApi(caseId, messages, sessionId);
+  
+  // Always save to local storage as backup
   localStorage.setItem(`chat_${caseId}`, JSON.stringify(messages));
   
   // If a sessionId is provided, also save to that session storage
@@ -43,20 +60,29 @@ export const saveChatMessages = (caseId: string, messages: ChatMessageProps[], s
 };
 
 // Add a single message to the chat history
-export const addChatMessage = (caseId: string, message: ChatMessageProps, sessionId?: string): ChatMessageProps[] => {
-  const messages = getChatMessages(caseId, sessionId);
+export const addChatMessage = async (caseId: string, message: ChatMessageProps, sessionId?: string): Promise<ChatMessageProps[]> => {
+  const messages = await getChatMessages(caseId, sessionId);
   const updatedMessages = [...messages, message];
-  saveChatMessages(caseId, updatedMessages, sessionId);
+  
+  // Try to add via API first
+  await addChatMessageToApi(caseId, message, sessionId);
+  
+  // Save to local storage
+  await saveChatMessages(caseId, updatedMessages, sessionId);
+  
   return updatedMessages;
 };
 
 // Clear chat history for a specific case
-export const clearChatHistory = (caseId: string): void => {
+export const clearChatHistory = async (caseId: string): Promise<void> => {
+  // Try API first
+  await clearChatHistoryApi(caseId);
+  
   // Clear main chat storage
   localStorage.removeItem(`chat_${caseId}`);
   
   // Clear all sessions for this case
-  const sessions = getSessionsList(caseId);
+  const sessions = await getSessionsList(caseId);
   sessions.forEach(session => {
     localStorage.removeItem(`chat_${caseId}_${session.id}`);
   });
@@ -66,7 +92,14 @@ export const clearChatHistory = (caseId: string): void => {
 };
 
 // Get the list of sessions for a case
-export const getSessionsList = (caseId: string): ChatSession[] => {
+export const getSessionsList = async (caseId: string): Promise<ChatSession[]> => {
+  // Try API first
+  const apiSessions = await fetchSessionsList(caseId);
+  if (apiSessions.length > 0) {
+    return apiSessions;
+  }
+  
+  // Fall back to localStorage
   const savedSessions = localStorage.getItem(`chat_sessions_${caseId}`);
   if (!savedSessions) return [];
   
@@ -79,8 +112,8 @@ export const getSessionsList = (caseId: string): ChatSession[] => {
 };
 
 // Update the sessions list for a case
-const updateSessionsList = (caseId: string, sessionId: string, timestamp: number): void => {
-  const sessions = getSessionsList(caseId);
+const updateSessionsList = async (caseId: string, sessionId: string, timestamp: number): Promise<void> => {
+  const sessions = await getSessionsList(caseId);
   
   // Check if session already exists
   const existingSessionIndex = sessions.findIndex(s => s.id === sessionId);

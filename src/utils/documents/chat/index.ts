@@ -3,3 +3,4 @@
 export * from './types';
 export * from './storage';
 export * from './messageGenerator';
+export * from './api';

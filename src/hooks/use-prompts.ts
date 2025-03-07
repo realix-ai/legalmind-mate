@@ -2,56 +2,93 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import type { Prompt } from '@/types/prompt';
+import { getPrompts, createPrompt, deletePrompt, importPrompts as importPromptsService } from '@/services/promptService';
 
 export function usePrompts() {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
-  // Load prompts from localStorage on component mount
+  // Load prompts when component mounts
   useEffect(() => {
-    const savedPrompts = localStorage.getItem('userPrompts');
-    if (savedPrompts) {
+    const fetchPrompts = async () => {
+      setIsLoading(true);
+      setError(null);
+      
       try {
-        setPrompts(JSON.parse(savedPrompts));
-      } catch (error) {
-        console.error('Error loading prompts:', error);
+        const response = await getPrompts();
+        if (response.success && response.data) {
+          setPrompts(response.data);
+        } else {
+          setError(response.error || 'Failed to load prompts');
+          toast.error('Failed to load saved prompts');
+        }
+      } catch (err) {
+        console.error('Error loading prompts:', err);
+        setError('Failed to load prompts');
         toast.error('Failed to load saved prompts');
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
+
+    fetchPrompts();
   }, []);
 
-  // Save prompts to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('userPrompts', JSON.stringify(prompts));
-  }, [prompts]);
-
-  const addPrompt = (text: string) => {
+  const addPrompt = async (text: string) => {
     if (!text.trim()) {
       toast.error('Prompt text cannot be empty');
       return false;
     }
 
-    const newPrompt: Prompt = {
-      id: Date.now().toString(),
-      text: text.trim()
-    };
-
-    setPrompts([...prompts, newPrompt]);
-    toast.success('Prompt saved successfully');
-    return true;
+    try {
+      const response = await createPrompt(text);
+      if (response.success && response.prompt) {
+        setPrompts([...prompts, response.prompt]);
+        toast.success('Prompt saved successfully');
+        return true;
+      } else {
+        toast.error(response.error || 'Failed to save prompt');
+        return false;
+      }
+    } catch (err) {
+      console.error('Error adding prompt:', err);
+      toast.error('Failed to save prompt');
+      return false;
+    }
   };
 
-  const deletePrompt = (id: string) => {
-    setPrompts(prompts.filter(prompt => prompt.id !== id));
-    toast.success('Prompt deleted');
+  const deletePromptById = async (id: string) => {
+    try {
+      const response = await deletePrompt(id);
+      if (response.success) {
+        setPrompts(prompts.filter(prompt => prompt.id !== id));
+        toast.success('Prompt deleted');
+        return true;
+      } else {
+        toast.error(response.error || 'Failed to delete prompt');
+        return false;
+      }
+    } catch (err) {
+      console.error('Error deleting prompt:', err);
+      toast.error('Failed to delete prompt');
+      return false;
+    }
   };
 
-  const importPrompts = (promptsData: string) => {
+  const importPromptsData = async (promptsData: string) => {
     try {
       const importedPrompts = JSON.parse(promptsData);
       if (Array.isArray(importedPrompts) && importedPrompts.every(p => p.id && p.text)) {
-        setPrompts(importedPrompts);
-        toast.success('Prompts imported successfully');
-        return true;
+        const response = await importPromptsService(importedPrompts);
+        if (response.success && response.data) {
+          setPrompts(response.data);
+          toast.success('Prompts imported successfully');
+          return true;
+        } else {
+          toast.error(response.error || 'Failed to import prompts');
+          return false;
+        }
       } else {
         toast.error('Invalid prompts file format');
         return false;
@@ -75,9 +112,11 @@ export function usePrompts() {
 
   return {
     prompts,
+    isLoading,
+    error,
     addPrompt,
-    deletePrompt,
-    importPrompts,
+    deletePrompt: deletePromptById,
+    importPrompts: importPromptsData,
     exportPrompts
   };
 }
