@@ -54,6 +54,11 @@ const DocumentToolbar = ({
           <Save className="mr-1 h-3.5 w-3.5" />
           Save
         </Button>
+        
+        {/* Moved GetFromIManage next to the save button */}
+        {onDocumentLoaded && (
+          <GetFromIManageDialog onDocumentSelected={onDocumentLoaded} />
+        )}
       </div>
       
       <div className="flex items-center gap-2">
@@ -80,10 +85,6 @@ const DocumentToolbar = ({
           currentDocumentId={currentDocumentId}
           onSaved={onDocumentSaved}
         />
-        
-        {onDocumentLoaded && (
-          <GetFromIManageDialog onDocumentSelected={onDocumentLoaded} />
-        )}
         
         <IManageConfigDialog />
         

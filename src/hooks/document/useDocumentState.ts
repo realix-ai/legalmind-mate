@@ -72,6 +72,7 @@ export function useDocumentState(documentId: string | undefined) {
     setCurrentDocumentId(document.id);
     setShowTemplates(false);
     console.log("Loaded document:", document.title);
+    toast.success(`Document "${document.title}" loaded successfully`);
   }, []);
 
   const handleBack = () => {
