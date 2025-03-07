@@ -1,3 +1,4 @@
+
 import { Settings, CreditCard, KeyRound, MessageSquarePlus, Cloud, Mail } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import { useTheme } from "@/hooks/use-theme"
@@ -198,11 +199,8 @@ export const SettingsMenu = () => {
                     <CardHeader className="pb-2">
                       <div className="flex items-center">
                         <KeyRound className="h-4 w-4 mr-2 text-primary" />
-                        <CardTitle className="text-base">OpenAI Integration</CardTitle>
+                        <CardTitle className="text-base">OpenAI</CardTitle>
                       </div>
-                      <CardDescription className="text-xs">
-                        Configure your OpenAI API key for AI-powered features
-                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <OpenAIKeySettings />
@@ -221,11 +219,8 @@ export const SettingsMenu = () => {
                     <CardHeader className="pb-2">
                       <div className="flex items-center">
                         <Cloud className="h-4 w-4 mr-2 text-primary" />
-                        <CardTitle className="text-base">iManage Integration</CardTitle>
+                        <CardTitle className="text-base">iManage</CardTitle>
                       </div>
-                      <CardDescription className="text-xs">
-                        Configure your connection to iManage Work document management system
-                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <IManageConfigDialog inSettings={true} />
@@ -244,11 +239,8 @@ export const SettingsMenu = () => {
                     <CardHeader className="pb-2">
                       <div className="flex items-center">
                         <Mail className="h-4 w-4 mr-2 text-primary" />
-                        <CardTitle className="text-base">Outlook Integration</CardTitle>
+                        <CardTitle className="text-base">Outlook</CardTitle>
                       </div>
-                      <CardDescription className="text-xs">
-                        Connect your Microsoft Outlook account for document sharing
-                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <OutlookIntegration />
