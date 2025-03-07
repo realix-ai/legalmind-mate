@@ -1,5 +1,5 @@
 
-import { Settings, CreditCard, KeyRound, MessageSquarePlus, Cloud } from "lucide-react"
+import { Settings, CreditCard, KeyRound, MessageSquarePlus, Cloud, Mail } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import { useTheme } from "@/hooks/use-theme"
 import { useLanguage } from "@/hooks/use-language"
@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { OpenAIKeySettings } from "@/components/settings/OpenAIKeySettings"
+import { OutlookIntegration } from "@/components/settings/OutlookIntegration"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -208,6 +209,21 @@ export const SettingsMenu = () => {
                   </CardHeader>
                   <CardContent>
                     <IManageConfigDialog inSettings={true} />
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center">
+                      <Mail className="h-4 w-4 mr-2 text-primary" />
+                      <CardTitle className="text-sm">Outlook Integration</CardTitle>
+                    </div>
+                    <CardDescription className="text-xs">
+                      Connect your Microsoft Outlook email
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <OutlookIntegration />
                   </CardContent>
                 </Card>
               </div>
