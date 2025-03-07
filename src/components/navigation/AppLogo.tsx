@@ -11,7 +11,7 @@ export const AppLogo = () => {
         <div className="flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
           <img 
             src="/lovable-uploads/a6a6474a-8323-47ad-847f-a072100060b7.png" 
-            alt="Realix.ai Logo" 
+            alt="Calamus.law Logo" 
             className="h-14 w-auto"
             style={{ 
               filter: `drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.2))`
@@ -19,7 +19,7 @@ export const AppLogo = () => {
           />
         </div>
         <span className="font-bold text-xl sm:inline-block bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent transition-all duration-300 group-hover:opacity-90">
-          Realix.ai
+          Calamus.law
         </span>
       </Link>
     </div>

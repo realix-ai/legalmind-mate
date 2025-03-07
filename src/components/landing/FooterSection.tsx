@@ -55,14 +55,14 @@ const FooterSection = () => {
               <div className="flex items-center justify-center">
                 <img 
                   src="/lovable-uploads/a6a6474a-8323-47ad-847f-a072100060b7.png" 
-                  alt="Realix.ai Logo" 
+                  alt="Calamus.law Logo" 
                   className="h-14 w-auto"
                   style={{ 
                     filter: `drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.2))`
                   }}
                 />
               </div>
-              <span className="font-bold text-2xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">Realix.ai</span>
+              <span className="font-bold text-2xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">Calamus.law</span>
             </div>
             
             <p className="text-muted-foreground mb-6 max-w-md">
@@ -107,7 +107,7 @@ const FooterSection = () => {
         
         <div className="border-t border-gray-200 dark:border-gray-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-muted-foreground mb-4 md:mb-0">
-            &copy; {new Date().getFullYear()} Realix.ai. All rights reserved.
+            &copy; {new Date().getFullYear()} Calamus.law. All rights reserved.
           </p>
           
           <div className="flex gap-6">
