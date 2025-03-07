@@ -35,6 +35,7 @@ const DocumentToolbar = ({
 }: DocumentToolbarProps) => {
   const exportDocumentUtils = useExportDocument();
   
+  // Define toggleAiPrompt outside of render to maintain consistent hook call order
   const toggleAiPrompt = useCallback(() => {
     setShowAiPrompt(!showAiPrompt);
   }, [showAiPrompt, setShowAiPrompt]);
