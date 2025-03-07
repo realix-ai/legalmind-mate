@@ -3,6 +3,7 @@ import React, { useState, useRef } from 'react';
 import { toast } from 'sonner';
 import FileUploadButton from './FileUploadButton';
 import SubmitButton from './SubmitButton';
+import GetFromIManageDialog from '@/components/document/GetFromIManageDialog';
 
 interface QueryTextareaProps {
   query: string;
@@ -98,6 +99,15 @@ const QueryTextarea = ({
         </div>
       )}
       <div className="absolute bottom-3 right-3 flex space-x-2">
+        <GetFromIManageDialog
+          onDocumentSelected={(doc) => {
+            const prefix = query.trim() ? `${query}\n\nReferencing document: ` : `Referencing document: `;
+            onChange({ target: { value: `${prefix}${doc.title}` } } as React.ChangeEvent<HTMLTextAreaElement>);
+            toast.success(`Document "${doc.title}" referenced in your query`);
+          }}
+          buttonSize="icon"
+          buttonLabel="iManage"
+        />
         <FileUploadButton 
           isProcessing={isProcessing}
           hasFiles={hasFiles}

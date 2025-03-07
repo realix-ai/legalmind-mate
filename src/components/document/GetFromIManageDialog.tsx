@@ -15,15 +15,18 @@ import { SavedDocument } from '@/utils/documents/types';
 import { useIManageConnection } from '@/hooks/document/useIManageConnection';
 import { useIManageSearch } from '@/hooks/document/useIManageSearch';
 import SearchContent from './imanage/SearchContent';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface GetFromIManageDialogProps {
   onDocumentSelected: (document: SavedDocument) => void;
-  buttonSize?: 'xs' | 'sm' | 'default' | 'lg';
+  buttonSize?: 'xs' | 'sm' | 'default' | 'lg' | 'icon';
+  buttonLabel?: string;
 }
 
 const GetFromIManageDialog = ({ 
   onDocumentSelected,
-  buttonSize = 'xs'  // Reset to 'xs' to match other buttons
+  buttonSize = 'xs',
+  buttonLabel = "Get from iManage"
 }: GetFromIManageDialogProps) => {
   const [open, setOpen] = useState(false);
 
@@ -63,14 +66,31 @@ const GetFromIManageDialog = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size={buttonSize}
-          className={buttonSize === 'lg' ? 'gap-2' : 'gap-1'}
-        >
-          <Cloud className={buttonSize === 'lg' ? 'h-4 w-4' : 'h-3.5 w-3.5'} />
-          Get from iManage
-        </Button>
+        {buttonSize === 'icon' ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-primary/10"
+              >
+                <Cloud className="h-5 w-5 text-muted-foreground" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{buttonLabel}</p>
+            </TooltipContent>
+          </Tooltip>
+        ) : (
+          <Button
+            variant="outline"
+            size={buttonSize}
+            className={buttonSize === 'lg' ? 'gap-2' : 'gap-1'}
+          >
+            <Cloud className={buttonSize === 'lg' ? 'h-4 w-4' : 'h-3.5 w-3.5'} />
+            {buttonLabel}
+          </Button>
+        )}
       </DialogTrigger>
       
       <DialogContent className="sm:max-w-[600px]">

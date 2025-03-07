@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -13,7 +12,6 @@ import QueryHistoryView from '@/components/query/QueryHistoryView';
 import FileUploadSection from '@/components/query/FileUploadSection';
 import ResearchToolSelector from '@/components/query/ResearchToolSelector';
 import { useFileHandler } from '@/hooks/use-file-handler';
-import GetFromIManageDialog from '@/components/document/GetFromIManageDialog';
 
 interface QueryFormProps {
   onSubmit: (query: string, queryType: QueryType, files: File[], researchTool?: ResearchToolType) => Promise<void>;
@@ -70,10 +68,8 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
     console.log("Submitting form with query:", query);
     
     try {
-      // Add query to history
       addToHistory(query);
       
-      // If research tool is selected but not configured, show error
       if (selectedResearchTool !== 'none' && 
           !isToolConfigured(selectedResearchTool) && 
           selectedResearchTool !== 'googlescholar') {
@@ -81,7 +77,6 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
         return;
       }
       
-      // Only pass the research tool if it's not 'none'
       const toolToUse = selectedResearchTool !== 'none' 
         ? selectedResearchTool 
         : undefined;
@@ -96,24 +91,20 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
 
   const handleLoadPrompt = (promptText: string) => {
     setQuery(promptText);
-    setShowPromptManager(false); // Hide prompt manager after selection
+    setShowPromptManager(false);
   };
   
   const handleSelectHistory = (historyText: string) => {
     setQuery(historyText);
-    setShowHistory(false); // Hide history after selection
+    setShowHistory(false);
   };
 
   const handleDocumentSelected = (document: any) => {
-    // Update the query to reference the selected document
     setQuery(prevQuery => {
       const prefix = prevQuery.trim() ? `${prevQuery}\n\nReferencing document: ` : `Referencing document: `;
       return `${prefix}${document.title}`;
     });
 
-    // You could also add the document content to the query if needed
-    // For large documents, it's better to just mention the document and
-    // have your backend process reference it
     toast.success(`Document "${document.title}" referenced in your query`);
   };
 
@@ -128,13 +119,6 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
           hasFiles={uploadedFiles.length > 0}
           fileError={fileError}
         />
-        
-        <div className="flex flex-wrap gap-2 mb-4">
-          <GetFromIManageDialog 
-            onDocumentSelected={handleDocumentSelected}
-            buttonSize="sm"
-          />
-        </div>
         
         <FileUploadSection 
           uploadedFiles={uploadedFiles}
