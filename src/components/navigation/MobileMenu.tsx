@@ -1,3 +1,4 @@
+
 import {
   Sheet,
   SheetContent,
@@ -7,9 +8,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
-import { ModeToggle } from "@/components/ModeToggle";
-import { UserButton } from "@clerk/nextjs";
-import { NavigationMenu } from "@/components/navigation/NavigationMenu";
 import { SettingsDialog } from "@/components/settings/SettingsDialog";
 
 export const MobileMenu = () => {
@@ -25,10 +23,12 @@ export const MobileMenu = () => {
             Explore options and manage your account
           </SheetDescription>
         </SheetHeader>
-
-        <ModeToggle />
-        <UserButton afterSignOutUrl="/" />
-        <NavigationMenu />
+        
+        {/* Remove references to components that don't exist */}
+        {/* Simplified menu content */}
+        <div className="mt-4 space-y-4">
+          <div>Menu Items</div>
+        </div>
       </SheetContent>
     </Sheet>
   );

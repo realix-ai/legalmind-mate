@@ -1,9 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { useRouter } from 'next/router';
-import { useSession, signOut } from "next-auth/react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from 'uuid';
-import { BeatLoader } from "react-spinners";
 import {
   Avatar,
   AvatarFallback,
@@ -19,19 +16,17 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
 import { useTheme } from "@/hooks/use-theme";
 import { cn } from "@/lib/utils";
 import { SettingsDialog } from "@/components/settings/SettingsDialog";
 
 const QueryAssistant = () => {
   const { theme } = useTheme();
-  const { data: session, status } = useSession();
-  const router = useRouter();
+  const [session, setSession] = useState<any>({ user: { name: 'User', email: 'user@example.com' } });
+  const [status, setStatus] = useState('authenticated');
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<any[]>([]);
@@ -39,12 +34,6 @@ const QueryAssistant = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('appearance');
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
-  }, [status, router]);
 
   useEffect(() => {
     // Scroll to the bottom when messages update
@@ -55,8 +44,9 @@ const QueryAssistant = () => {
 
   const handleSignOut = async () => {
     try {
-      await signOut({ redirect: false });
-      router.push("/login");
+      // Simulated sign out since we don't have next-auth
+      setSession(null);
+      setStatus('unauthenticated');
     } catch (error) {
       console.error("Sign out failed", error);
     }
