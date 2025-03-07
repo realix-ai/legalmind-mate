@@ -53,11 +53,12 @@ const FooterSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-6">
-              <div className="rounded-lg flex items-center justify-center shadow-sm">
+              <div className="flex items-center justify-center">
                 <img 
                   src="/lovable-uploads/302e2cd3-1590-4b14-bb63-2a91d96145d9.png" 
                   alt="Realix.ai Logo" 
-                  className={`h-12 w-auto ${theme === 'dark' ? 'filter brightness-110' : ''} drop-shadow-md`}
+                  className={`h-14 w-auto ${theme === 'dark' ? 'filter brightness-125 contrast-125' : ''} drop-shadow-md`}
+                  style={{ filter: 'drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.1))' }}
                 />
               </div>
               <span className="font-bold text-2xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">Realix.ai</span>
