@@ -1,12 +1,11 @@
 
 import { useCallback } from 'react';
-import { ArrowLeft, Save, Sparkles, Cloud } from 'lucide-react';
+import { ArrowLeft, Save, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ExportOptions from './ExportOptions';
 import SaveToCaseDialog from './SaveToCaseDialog';
 import SaveToIManageDialog from './SaveToIManageDialog';
 import GetFromIManageDialog from './GetFromIManageDialog';
-import IManageConfigDialog from './IManageConfigDialog';
 import { useExportDocument } from '@/hooks/document/useExportDocument';
 import { SavedDocument } from '@/utils/documents/types';
 
@@ -85,8 +84,6 @@ const DocumentToolbar = ({
           currentDocumentId={currentDocumentId}
           onSaved={onDocumentSaved}
         />
-        
-        <IManageConfigDialog />
         
         <Button
           variant={showAiPrompt ? "default" : "outline"}

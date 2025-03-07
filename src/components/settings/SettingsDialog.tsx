@@ -7,6 +7,9 @@ import { OpenAIKeySettings } from "./OpenAIKeySettings";
 import { useEffect, useState } from "react";
 import FeedbackPanel from "./FeedbackPanel";
 import IManageConfigDialog from "@/components/document/IManageConfigDialog";
+import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { KeyRound, Cloud } from "lucide-react";
 
 interface SettingsDialogProps {
   open: boolean;
@@ -134,17 +137,36 @@ const SettingsDialog = ({ open, onOpenChange, defaultTab = "appearance" }: Setti
           </TabsContent>
           
           <TabsContent value="integrations" className="space-y-6">
-            <OpenAIKeySettings />
-            
-            <div className="space-y-4 border-t pt-4">
-              <h3 className="text-lg font-medium">iManage Integration</h3>
-              <p className="text-sm text-muted-foreground">
-                Configure your connection to iManage Work document management system.
-              </p>
+            <div className="grid gap-6">
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center">
+                    <KeyRound className="h-5 w-5 mr-2 text-primary" />
+                    <CardTitle>OpenAI Integration</CardTitle>
+                  </div>
+                  <CardDescription>
+                    Configure your OpenAI API key for AI-powered features
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <OpenAIKeySettings />
+                </CardContent>
+              </Card>
               
-              <div className="pt-2">
-                <IManageConfigDialog />
-              </div>
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center">
+                    <Cloud className="h-5 w-5 mr-2 text-primary" />
+                    <CardTitle>iManage Integration</CardTitle>
+                  </div>
+                  <CardDescription>
+                    Configure your connection to iManage Work document management system
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <IManageConfigDialog inSettings={true} />
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
           

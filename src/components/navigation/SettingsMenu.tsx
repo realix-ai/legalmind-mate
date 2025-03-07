@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import FeedbackPanel from "@/components/settings/FeedbackPanel"
 import IManageConfigDialog from "@/components/document/IManageConfigDialog"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 // Language options for the settings menu
 const languageOptions = [
@@ -179,17 +180,36 @@ export const SettingsMenu = () => {
             </TabsContent>
             
             <TabsContent value="integrations" className="space-y-4">
-              <OpenAIKeySettings />
-              
-              <div className="space-y-4 border-t pt-4 mt-4">
-                <h3 className="text-sm font-medium">iManage Integration</h3>
-                <p className="text-xs text-muted-foreground">
-                  Configure your connection to iManage Work document management system.
-                </p>
+              <div className="space-y-4">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center">
+                      <KeyRound className="h-4 w-4 mr-2 text-primary" />
+                      <CardTitle className="text-sm">OpenAI Integration</CardTitle>
+                    </div>
+                    <CardDescription className="text-xs">
+                      Configure your OpenAI API key
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <OpenAIKeySettings />
+                  </CardContent>
+                </Card>
                 
-                <div>
-                  <IManageConfigDialog />
-                </div>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center">
+                      <Cloud className="h-4 w-4 mr-2 text-primary" />
+                      <CardTitle className="text-sm">iManage Integration</CardTitle>
+                    </div>
+                    <CardDescription className="text-xs">
+                      Configure your iManage connection
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <IManageConfigDialog inSettings={true} />
+                  </CardContent>
+                </Card>
               </div>
             </TabsContent>
 
