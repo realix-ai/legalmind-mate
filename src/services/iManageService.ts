@@ -62,16 +62,40 @@ export const fetchDocumentFromIManage = async (documentId: string): Promise<Save
 
     const iManageDoc = await response.json();
     
+    // If content isn't included in the first request, fetch it separately
+    let documentContent = iManageDoc.content || '';
+    
+    if (!documentContent && iManageDoc.contentUrl) {
+      const contentResponse = await fetch(iManageDoc.contentUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('imanage-token')}`,
+        },
+      });
+      
+      if (contentResponse.ok) {
+        // Try to get content as text first
+        documentContent = await contentResponse.text();
+      }
+    }
+    
+    // Generate a unique local ID for this document
+    const localId = `doc-${Date.now()}`;
+    
     // Convert iManage document format to our application format
     const document: SavedDocument = {
-      id: iManageDoc.id || `doc-${Date.now()}`,
+      id: localId,
       title: iManageDoc.name || 'Untitled Document',
-      content: iManageDoc.content || '',
+      content: documentContent,
       lastModified: Date.now(),
       category: iManageDoc.docClass || 'general',
       externalSystem: 'imanage',
       externalId: iManageDoc.id,
     };
+    
+    // Save the document locally with reference to iManage
+    localStorage.setItem(`doc-${localId}-external-system`, 'imanage');
+    localStorage.setItem(`doc-${localId}-external-id`, iManageDoc.id);
     
     return document;
   } catch (error) {

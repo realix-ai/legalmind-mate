@@ -41,6 +41,7 @@ const DocumentDrafting = () => {
     currentDocumentId,
     handleSaveDocument,
     handleDocumentSaved,
+    handleDocumentLoaded,
     handleBack,
     handleSelectTemplate,
     handleCategoryChange,
@@ -84,6 +85,7 @@ const DocumentDrafting = () => {
               documentCategory={documentCategory}
               currentDocumentId={currentDocumentId}
               onDocumentSaved={handleDocumentSaved}
+              onDocumentLoaded={handleDocumentLoaded}
             />
             
             <div className="flex gap-6 relative">

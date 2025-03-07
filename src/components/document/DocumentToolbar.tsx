@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import ExportOptions from './ExportOptions';
 import SaveToCaseDialog from './SaveToCaseDialog';
 import SaveToIManageDialog from './SaveToIManageDialog';
+import GetFromIManageDialog from './GetFromIManageDialog';
 import IManageConfigDialog from './IManageConfigDialog';
 import { useExportDocument } from '@/hooks/document/useExportDocument';
+import { SavedDocument } from '@/utils/documents/types';
 
 interface DocumentToolbarProps {
   onBack: () => void;
@@ -18,6 +20,7 @@ interface DocumentToolbarProps {
   documentCategory: string;
   currentDocumentId: string | null;
   onDocumentSaved: (id: string) => void;
+  onDocumentLoaded?: (document: SavedDocument) => void;
 }
 
 const DocumentToolbar = ({
@@ -29,7 +32,8 @@ const DocumentToolbar = ({
   documentContent,
   documentCategory,
   currentDocumentId,
-  onDocumentSaved
+  onDocumentSaved,
+  onDocumentLoaded
 }: DocumentToolbarProps) => {
   const exportDocumentUtils = useExportDocument();
   
@@ -76,6 +80,10 @@ const DocumentToolbar = ({
           currentDocumentId={currentDocumentId}
           onSaved={onDocumentSaved}
         />
+        
+        {onDocumentLoaded && (
+          <GetFromIManageDialog onDocumentSelected={onDocumentLoaded} />
+        )}
         
         <IManageConfigDialog />
         

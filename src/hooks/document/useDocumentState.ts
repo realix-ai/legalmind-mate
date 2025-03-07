@@ -1,10 +1,11 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { getSavedDocument, saveDocument } from '@/utils/documents';
 import { getTemplateContent } from '@/utils/documents/templateData';
 import { getCustomTemplate } from '@/utils/documents/templateManager';
+import { SavedDocument } from '@/utils/documents/types';
 
 export function useDocumentState(documentId: string | undefined) {
   const navigate = useNavigate();
@@ -62,6 +63,16 @@ export function useDocumentState(documentId: string | undefined) {
       console.log("Updated document title to:", savedDoc.title);
     }
   };
+  
+  const handleDocumentLoaded = useCallback((document: SavedDocument) => {
+    // Update the document state with the loaded document
+    setDocumentTitle(document.title);
+    setDocumentContent(document.content);
+    setDocumentCategory(document.category || 'general');
+    setCurrentDocumentId(document.id);
+    setShowTemplates(false);
+    console.log("Loaded document:", document.title);
+  }, []);
 
   const handleBack = () => {
     if (documentId) {
@@ -143,6 +154,7 @@ export function useDocumentState(documentId: string | undefined) {
     setCurrentDocumentId,
     handleSaveDocument,
     handleDocumentSaved,
+    handleDocumentLoaded,
     handleBack,
     handleSelectTemplate,
     handleCategoryChange,
