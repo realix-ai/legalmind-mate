@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import FileUploadButton from './FileUploadButton';
 import SubmitButton from './SubmitButton';
 import GetFromIManageDialog from '@/components/document/GetFromIManageDialog';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 interface QueryTextareaProps {
   query: string;
@@ -78,47 +79,49 @@ const QueryTextarea = ({
   };
 
   return (
-    <div 
-      className="relative mb-6"
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-    >
-      <textarea
-        ref={textareaRef}
-        value={query}
-        onChange={onChange}
-        placeholder="Describe your legal question or issue..."
-        className={`w-full min-h-[80px] p-4 pr-12 rounded-xl border ${isDragging ? 'border-primary border-dashed bg-primary/5' : 'border-input'} bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all duration-200 resize-y`}
-        disabled={isProcessing}
-      />
-      {isDragging && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="text-primary/70 font-medium">Drop files here</div>
+    <TooltipProvider>
+      <div 
+        className="relative mb-6"
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+      >
+        <textarea
+          ref={textareaRef}
+          value={query}
+          onChange={onChange}
+          placeholder="Describe your legal question or issue..."
+          className={`w-full min-h-[80px] p-4 pr-12 rounded-xl border ${isDragging ? 'border-primary border-dashed bg-primary/5' : 'border-input'} bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all duration-200 resize-y`}
+          disabled={isProcessing}
+        />
+        {isDragging && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="text-primary/70 font-medium">Drop files here</div>
+          </div>
+        )}
+        <div className="absolute bottom-3 right-3 flex space-x-2">
+          <GetFromIManageDialog
+            onDocumentSelected={(doc) => {
+              const prefix = query.trim() ? `${query}\n\nReferencing document: ` : `Referencing document: `;
+              onChange({ target: { value: `${prefix}${doc.title}` } } as React.ChangeEvent<HTMLTextAreaElement>);
+              toast.success(`Document "${doc.title}" referenced in your query`);
+            }}
+            buttonSize="icon"
+            buttonLabel="iManage"
+          />
+          <FileUploadButton 
+            isProcessing={isProcessing}
+            hasFiles={hasFiles}
+            onClick={onTriggerFileUpload}
+          />
+          <SubmitButton 
+            isProcessing={isProcessing} 
+            isDisabled={!query.trim() || !!fileError} 
+          />
         </div>
-      )}
-      <div className="absolute bottom-3 right-3 flex space-x-2">
-        <GetFromIManageDialog
-          onDocumentSelected={(doc) => {
-            const prefix = query.trim() ? `${query}\n\nReferencing document: ` : `Referencing document: `;
-            onChange({ target: { value: `${prefix}${doc.title}` } } as React.ChangeEvent<HTMLTextAreaElement>);
-            toast.success(`Document "${doc.title}" referenced in your query`);
-          }}
-          buttonSize="icon"
-          buttonLabel="iManage"
-        />
-        <FileUploadButton 
-          isProcessing={isProcessing}
-          hasFiles={hasFiles}
-          onClick={onTriggerFileUpload}
-        />
-        <SubmitButton 
-          isProcessing={isProcessing} 
-          isDisabled={!query.trim() || !!fileError} 
-        />
       </div>
-    </div>
+    </TooltipProvider>
   );
 };
 

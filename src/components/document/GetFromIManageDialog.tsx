@@ -63,33 +63,47 @@ const GetFromIManageDialog = ({
     return success;
   };
 
+  // Render the appropriate button based on size
+  const renderButton = () => {
+    if (buttonSize === 'icon') {
+      return (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="hover:bg-primary/10"
+          aria-label={buttonLabel}
+        >
+          <Cloud className="h-5 w-5 text-muted-foreground" />
+        </Button>
+      );
+    }
+    
+    return (
+      <Button
+        variant="outline"
+        size={buttonSize}
+        className={buttonSize === 'lg' ? 'gap-2' : 'gap-1'}
+      >
+        <Cloud className={buttonSize === 'lg' ? 'h-4 w-4' : 'h-3.5 w-3.5'} />
+        {buttonLabel}
+      </Button>
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {buttonSize === 'icon' ? (
           <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="hover:bg-primary/10"
-              >
-                <Cloud className="h-5 w-5 text-muted-foreground" />
-              </Button>
+            <TooltipTrigger>
+              {renderButton()}
             </TooltipTrigger>
             <TooltipContent>
               <p>{buttonLabel}</p>
             </TooltipContent>
           </Tooltip>
         ) : (
-          <Button
-            variant="outline"
-            size={buttonSize}
-            className={buttonSize === 'lg' ? 'gap-2' : 'gap-1'}
-          >
-            <Cloud className={buttonSize === 'lg' ? 'h-4 w-4' : 'h-3.5 w-3.5'} />
-            {buttonLabel}
-          </Button>
+          renderButton()
         )}
       </DialogTrigger>
       
