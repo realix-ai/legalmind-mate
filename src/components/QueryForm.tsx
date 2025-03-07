@@ -13,6 +13,7 @@ import QueryHistoryView from '@/components/query/QueryHistoryView';
 import FileUploadSection from '@/components/query/FileUploadSection';
 import ResearchToolSelector from '@/components/query/ResearchToolSelector';
 import { useFileHandler } from '@/hooks/use-file-handler';
+import GetFromIManageDialog from '@/components/document/GetFromIManageDialog';
 
 interface QueryFormProps {
   onSubmit: (query: string, queryType: QueryType, files: File[], researchTool?: ResearchToolType) => Promise<void>;
@@ -103,6 +104,19 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
     setShowHistory(false); // Hide history after selection
   };
 
+  const handleDocumentSelected = (document: any) => {
+    // Update the query to reference the selected document
+    setQuery(prevQuery => {
+      const prefix = prevQuery.trim() ? `${prevQuery}\n\nReferencing document: ` : `Referencing document: `;
+      return `${prefix}${document.title}`;
+    });
+
+    // You could also add the document content to the query if needed
+    // For large documents, it's better to just mention the document and
+    // have your backend process reference it
+    toast.success(`Document "${document.title}" referenced in your query`);
+  };
+
   return (
     <motion.div variants={itemVariants}>
       <form onSubmit={handleSubmit} className="mb-8">
@@ -114,6 +128,13 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
           hasFiles={uploadedFiles.length > 0}
           fileError={fileError}
         />
+        
+        <div className="flex flex-wrap gap-2 mb-4">
+          <GetFromIManageDialog 
+            onDocumentSelected={handleDocumentSelected}
+            buttonSize="sm"
+          />
+        </div>
         
         <FileUploadSection 
           uploadedFiles={uploadedFiles}

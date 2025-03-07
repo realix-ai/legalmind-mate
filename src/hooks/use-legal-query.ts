@@ -13,6 +13,7 @@ export const useLegalQuery = (setActiveTab: (tab: string) => void) => {
   const [currentQuery, setCurrentQuery] = useState<string>('');
   const [currentQueryType, setCurrentQueryType] = useState<QueryType>('legal-research');
   const [currentResearchTool, setCurrentResearchTool] = useState<ResearchToolType | undefined>(undefined);
+  const [referencedDocuments, setReferencedDocuments] = useState<string[]>([]);
 
   const handleSubmit = async (
     query: string, 
@@ -30,6 +31,21 @@ export const useLegalQuery = (setActiveTab: (tab: string) => void) => {
       console.log("QueryAssistant: Starting to process query:", query);
       console.log("QueryAssistant: Selected option:", selectedOption);
       console.log("QueryAssistant: Research tool:", researchTool || "none");
+      
+      // Check if query mentions iManage documents
+      const hasIManageReference = query.toLowerCase().includes("referencing document:");
+      if (hasIManageReference) {
+        console.log("QueryAssistant: Query references iManage documents");
+        
+        // Extract document names for logging
+        const regex = /referencing document: ([^\n]+)/gi;
+        const matches = [...query.matchAll(regex)];
+        const docNames = matches.map(match => match[1]);
+        if (docNames.length > 0) {
+          setReferencedDocuments(docNames);
+          console.log("QueryAssistant: Referenced documents:", docNames);
+        }
+      }
       
       if (files.length > 0) {
         console.log(`QueryAssistant: Processing with ${files.length} files:`, files.map(f => f.name));
@@ -104,6 +120,7 @@ export const useLegalQuery = (setActiveTab: (tab: string) => void) => {
     currentQuery,
     currentQueryType,
     currentResearchTool,
+    referencedDocuments,
     handleSubmit,
     handleShareQuery,
     handleResponseEdit
