@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,12 +24,16 @@ export function FormatTab({ onInsertCitation }: FormatTabProps) {
     pinpoint: '',
   });
   const [citationStyle, setCitationStyle] = useState('bluebook');
+  const [formattedCitation, setFormattedCitation] = useState('');
 
-  // Format the custom citation based on current values
-  const formattedCitation = formatCitation(
-    customCitation,
-    citationStyle as any
-  );
+  // Update the formatted citation whenever any of the inputs change
+  useEffect(() => {
+    const formatted = formatCitation(
+      customCitation,
+      citationStyle as any
+    );
+    setFormattedCitation(formatted);
+  }, [customCitation, citationStyle]);
 
   // Update custom citation field
   const updateCitation = (field: string, value: any) => {
@@ -103,7 +107,7 @@ export function FormatTab({ onInsertCitation }: FormatTabProps) {
               id="citation-year"
               type="number"
               value={customCitation.year}
-              onChange={(e) => updateCitation('year', e.target.value)}
+              onChange={(e) => updateCitation('year', parseInt(e.target.value) || customCitation.year)}
               placeholder="e.g., 2023"
             />
           </div>
@@ -165,7 +169,7 @@ export function FormatTab({ onInsertCitation }: FormatTabProps) {
       <div className="space-y-2">
         <Label>Formatted Citation:</Label>
         <div className="p-3 border rounded-md bg-muted">
-          <p className="break-all text-sm">{formattedCitation}</p>
+          <p className="break-all text-sm font-mono">{formattedCitation}</p>
         </div>
         <Button onClick={handleInsertCitation} className="w-full">
           Insert Citation
