@@ -61,8 +61,8 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="gap-1">
-            <Download className="h-4 w-4" />
+          <Button variant="outline" size="xs" className="gap-1">
+            <Download className="h-3.5 w-3.5" />
             <span className="hidden md:inline">Export</span>
           </Button>
         </DropdownMenuTrigger>

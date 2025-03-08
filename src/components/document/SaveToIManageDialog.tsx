@@ -121,7 +121,7 @@ const SaveToIManageDialog = ({
             size="xs"
             className="gap-1"
           >
-            <Cloud className="h-3.5 w-3.5 mr-1" />
+            <Cloud className="h-3.5 w-3.5" />
             Save to iManage
           </Button>
         </DialogTrigger>

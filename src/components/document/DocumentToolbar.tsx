@@ -101,22 +101,22 @@ const DocumentToolbar = ({
       <div className="flex items-center justify-between">
         <Button 
           variant="ghost" 
-          size="sm" 
+          size="xs" 
           onClick={onBack}
           className="gap-1"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-3.5 w-3.5" />
           <span>Back</span>
         </Button>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Button
             variant="outline"
-            size="sm"
+            size="xs"
             onClick={() => setShowAiPrompt(!showAiPrompt)}
             className="gap-1"
           >
-            <Wand2 className="h-4 w-4" />
+            <Wand2 className="h-3.5 w-3.5" />
             <span className="hidden md:inline">AI Assistant</span>
           </Button>
           
@@ -126,22 +126,22 @@ const DocumentToolbar = ({
           />
           
           <Button 
-            variant="default" 
-            size="sm" 
+            variant="outline" 
+            size="xs" 
             onClick={onSaveDocument}
             className="gap-1"
           >
-            <Save className="h-4 w-4" />
+            <Save className="h-3.5 w-3.5" />
             <span className="hidden md:inline">Save</span>
           </Button>
           
           <Button 
             variant="outline" 
-            size="sm" 
+            size="xs" 
             onClick={() => setShowSaveToCaseDialog(true)}
             className="gap-1 hidden sm:flex"
           >
-            <Briefcase className="h-4 w-4" />
+            <Briefcase className="h-3.5 w-3.5" />
             <span className="hidden md:inline">Save to Case</span>
           </Button>
           
@@ -157,28 +157,28 @@ const DocumentToolbar = ({
           
           <Button 
             variant="outline" 
-            size="sm" 
+            size="xs" 
             onClick={() => setShowSaveToIManageDialog(true)}
             className="gap-1 hidden lg:flex"
           >
-            <Cloud className="h-4 w-4" />
+            <Cloud className="h-3.5 w-3.5" />
             <span className="hidden md:inline">Save to iManage</span>
           </Button>
           
           <Button 
             variant="outline" 
-            size="sm" 
+            size="xs" 
             onClick={() => setShowGetFromIManageDialog(true)}
             className="gap-1 hidden lg:flex"
           >
-            <Cloud className="h-4 w-4" />
+            <Cloud className="h-3.5 w-3.5" />
             <span className="hidden md:inline">Get from iManage</span>
           </Button>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
-                <MoreVertical className="h-4 w-4" />
+              <Button variant="ghost" size="xs">
+                <MoreVertical className="h-3.5 w-3.5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
