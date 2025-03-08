@@ -21,14 +21,22 @@ interface GetFromIManageDialogProps {
   onDocumentSelected: (document: SavedDocument) => void;
   buttonSize?: 'xs' | 'sm' | 'default' | 'lg' | 'icon';
   buttonLabel?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 const GetFromIManageDialog = ({ 
   onDocumentSelected,
   buttonSize = 'xs',
-  buttonLabel = "Get from iManage"
+  buttonLabel = "Get from iManage",
+  open,
+  onOpenChange
 }: GetFromIManageDialogProps) => {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  
+  const isControlled = open !== undefined && onOpenChange !== undefined;
+  const isDialogOpen = isControlled ? open : internalOpen;
+  const setIsDialogOpen = isControlled ? onOpenChange : setInternalOpen;
 
   // Search functionality
   const {
@@ -45,20 +53,20 @@ const GetFromIManageDialog = ({
   
   // Reset state when dialog closes
   useEffect(() => {
-    if (!open) {
+    if (!isDialogOpen) {
       setSearchQuery('');
       setSearchResults([]);
     }
-  }, [open, setSearchQuery, setSearchResults]);
+  }, [isDialogOpen, setSearchQuery, setSearchResults]);
   
   // Connection management
-  const { isConnected } = useIManageConnection(open);
+  const { isConnected } = useIManageConnection(isDialogOpen);
 
   // Handle document selection and close dialog if successful
   const handleSelectDocument = async (documentId: string): Promise<boolean> => {
     const success = await handleDocumentSelect(documentId);
     if (success) {
-      setOpen(false);
+      setIsDialogOpen(false);
     }
     return success;
   };
@@ -91,22 +99,24 @@ const GetFromIManageDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      {buttonSize === 'icon' ? (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <DialogTrigger asChild>
-              {renderTriggerContent()}
-            </DialogTrigger>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{buttonLabel}</p>
-          </TooltipContent>
-        </Tooltip>
-      ) : (
-        <DialogTrigger asChild>
-          {renderTriggerContent()}
-        </DialogTrigger>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      {!isControlled && (
+        buttonSize === 'icon' ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DialogTrigger asChild>
+                {renderTriggerContent()}
+              </DialogTrigger>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{buttonLabel}</p>
+            </TooltipContent>
+          </Tooltip>
+        ) : (
+          <DialogTrigger asChild>
+            {renderTriggerContent()}
+          </DialogTrigger>
+        )
       )}
       
       <DialogContent className="sm:max-w-[600px]">
@@ -137,7 +147,7 @@ const GetFromIManageDialog = ({
         </div>
         
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
+          <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
             Cancel
           </Button>
         </DialogFooter>

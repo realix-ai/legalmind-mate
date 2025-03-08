@@ -6,6 +6,9 @@ import {
   ArrowLeft, 
   MoreVertical, 
   Wand2,
+  Briefcase,
+  FileText,
+  Cloud,
   BookOpen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -21,7 +24,7 @@ import SaveToCaseDialog from './SaveToCaseDialog';
 import ExportOptions from './ExportOptions';
 import SaveToIManageDialog from './SaveToIManageDialog';
 import GetFromIManageDialog from './GetFromIManageDialog';
-import { DocumentCategories } from './DocumentCategories';
+import { DOCUMENT_CATEGORIES } from './DocumentCategories';
 import { SavedDocument } from '@/utils/documents/types';
 import CitationTool from './citation/CitationTool';
 
@@ -72,6 +75,27 @@ const DocumentToolbar = ({
     document.dispatchEvent(event);
   };
   
+  // Mock export handlers for ExportOptions
+  const handleExportPdf = () => {
+    toast.success('Exporting document as PDF');
+  };
+  
+  const handleExportDocx = () => {
+    toast.success('Exporting document as DOCX');
+  };
+  
+  const handleExportTxt = () => {
+    toast.success('Exporting document as TXT');
+  };
+  
+  const handlePrint = () => {
+    toast.success('Printing document');
+  };
+  
+  const handleEmailDocument = () => {
+    toast.success('Email document');
+  };
+  
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
@@ -111,6 +135,46 @@ const DocumentToolbar = ({
             <span className="hidden md:inline">Save</span>
           </Button>
           
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setShowSaveToCaseDialog(true)}
+            className="gap-1 hidden sm:flex"
+          >
+            <Briefcase className="h-4 w-4" />
+            <span className="hidden md:inline">Save to Case</span>
+          </Button>
+          
+          <ExportOptions 
+            title={documentTitle}
+            content={documentContent}
+            onExportPdf={handleExportPdf}
+            onExportDocx={handleExportDocx}
+            onExportTxt={handleExportTxt}
+            onPrint={handlePrint}
+            onEmailDocument={handleEmailDocument}
+          />
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setShowSaveToIManageDialog(true)}
+            className="gap-1 hidden lg:flex"
+          >
+            <Cloud className="h-4 w-4" />
+            <span className="hidden md:inline">Save to iManage</span>
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setShowGetFromIManageDialog(true)}
+            className="gap-1 hidden lg:flex"
+          >
+            <Cloud className="h-4 w-4" />
+            <span className="hidden md:inline">Get from iManage</span>
+          </Button>
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm">
@@ -118,16 +182,22 @@ const DocumentToolbar = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setShowSaveToCaseDialog(true)}>
+              <DropdownMenuItem 
+                onClick={() => setShowSaveToCaseDialog(true)}
+                className="sm:hidden"
+              >
                 Save to Case
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setShowExportDialog(true)}>
-                Export Document
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setShowSaveToIManageDialog(true)}>
+              <DropdownMenuItem 
+                onClick={() => setShowSaveToIManageDialog(true)}
+                className="lg:hidden"
+              >
                 Save to iManage
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setShowGetFromIManageDialog(true)}>
+              <DropdownMenuItem 
+                onClick={() => setShowGetFromIManageDialog(true)}
+                className="lg:hidden"
+              >
                 Get from iManage
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -136,31 +206,28 @@ const DocumentToolbar = ({
       </div>
       
       <SaveToCaseDialog 
+        title={documentTitle}
+        content={documentContent}
+        currentDocumentId={currentDocumentId}
+        onSaved={onDocumentSaved}
         open={showSaveToCaseDialog}
         onOpenChange={setShowSaveToCaseDialog}
-        documentId={currentDocumentId}
-        documentTitle={documentTitle}
-        onDocumentSaved={onDocumentSaved}
-      />
-      
-      <ExportOptions 
-        open={showExportDialog}
-        onOpenChange={setShowExportDialog}
-        documentTitle={documentTitle}
-        documentContent={documentContent}
       />
       
       <SaveToIManageDialog 
+        title={documentTitle}
+        content={documentContent}
+        category={documentCategory}
+        currentDocumentId={currentDocumentId}
+        onSaved={onDocumentSaved}
         open={showSaveToIManageDialog}
         onOpenChange={setShowSaveToIManageDialog}
-        documentId={currentDocumentId}
-        documentTitle={documentTitle}
       />
       
       <GetFromIManageDialog 
+        onDocumentSelected={onDocumentLoaded}
         open={showGetFromIManageDialog}
         onOpenChange={setShowGetFromIManageDialog}
-        onDocumentLoaded={onDocumentLoaded}
       />
     </div>
   );

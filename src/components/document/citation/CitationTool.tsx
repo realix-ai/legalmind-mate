@@ -38,7 +38,7 @@ export function CitationTool({ onInsertCitation, onInsertCaseText }: CitationToo
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
   const [customCitation, setCustomCitation] = useState({
-    type: 'case',
+    type: 'case' as 'case' | 'statute' | 'regulation' | 'article' | 'book' | 'website',
     title: '',
     year: new Date().getFullYear(),
     volume: '',

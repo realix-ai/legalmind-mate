@@ -1,12 +1,13 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
+  DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenu
+  DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { FileText, File, Download, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -21,6 +22,8 @@ interface ExportOptionsProps {
   onExportTxt: () => void;
   onPrint: () => void;
   onEmailDocument: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 const ExportOptions: React.FC<ExportOptionsProps> = ({ 
@@ -30,8 +33,12 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({
   onExportDocx, 
   onExportTxt, 
   onPrint,
-  onEmailDocument 
+  onEmailDocument,
+  open,
+  onOpenChange
 }) => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  
   const isOutlookConnected = localStorage.getItem('outlook-connected') === 'true';
   const outlookEmail = localStorage.getItem('outlook-email') || '';
   
@@ -51,43 +58,77 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({
   };
   
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="xs" className="gap-1">
-          <Download className="h-3.5 w-3.5 mr-1" />
-          Export
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[200px]">
-        <DropdownMenuItem onClick={onEmailDocument}>
-          <Mail className="h-4 w-4 mr-2" />
-          Email Document
-        </DropdownMenuItem>
-        
-        {isOutlookConnected && (
-          <DropdownMenuItem onClick={handleExportToOutlook}>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className="gap-1">
+            <Download className="h-4 w-4" />
+            <span className="hidden md:inline">Export</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-[200px]">
+          <DropdownMenuItem onClick={onEmailDocument}>
             <Mail className="h-4 w-4 mr-2" />
-            Send via Outlook
+            Email Document
           </DropdownMenuItem>
-        )}
-        
-        <DropdownMenuItem onClick={onExportPdf}>
-          <FileText className="h-4 w-4 mr-2" />
-          Export as PDF
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={onExportDocx}>
-          <File className="h-4 w-4 mr-2" />
-          Export as DOCX
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={onExportTxt}>
-          Export as TXT
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={onPrint}>
-          Print Document
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          
+          {isOutlookConnected && (
+            <DropdownMenuItem onClick={handleExportToOutlook}>
+              <Mail className="h-4 w-4 mr-2" />
+              Send via Outlook
+            </DropdownMenuItem>
+          )}
+          
+          <DropdownMenuItem onClick={onExportPdf}>
+            <FileText className="h-4 w-4 mr-2" />
+            Export as PDF
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onExportDocx}>
+            <File className="h-4 w-4 mr-2" />
+            Export as DOCX
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={onExportTxt}>
+            Export as TXT
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onPrint}>
+            Print Document
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* Alternative implementation if we need the dialog version */}
+      {open !== undefined && onOpenChange !== undefined && (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Export Options</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <Button onClick={onExportPdf} className="w-full justify-start">
+                <FileText className="h-4 w-4 mr-2" />
+                Export as PDF
+              </Button>
+              <Button onClick={onExportDocx} className="w-full justify-start">
+                <File className="h-4 w-4 mr-2" />
+                Export as DOCX
+              </Button>
+              <Button onClick={onExportTxt} className="w-full justify-start">
+                Export as TXT
+              </Button>
+              <Button onClick={onPrint} className="w-full justify-start">
+                Print Document
+              </Button>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 };
 

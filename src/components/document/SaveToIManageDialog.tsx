@@ -24,6 +24,8 @@ interface SaveToIManageDialogProps {
   category: string;
   currentDocumentId: string | null;
   onSaved: (documentId: string) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 const SaveToIManageDialog = ({ 
@@ -31,21 +33,27 @@ const SaveToIManageDialog = ({
   content,
   category,
   currentDocumentId,
-  onSaved
+  onSaved,
+  open,
+  onOpenChange
 }: SaveToIManageDialogProps) => {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
   const [documentTitle, setDocumentTitle] = useState('');
   const [documentCategory, setDocumentCategory] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   
+  const isControlled = open !== undefined && onOpenChange !== undefined;
+  const isDialogOpen = isControlled ? open : internalOpen;
+  const setIsDialogOpen = isControlled ? onOpenChange : setInternalOpen;
+  
   useEffect(() => {
-    if (open) {
+    if (isDialogOpen) {
       setDocumentTitle(title);
       setDocumentCategory(category);
       checkConnection();
     }
-  }, [open, title, category]);
+  }, [isDialogOpen, title, category]);
   
   const checkConnection = async () => {
     const connected = await checkIManageConnection();
@@ -91,7 +99,7 @@ const SaveToIManageDialog = ({
         localStorage.setItem(`doc-${savedDoc.id}-external-id`, result.documentId);
         
         toast.success("Document saved to iManage and locally");
-        setOpen(false);
+        setIsDialogOpen(false);
         onSaved(savedDoc.id);
       } else {
         toast.error("Failed to save to iManage");
@@ -105,17 +113,19 @@ const SaveToIManageDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="xs"
-          className="gap-1"
-        >
-          <Cloud className="h-3.5 w-3.5 mr-1" />
-          Save to iManage
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            size="xs"
+            className="gap-1"
+          >
+            <Cloud className="h-3.5 w-3.5 mr-1" />
+            Save to iManage
+          </Button>
+        </DialogTrigger>
+      )}
       
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

@@ -27,22 +27,30 @@ interface SaveToCaseDialogProps {
   content: string;
   currentDocumentId: string | null;
   onSaved: (documentId: string) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 const SaveToCaseDialog = ({ 
   title, 
   content,
   currentDocumentId,
-  onSaved
+  onSaved,
+  open,
+  onOpenChange
 }: SaveToCaseDialogProps) => {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
   const [cases, setCases] = useState<{id: string, name: string}[]>([]);
   const [selectedCase, setSelectedCase] = useState<string>('');
   const [newCaseName, setNewCaseName] = useState('');
   const [isCreatingCase, setIsCreatingCase] = useState(false);
   
+  const isControlled = open !== undefined && onOpenChange !== undefined;
+  const isDialogOpen = isControlled ? open : internalOpen;
+  const setIsDialogOpen = isControlled ? onOpenChange : setInternalOpen;
+  
   useEffect(() => {
-    if (open) {
+    if (isDialogOpen) {
       const availableCases = getCases();
       setCases(availableCases);
       if (availableCases.length > 0) {
@@ -51,7 +59,7 @@ const SaveToCaseDialog = ({
         setIsCreatingCase(true);
       }
     }
-  }, [open]);
+  }, [isDialogOpen]);
   
   const handleSave = () => {
     try {
@@ -85,7 +93,7 @@ const SaveToCaseDialog = ({
       console.log("Document saved:", saved);
       toast.success(`Document saved to ${isCreatingCase ? `new case "${newCaseName}"` : 'the selected case'}`);
       
-      setOpen(false);
+      setIsDialogOpen(false);
       onSaved(saved.id);
     } catch (error) {
       console.error("Error saving document:", error);
@@ -106,17 +114,19 @@ const SaveToCaseDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="xs"
-          className="gap-1"
-        >
-          <Briefcase className="mr-1 h-3.5 w-3.5" />
-          Save to Case
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            size="xs"
+            className="gap-1"
+          >
+            <Briefcase className="mr-1 h-3.5 w-3.5" />
+            Save to Case
+          </Button>
+        </DialogTrigger>
+      )}
       
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
