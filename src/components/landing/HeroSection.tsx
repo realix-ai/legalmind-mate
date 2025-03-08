@@ -1,5 +1,4 @@
-
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Zap, Clock, ShieldCheck, Search, CheckCircle2, BookOpen } from 'lucide-react';
@@ -14,16 +13,13 @@ const HeroSection = () => {
     offset: ["start start", "end start"]
   });
   
-  // Create transformations based on scroll
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
   const y = useTransform(scrollYProgress, [0, 0.8], [0, 100]);
   const scale = useTransform(scrollYProgress, [0, 0.8], [1, 0.97]);
   
-  // Create wave background elements
   const numWaves = 3;
   const waves = Array.from({ length: numWaves });
   
-  // Create circular background elements
   const numCircles = 8;
   const circles = Array.from({ length: numCircles });
 
@@ -38,7 +34,6 @@ const HeroSection = () => {
     };
   }, []);
 
-  // Features list with icons for the hero section
   const features = [
     { icon: <Zap className="h-4 w-4" />, text: "Fast Research" },
     { icon: <Clock className="h-4 w-4" />, text: "Time Saving" },
@@ -53,9 +48,7 @@ const HeroSection = () => {
       ref={sectionRef} 
       className="relative min-h-[100vh] flex items-center justify-center overflow-hidden px-4 py-20"
     >
-      {/* Dynamic Background */}
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white via-gray-50 to-gray-100 dark:from-gray-900 dark:via-gray-950 dark:to-black overflow-hidden">
-        {/* Animated waves */}
         {waves.map((_, index) => (
           <motion.div
             key={`wave-${index}`}
@@ -78,8 +71,6 @@ const HeroSection = () => {
             }}
           />
         ))}
-
-        {/* Animated circles */}
         {circles.map((_, index) => (
           <motion.div
             key={`circle-${index}`}
@@ -103,8 +94,6 @@ const HeroSection = () => {
             }}
           />
         ))}
-
-        {/* Light effect */}
         <div className="absolute top-1/4 -left-1/4 w-1/2 h-1/2 bg-primary/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-1/4 -right-1/4 w-1/2 h-1/2 bg-primary/10 rounded-full blur-3xl"></div>
       </div>
@@ -114,7 +103,6 @@ const HeroSection = () => {
           className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center"
           style={{ opacity, y, scale }}
         >
-          {/* Text Content */}
           <motion.div 
             className="text-center lg:text-left lg:col-span-7"
             initial={{ opacity: 0, y: 20 }}
@@ -196,7 +184,6 @@ const HeroSection = () => {
               </Button>
             </motion.div>
             
-            {/* Feature highlights - Updated for smaller, more organized layout */}
             <motion.div 
               className="mt-6"
               initial={{ opacity: 0, y: 20 }}
@@ -226,14 +213,12 @@ const HeroSection = () => {
             </motion.div>
           </motion.div>
           
-          {/* App Mockup */}
           <motion.div 
             className="relative lg:col-span-5"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.8, duration: 0.8 }}
           >
-            {/* Main mockup */}
             <div className="relative z-10">
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-xl blur-xl"
@@ -257,7 +242,6 @@ const HeroSection = () => {
                   ease: "easeInOut" 
                 }}
               >
-                {/* App interface mockup */}
                 <div className="p-4 bg-primary/5 dark:bg-primary/10 border-b border-gray-200 dark:border-gray-800 flex items-center">
                   <div className="flex space-x-2">
                     <div className="w-3 h-3 rounded-full bg-red-500"></div>
@@ -288,7 +272,6 @@ const HeroSection = () => {
               </motion.div>
             </div>
             
-            {/* Secondary mockup for layering effect */}
             <motion.div 
               className="absolute -bottom-8 -right-8 w-2/3 h-64 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xl z-0 hidden lg:block"
               animate={{ 
@@ -312,7 +295,6 @@ const HeroSection = () => {
               </div>
             </motion.div>
             
-            {/* Floating elements */}
             <motion.div
               className="absolute -top-6 -left-6 w-16 h-16 bg-primary/20 dark:bg-primary/30 rounded-lg z-20 hidden lg:flex items-center justify-center"
               animate={{ 
