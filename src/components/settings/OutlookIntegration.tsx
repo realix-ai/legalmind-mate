@@ -1,9 +1,8 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Mail, ExternalLink, CheckCircle, XCircle } from 'lucide-react';
+import { ExternalLink, CheckCircle, XCircle } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 
 export function OutlookIntegration() {
@@ -26,11 +25,9 @@ export function OutlookIntegration() {
       return;
     }
     
-    // Simulate authentication with Microsoft
     setIsConnecting(true);
     toast.success("Connecting to Outlook...");
     
-    // Simulate a successful connection after 1.5 seconds
     setTimeout(() => {
       localStorage.setItem('outlook-connected', 'true');
       localStorage.setItem('outlook-email', email);
@@ -41,7 +38,6 @@ export function OutlookIntegration() {
   };
   
   const handleDisconnect = () => {
-    // Simulate disconnection
     localStorage.removeItem('outlook-connected');
     localStorage.removeItem('outlook-email');
     setConnected(false);
@@ -51,11 +47,6 @@ export function OutlookIntegration() {
   
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Mail className="h-5 w-5 text-primary" />
-        <h3 className="text-lg font-medium">Microsoft Outlook</h3>
-      </div>
-      
       <div className="space-y-2">
         <Label htmlFor="outlook-email">Email Address</Label>
         {!connected ? (
