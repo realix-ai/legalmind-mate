@@ -10,6 +10,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { FileText, File, Download, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 // Define export format types
 export type ExportFormat = 'pdf' | 'docx' | 'html' | 'txt' | 'md' | 'email' | 'outlook';
@@ -52,8 +53,76 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({
       window.open(`mailto:${outlookEmail}?subject=${subject}&body=${body}`);
       
       console.log(`Sending document "${title}" via Outlook to ${outlookEmail}`);
+      toast.success(`Document sent via Outlook to ${outlookEmail}`);
     } catch (error) {
       console.error('Outlook export error:', error);
+      toast.error('Failed to send via Outlook');
+    }
+  };
+  
+  // Function to handle HTML export
+  const handleExportHTML = () => {
+    try {
+      // Convert markdown content to basic HTML
+      let htmlContent = content
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/\n/g, '<br/>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/# (.*)/g, '<h1>$1</h1>')
+        .replace(/## (.*)/g, '<h2>$1</h2>')
+        .replace(/### (.*)/g, '<h3>$1</h3>');
+      
+      htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+  <title>${title}</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }
+    h1, h2, h3 { color: #333; }
+  </style>
+</head>
+<body>
+  <h1>${title}</h1>
+  <div>${htmlContent}</div>
+</body>
+</html>`;
+      
+      // Create data blob and download
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${title.replace(/\s+/g, '-')}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast.success('Document exported as HTML');
+    } catch (error) {
+      console.error('HTML export error:', error);
+      toast.error('Failed to export HTML');
+    }
+  };
+  
+  // Function to handle Markdown export
+  const handleExportMarkdown = () => {
+    try {
+      const blob = new Blob([content], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${title.replace(/\s+/g, '-')}.md`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast.success('Document exported as Markdown');
+    } catch (error) {
+      console.error('Markdown export error:', error);
+      toast.error('Failed to export Markdown');
     }
   };
   
@@ -91,6 +160,13 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({
           <DropdownMenuItem onClick={onExportTxt}>
             Export as TXT
           </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleExportHTML}>
+            Export as HTML
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleExportMarkdown}>
+            Export as Markdown
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem onClick={onPrint}>
             Print Document
           </DropdownMenuItem>
@@ -115,6 +191,12 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({
               </Button>
               <Button onClick={onExportTxt} className="w-full justify-start">
                 Export as TXT
+              </Button>
+              <Button onClick={handleExportHTML} className="w-full justify-start">
+                Export as HTML
+              </Button>
+              <Button onClick={handleExportMarkdown} className="w-full justify-start">
+                Export as Markdown
               </Button>
               <Button onClick={onPrint} className="w-full justify-start">
                 Print Document

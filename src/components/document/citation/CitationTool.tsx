@@ -108,9 +108,14 @@ export function CitationTool({ onInsertCitation, onInsertCaseText }: CitationToo
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-1">
-          <QuoteIcon className="h-4 w-4" />
-          Legal Citations
+        <Button 
+          data-citation-tool-trigger
+          variant="outline" 
+          size="xs" 
+          className="hidden"
+        >
+          <QuoteIcon className="h-3.5 w-3.5" />
+          <span className="hidden md:inline">Citations</span>
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="sm:max-w-md w-[90%]">

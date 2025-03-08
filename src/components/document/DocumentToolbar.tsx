@@ -9,7 +9,9 @@ import {
   Briefcase,
   FileText,
   Cloud,
-  BookOpen
+  BookOpen,
+  QuoteIcon,
+  Download
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -118,6 +120,21 @@ const DocumentToolbar = ({
           >
             <Wand2 className="h-3.5 w-3.5" />
             <span className="hidden md:inline">AI Assistant</span>
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="xs"
+            onClick={() => {
+              const citationToolTrigger = document.querySelector('[data-citation-tool-trigger]');
+              if (citationToolTrigger) {
+                (citationToolTrigger as HTMLButtonElement).click();
+              }
+            }}
+            className="gap-1"
+          >
+            <QuoteIcon className="h-3.5 w-3.5" />
+            <span className="hidden md:inline">Legal Citations</span>
           </Button>
           
           <CitationTool 
