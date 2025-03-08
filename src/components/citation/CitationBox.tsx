@@ -64,9 +64,11 @@ const CitationBox = ({
     return Array.from(courts);
   }, [citations]);
   
-  // Get year range for slider
+  // Get year range for slider - modified to always include current year
   const yearBounds = useMemo(() => {
-    if (citations.length === 0) return [1950, new Date().getFullYear()] as [number, number];
+    const currentYear = new Date().getFullYear();
+    
+    if (citations.length === 0) return [1950, currentYear] as [number, number];
     
     let minYear = citations[0].year;
     let maxYear = citations[0].year;
@@ -75,6 +77,9 @@ const CitationBox = ({
       if (citation.year < minYear) minYear = citation.year;
       if (citation.year > maxYear) maxYear = citation.year;
     });
+    
+    // Always make sure current year is included in the range
+    maxYear = Math.max(maxYear, currentYear);
     
     return [minYear, maxYear] as [number, number];
   }, [citations]);
@@ -128,7 +133,7 @@ const CitationBox = ({
   
   const resetFilters = () => {
     setCourtFilter(null);
-    // Fix: Cast yearBounds to the explicit tuple type
+    // Cast yearBounds to the explicit tuple type
     setYearRange(yearBounds as [number, number]);
   };
   
