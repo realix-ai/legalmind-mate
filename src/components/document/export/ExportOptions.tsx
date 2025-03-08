@@ -2,18 +2,22 @@
 import React, { useState } from 'react';
 import { Dialog } from '@/components/ui/dialog';
 import { ExportFormat } from './types';
-import { exportToHtml, exportToMarkdown, sendViaEmail, sendViaOutlook } from './exportUtils';
+import { 
+  exportToPdf, 
+  exportToDocx, 
+  exportToTxt, 
+  exportToHtml, 
+  exportToMarkdown, 
+  sendViaEmail, 
+  sendViaOutlook,
+  printDocument
+} from './exportUtils';
 import ExportDropdownMenu from './ExportDropdownMenu';
 import ExportDialogContent from './ExportDialogContent';
 
 interface ExportOptionsProps {
   title: string;
   content: string;
-  onExportPdf: () => void;
-  onExportDocx: () => void;
-  onExportTxt: () => void;
-  onPrint: () => void;
-  onEmailDocument: () => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
@@ -21,16 +25,26 @@ interface ExportOptionsProps {
 const ExportOptions: React.FC<ExportOptionsProps> = ({ 
   title, 
   content, 
-  onExportPdf, 
-  onExportDocx, 
-  onExportTxt, 
-  onPrint,
-  onEmailDocument,
   open,
   onOpenChange
 }) => {
   const isOutlookConnected = localStorage.getItem('outlook-connected') === 'true';
   const outlookEmail = localStorage.getItem('outlook-email') || '';
+  
+  // Export to PDF handler
+  const handleExportPdf = () => {
+    exportToPdf(title, content);
+  };
+  
+  // Export to DOCX handler
+  const handleExportDocx = () => {
+    exportToDocx(title, content);
+  };
+  
+  // Export to TXT handler
+  const handleExportTxt = () => {
+    exportToTxt(title, content);
+  };
   
   // Export to HTML handler
   const handleExportHTML = () => {
@@ -42,22 +56,32 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({
     exportToMarkdown(title, content);
   };
 
+  // Email document handler
+  const handleEmailDocument = () => {
+    sendViaEmail(title, content);
+  };
+
   // Export to Outlook handler
   const handleExportToOutlook = () => {
     sendViaOutlook(title, content, outlookEmail);
   };
   
+  // Print document handler
+  const handlePrint = () => {
+    printDocument(title, content);
+  };
+  
   return (
     <>
       <ExportDropdownMenu 
-        onExportPdf={onExportPdf}
-        onExportDocx={onExportDocx}
-        onExportTxt={onExportTxt}
+        onExportPdf={handleExportPdf}
+        onExportDocx={handleExportDocx}
+        onExportTxt={handleExportTxt}
         onExportHTML={handleExportHTML}
         onExportMarkdown={handleExportMarkdown}
-        onEmailDocument={onEmailDocument}
+        onEmailDocument={handleEmailDocument}
         onExportToOutlook={handleExportToOutlook}
-        onPrint={onPrint}
+        onPrint={handlePrint}
         isOutlookConnected={isOutlookConnected}
       />
 
@@ -65,12 +89,12 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({
       {open !== undefined && onOpenChange !== undefined && (
         <Dialog open={open} onOpenChange={onOpenChange}>
           <ExportDialogContent 
-            onExportPdf={onExportPdf}
-            onExportDocx={onExportDocx}
-            onExportTxt={onExportTxt}
+            onExportPdf={handleExportPdf}
+            onExportDocx={handleExportDocx}
+            onExportTxt={handleExportTxt}
             onExportHTML={handleExportHTML}
             onExportMarkdown={handleExportMarkdown}
-            onPrint={onPrint}
+            onPrint={handlePrint}
             onOpenChange={onOpenChange}
           />
         </Dialog>

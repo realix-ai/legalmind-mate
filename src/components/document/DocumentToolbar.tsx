@@ -14,7 +14,6 @@ import ToolbarOverflowMenu from './toolbar/ToolbarOverflowMenu';
 import SaveToCaseDialog from './SaveToCaseDialog';
 import SaveToIManageDialog from './SaveToIManageDialog';
 import GetFromIManageDialog from './GetFromIManageDialog';
-import { toast } from 'sonner';
 
 interface DocumentToolbarProps {
   onBack: () => void;
@@ -62,27 +61,6 @@ const DocumentToolbar = ({
     document.dispatchEvent(event);
   };
   
-  // Mock export handlers for ExportOptions
-  const handleExportPdf = () => {
-    toast.success('Exporting document as PDF');
-  };
-  
-  const handleExportDocx = () => {
-    toast.success('Exporting document as DOCX');
-  };
-  
-  const handleExportTxt = () => {
-    toast.success('Exporting document as TXT');
-  };
-  
-  const handlePrint = () => {
-    toast.success('Printing document');
-  };
-  
-  const handleEmailDocument = () => {
-    toast.success('Email document');
-  };
-
   const handleCitationButtonClick = () => {
     const citationToolTrigger = document.querySelector('[data-citation-tool-trigger]');
     if (citationToolTrigger) {
@@ -137,11 +115,8 @@ const DocumentToolbar = ({
           <ExportOptions 
             title={documentTitle}
             content={documentContent}
-            onExportPdf={handleExportPdf}
-            onExportDocx={handleExportDocx}
-            onExportTxt={handleExportTxt}
-            onPrint={handlePrint}
-            onEmailDocument={handleEmailDocument}
+            open={showExportDialog}
+            onOpenChange={setShowExportDialog}
           />
           
           <SaveToIManageButton 

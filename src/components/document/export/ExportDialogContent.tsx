@@ -2,7 +2,7 @@
 import React from 'react';
 import { DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { FileText, File } from 'lucide-react';
+import { FileText, File, Mail } from 'lucide-react';
 import ExportFormatButton from './ExportFormatButton';
 
 interface ExportDialogContentProps {
