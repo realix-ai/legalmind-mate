@@ -66,7 +66,7 @@ const CitationBox = ({
   
   // Get year range for slider
   const yearBounds = useMemo(() => {
-    if (citations.length === 0) return [1950, new Date().getFullYear()];
+    if (citations.length === 0) return [1950, new Date().getFullYear()] as [number, number];
     
     let minYear = citations[0].year;
     let maxYear = citations[0].year;
@@ -132,6 +132,11 @@ const CitationBox = ({
     setYearRange(yearBounds as [number, number]);
   };
   
+  // Handle court selection
+  const handleCourtChange = (value: string) => {
+    setCourtFilter(value === "_all" ? null : value);
+  };
+  
   return (
     <div className={cn(
       "mt-6 border rounded-lg p-4 bg-muted/30 shadow-sm",
@@ -190,14 +195,14 @@ const CitationBox = ({
                   <span className="text-xs font-medium">Court</span>
                 </div>
                 <Select 
-                  value={courtFilter || ""}
-                  onValueChange={(value) => setCourtFilter(value || null)}
+                  value={courtFilter === null ? "_all" : courtFilter}
+                  onValueChange={handleCourtChange}
                 >
                   <SelectTrigger className="h-7 text-xs">
                     <SelectValue placeholder="All Courts" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Courts</SelectItem>
+                    <SelectItem value="_all">All Courts</SelectItem>
                     {availableCourts.map(court => (
                       <SelectItem key={court} value={court}>{court}</SelectItem>
                     ))}
