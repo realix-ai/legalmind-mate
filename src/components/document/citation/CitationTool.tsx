@@ -6,22 +6,21 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search, FileText, BookOpen } from 'lucide-react';
-import CitationToolTrigger from './CitationToolTrigger';
 import SearchTab from './tabs/SearchTab';
 import FormatTab from './tabs/FormatTab';
 import DetailsTab from './tabs/DetailsTab';
 
 interface CitationToolProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onInsertCitation: (citation: string) => void;
   onInsertCaseText: (text: string) => void;
 }
 
-export function CitationTool({ onInsertCitation, onInsertCaseText }: CitationToolProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function CitationTool({ open, onOpenChange, onInsertCitation, onInsertCaseText }: CitationToolProps) {
   const [citationTab, setCitationTab] = useState('search');
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
 
@@ -32,10 +31,7 @@ export function CitationTool({ onInsertCitation, onInsertCaseText }: CitationToo
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild>
-        <CitationToolTrigger />
-      </SheetTrigger>
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="sm:max-w-md w-[90%]">
         <SheetHeader>
           <SheetTitle>Legal Citation Tool</SheetTitle>
@@ -64,7 +60,7 @@ export function CitationTool({ onInsertCitation, onInsertCaseText }: CitationToo
             <SearchTab 
               onInsertCitation={(citation) => {
                 onInsertCitation(citation);
-                setIsOpen(false);
+                onOpenChange(false);
               }} 
               onViewCaseDetails={viewCaseDetails}
             />
@@ -74,7 +70,7 @@ export function CitationTool({ onInsertCitation, onInsertCaseText }: CitationToo
             <FormatTab 
               onInsertCitation={(citation) => {
                 onInsertCitation(citation);
-                setIsOpen(false);
+                onOpenChange(false);
               }}
             />
           </TabsContent>
@@ -84,11 +80,11 @@ export function CitationTool({ onInsertCitation, onInsertCaseText }: CitationToo
               selectedCaseId={selectedCaseId}
               onInsertCitation={(citation) => {
                 onInsertCitation(citation);
-                setIsOpen(false);
+                onOpenChange(false);
               }}
               onInsertCaseText={(text) => {
                 onInsertCaseText(text);
-                setIsOpen(false);
+                onOpenChange(false);
               }}
             />
           </TabsContent>

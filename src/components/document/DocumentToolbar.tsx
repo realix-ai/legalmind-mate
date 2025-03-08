@@ -44,7 +44,7 @@ const DocumentToolbar = ({
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showSaveToIManageDialog, setShowSaveToIManageDialog] = useState(false);
   const [showGetFromIManageDialog, setShowGetFromIManageDialog] = useState(false);
-  const [showCitationTool, setShowCitationTool] = useState(false);
+  const [citationSheetOpen, setCitationSheetOpen] = useState(false);
 
   const handleInsertCitation = (citation: string) => {
     // Create a citation insertion event
@@ -62,17 +62,6 @@ const DocumentToolbar = ({
     document.dispatchEvent(event);
   };
   
-  const handleCitationButtonClick = () => {
-    setShowCitationTool(true);
-    // Defer to next tick to ensure state is updated
-    setTimeout(() => {
-      const citationToolTrigger = document.querySelector('[data-citation-tool-trigger]');
-      if (citationToolTrigger) {
-        (citationToolTrigger as HTMLButtonElement).click();
-      }
-    }, 10);
-  };
-
   // Define overflow menu actions
   const overflowActions = [
     {
@@ -103,9 +92,11 @@ const DocumentToolbar = ({
             setShowAiPrompt={setShowAiPrompt} 
           />
           
-          <LegalCitationsButton onClick={handleCitationButtonClick} />
+          <LegalCitationsButton onClick={() => setCitationSheetOpen(true)} />
           
           <CitationTool 
+            open={citationSheetOpen}
+            onOpenChange={setCitationSheetOpen}
             onInsertCitation={handleInsertCitation}
             onInsertCaseText={handleInsertCaseText}
           />
