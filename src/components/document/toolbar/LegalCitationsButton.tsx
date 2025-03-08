@@ -5,14 +5,16 @@ import ToolbarButton from './ToolbarButton';
 
 interface LegalCitationsButtonProps {
   onClick: () => void;
+  className?: string;
 }
 
-const LegalCitationsButton = ({ onClick }: LegalCitationsButtonProps) => {
+const LegalCitationsButton = ({ onClick, className }: LegalCitationsButtonProps) => {
   return (
     <ToolbarButton
       icon={QuoteIcon}
       label="Legal Citations"
       onClick={onClick}
+      className={className}
     />
   );
 };
