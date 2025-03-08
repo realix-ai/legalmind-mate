@@ -35,10 +35,16 @@ const ResponseSection = ({
         onEdit={onResponseEdit ? handleEdit : undefined}
       />
       
-      {citations.length > 0 && !isProcessing && response && (
+      {!isProcessing && response && (
         <div className="max-w-4xl mx-auto mt-8">
           <h3 className="text-xl font-medium mb-4">Related Citations</h3>
-          <CitationBox citations={citations} />
+          {citations.length > 0 ? (
+            <CitationBox citations={citations} />
+          ) : (
+            <div className="bg-background rounded-md p-4 text-sm border">
+              <p className="text-muted-foreground">No relevant citations found for this query. Try a more specific legal query to see related citations.</p>
+            </div>
+          )}
         </div>
       )}
     </div>
