@@ -89,6 +89,68 @@ const DocumentEditor = ({
     setSections(parsedSections);
   }, [documentContent]);
 
+  useEffect(() => {
+    const handleInsertCitation = (e: Event) => {
+      const citationEvent = e as CustomEvent;
+      const citation = citationEvent.detail.text;
+      
+      if (editorRef.current && citation) {
+        const textarea = editorRef.current;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        
+        const newContent = 
+          documentContent.substring(0, start) + 
+          citation + 
+          documentContent.substring(end);
+        
+        setDocumentContent(newContent);
+        
+        setTimeout(() => {
+          textarea.focus();
+          const newPosition = start + citation.length;
+          textarea.setSelectionRange(newPosition, newPosition);
+          updateCursorPosition(newPosition);
+        }, 10);
+      }
+    };
+    
+    const handleInsertCaseText = (e: Event) => {
+      const textEvent = e as CustomEvent;
+      const caseText = textEvent.detail.text;
+      
+      if (editorRef.current && caseText) {
+        const textarea = editorRef.current;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        
+        const formattedText = "\n\n```\n" + caseText + "\n```\n\n";
+        
+        const newContent = 
+          documentContent.substring(0, start) + 
+          formattedText + 
+          documentContent.substring(end);
+        
+        setDocumentContent(newContent);
+        
+        setTimeout(() => {
+          textarea.focus();
+          const newPosition = start + formattedText.length;
+          textarea.setSelectionRange(newPosition, newPosition);
+          updateCursorPosition(newPosition);
+        }, 10);
+      }
+    };
+    
+    document.addEventListener('insertCitation', handleInsertCitation);
+    document.addEventListener('insertCaseText', handleInsertCaseText);
+    
+    return () => {
+      document.removeEventListener('insertCitation', handleInsertCitation);
+      document.removeEventListener('insertCaseText', handleInsertCaseText);
+    };
+  }, [documentContent, setDocumentContent, updateCursorPosition]);
+
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.ctrlKey || e.metaKey) {
       switch (e.key.toLowerCase()) {
