@@ -1,34 +1,20 @@
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { 
-  Save, 
-  ArrowLeft, 
-  MoreVertical, 
-  Wand2,
-  Briefcase,
-  FileText,
-  Cloud,
-  BookOpen,
-  QuoteIcon,
-  Download
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { toast } from 'sonner';
-import SaveToCaseDialog from './SaveToCaseDialog';
-import ExportOptions from './ExportOptions';
-import SaveToIManageDialog from './SaveToIManageDialog';
-import GetFromIManageDialog from './GetFromIManageDialog';
 import { DOCUMENT_CATEGORIES } from './DocumentCategories';
 import { SavedDocument } from '@/utils/documents/types';
 import CitationTool from './citation/CitationTool';
+import BackButton from './toolbar/BackButton';
+import AiAssistantButton from './toolbar/AiAssistantButton';
+import LegalCitationsButton from './toolbar/LegalCitationsButton';
+import SaveButton from './toolbar/SaveButton';
+import SaveToCaseButton from './toolbar/SaveToCaseButton';
+import ExportOptions from './ExportOptions';
+import { SaveToIManageButton, GetFromIManageButton } from './toolbar/IManageButtons';
+import ToolbarOverflowMenu from './toolbar/ToolbarOverflowMenu';
+import SaveToCaseDialog from './SaveToCaseDialog';
+import SaveToIManageDialog from './SaveToIManageDialog';
+import GetFromIManageDialog from './GetFromIManageDialog';
+import { toast } from 'sonner';
 
 interface DocumentToolbarProps {
   onBack: () => void;
@@ -55,7 +41,6 @@ const DocumentToolbar = ({
   onDocumentSaved,
   onDocumentLoaded,
 }: DocumentToolbarProps) => {
-  const navigate = useNavigate();
   const [showSaveToCaseDialog, setShowSaveToCaseDialog] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showSaveToIManageDialog, setShowSaveToIManageDialog] = useState(false);
@@ -97,70 +82,57 @@ const DocumentToolbar = ({
   const handleEmailDocument = () => {
     toast.success('Email document');
   };
+
+  const handleCitationButtonClick = () => {
+    const citationToolTrigger = document.querySelector('[data-citation-tool-trigger]');
+    if (citationToolTrigger) {
+      (citationToolTrigger as HTMLButtonElement).click();
+    }
+  };
+
+  // Define overflow menu actions
+  const overflowActions = [
+    {
+      label: 'Save to Case',
+      onClick: () => setShowSaveToCaseDialog(true),
+      className: "sm:hidden"
+    },
+    {
+      label: 'Save to iManage',
+      onClick: () => setShowSaveToIManageDialog(true),
+      className: "lg:hidden"
+    },
+    {
+      label: 'Get from iManage',
+      onClick: () => setShowGetFromIManageDialog(true),
+      className: "lg:hidden"
+    }
+  ];
   
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <Button 
-          variant="ghost" 
-          size="xs" 
-          onClick={onBack}
-          className="gap-1"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          <span>Back</span>
-        </Button>
+        <BackButton onClick={onBack} />
         
         <div className="flex items-center gap-1">
-          <Button
-            variant="outline"
-            size="xs"
-            onClick={() => setShowAiPrompt(!showAiPrompt)}
-            className="gap-1"
-          >
-            <Wand2 className="h-3.5 w-3.5" />
-            <span className="hidden md:inline">AI Assistant</span>
-          </Button>
+          <AiAssistantButton 
+            showAiPrompt={showAiPrompt} 
+            setShowAiPrompt={setShowAiPrompt} 
+          />
           
-          <Button
-            variant="outline"
-            size="xs"
-            onClick={() => {
-              const citationToolTrigger = document.querySelector('[data-citation-tool-trigger]');
-              if (citationToolTrigger) {
-                (citationToolTrigger as HTMLButtonElement).click();
-              }
-            }}
-            className="gap-1"
-          >
-            <QuoteIcon className="h-3.5 w-3.5" />
-            <span className="hidden md:inline">Legal Citations</span>
-          </Button>
+          <LegalCitationsButton onClick={handleCitationButtonClick} />
           
           <CitationTool 
             onInsertCitation={handleInsertCitation}
             onInsertCaseText={handleInsertCaseText}
           />
           
-          <Button 
-            variant="outline" 
-            size="xs" 
-            onClick={onSaveDocument}
-            className="gap-1"
-          >
-            <Save className="h-3.5 w-3.5" />
-            <span className="hidden md:inline">Save</span>
-          </Button>
+          <SaveButton onSaveDocument={onSaveDocument} />
           
-          <Button 
-            variant="outline" 
-            size="xs" 
+          <SaveToCaseButton 
             onClick={() => setShowSaveToCaseDialog(true)}
-            className="gap-1 hidden sm:flex"
-          >
-            <Briefcase className="h-3.5 w-3.5" />
-            <span className="hidden md:inline">Save to Case</span>
-          </Button>
+            className="hidden sm:flex"
+          />
           
           <ExportOptions 
             title={documentTitle}
@@ -172,53 +144,17 @@ const DocumentToolbar = ({
             onEmailDocument={handleEmailDocument}
           />
           
-          <Button 
-            variant="outline" 
-            size="xs" 
+          <SaveToIManageButton 
             onClick={() => setShowSaveToIManageDialog(true)}
-            className="gap-1 hidden lg:flex"
-          >
-            <Cloud className="h-3.5 w-3.5" />
-            <span className="hidden md:inline">Save to iManage</span>
-          </Button>
+            className="hidden lg:flex"
+          />
           
-          <Button 
-            variant="outline" 
-            size="xs" 
+          <GetFromIManageButton 
             onClick={() => setShowGetFromIManageDialog(true)}
-            className="gap-1 hidden lg:flex"
-          >
-            <Cloud className="h-3.5 w-3.5" />
-            <span className="hidden md:inline">Get from iManage</span>
-          </Button>
+            className="hidden lg:flex"
+          />
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="xs">
-                <MoreVertical className="h-3.5 w-3.5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem 
-                onClick={() => setShowSaveToCaseDialog(true)}
-                className="sm:hidden"
-              >
-                Save to Case
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setShowSaveToIManageDialog(true)}
-                className="lg:hidden"
-              >
-                Save to iManage
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setShowGetFromIManageDialog(true)}
-                className="lg:hidden"
-              >
-                Get from iManage
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ToolbarOverflowMenu actions={overflowActions} />
         </div>
       </div>
       
