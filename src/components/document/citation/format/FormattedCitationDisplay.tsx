@@ -70,7 +70,7 @@ export function FormattedCitationDisplay({
             <Switch 
               checked={formatOptions.includeUrl || false}
               onCheckedChange={(checked) => handleOptionChange('includeUrl', checked)}
-              size="sm"
+              className="scale-75"
             />
           </div>
           <div className="flex items-center justify-between">
@@ -78,7 +78,7 @@ export function FormattedCitationDisplay({
             <Switch 
               checked={formatOptions.shortForm || false}
               onCheckedChange={(checked) => handleOptionChange('shortForm', checked)}
-              size="sm"
+              className="scale-75"
             />
           </div>
           <div className="flex items-center justify-between">
@@ -86,7 +86,7 @@ export function FormattedCitationDisplay({
             <Switch 
               checked={formatOptions.uppercase || false}
               onCheckedChange={(checked) => handleOptionChange('uppercase', checked)}
-              size="sm"
+              className="scale-75"
             />
           </div>
         </div>

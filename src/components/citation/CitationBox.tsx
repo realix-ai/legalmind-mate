@@ -76,7 +76,7 @@ const CitationBox = ({
       if (citation.year > maxYear) maxYear = citation.year;
     });
     
-    return [minYear, maxYear];
+    return [minYear, maxYear] as [number, number];
   }, [citations]);
   
   // Apply filters
@@ -128,7 +128,8 @@ const CitationBox = ({
   
   const resetFilters = () => {
     setCourtFilter(null);
-    setYearRange(yearBounds);
+    // Fix: Cast yearBounds to the explicit tuple type
+    setYearRange(yearBounds as [number, number]);
   };
   
   return (
@@ -243,7 +244,7 @@ const CitationBox = ({
                     variant="ghost"
                     size="sm"
                     className="h-4 w-4 p-0 ml-1"
-                    onClick={() => setYearRange(yearBounds)}
+                    onClick={() => setYearRange(yearBounds as [number, number])}
                   >
                     <X className="h-2 w-2" />
                   </Button>
