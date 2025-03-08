@@ -38,11 +38,7 @@ const ResponseSection = ({
       {citations.length > 0 && !isProcessing && response && (
         <div className="max-w-4xl mx-auto mt-8">
           <h3 className="text-xl font-medium mb-4">Related Citations</h3>
-          <div className="grid gap-4">
-            {citations.map((citation, index) => (
-              <CitationBox key={index} citation={citation} />
-            ))}
-          </div>
+          <CitationBox citations={citations} />
         </div>
       )}
     </div>
