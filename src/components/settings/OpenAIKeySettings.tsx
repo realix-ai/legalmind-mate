@@ -1,8 +1,9 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Save, ExternalLink, CheckCircle, XCircle } from 'lucide-react';
+import { KeyRound, Save, ExternalLink, CheckCircle, XCircle } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 
 export function OpenAIKeySettings() {
@@ -53,6 +54,11 @@ export function OpenAIKeySettings() {
   
   return (
     <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <KeyRound className="h-5 w-5 text-primary" />
+        <h3 className="text-lg font-medium">OpenAI API Key</h3>
+      </div>
+      
       <div className="space-y-2">
         <Label htmlFor="openai-key">API Key</Label>
         {isEditing ? (
