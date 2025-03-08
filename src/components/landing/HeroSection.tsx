@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -206,7 +207,7 @@ const HeroSection = () => {
                     <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-primary/10">
                       {React.cloneElement(feature.icon, { className: "h-3.5 w-3.5 text-primary" })}
                     </div>
-                    <span className="text-sm font-medium line-clamp-1">{feature.text}</span>
+                    <span className="text-sm font-medium whitespace-normal">{feature.text}</span>
                   </motion.div>
                 ))}
               </div>
