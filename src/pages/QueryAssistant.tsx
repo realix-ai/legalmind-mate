@@ -92,20 +92,30 @@ const QueryAssistant = () => {
     setError(null);
 
     try {
-      // Simulate API response for demo
-      setTimeout(() => {
-        const assistantMessage = {
-          id: uuidv4(),
-          role: "assistant",
-          content: "This is a simulated response. In a real app, this would come from your backend API.",
-        };
-        setMessages((prevMessages) => [...prevMessages, assistantMessage]);
-        setIsLoading(false);
-      }, 1000);
+      const response = await fetch("/api/assistant", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: query }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const assistantMessage = {
+        id: uuidv4(),
+        role: "assistant",
+        content: data.result,
+      };
+      setMessages((prevMessages) => [...prevMessages, assistantMessage]);
     } catch (e: any) {
       console.error("Error sending message:", e);
       setError(e.message || "Failed to send message");
       toast.error(e.message || "Failed to send message");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -142,9 +152,6 @@ const QueryAssistant = () => {
                     {session?.user?.email}
                   </Badge>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleOpenSettings("integrations")}>
-                  Integrations
-                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleOpenSettings("appearance")}>
                   Settings
                 </DropdownMenuItem>
@@ -161,18 +168,6 @@ const QueryAssistant = () => {
       <div className="flex-1 overflow-auto">
         <ScrollArea className="h-full">
           <div ref={scrollRef} className="container py-4">
-            {messages.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-[50vh] text-center">
-                <h2 className="text-2xl font-bold mb-2">Welcome to Acme AI Assistant</h2>
-                <p className="text-muted-foreground mb-4 max-w-md">
-                  Ask me anything about your legal cases, documents, or use me to draft content.
-                </p>
-                <Button onClick={() => setQuery("How can you help me with legal research?")}>
-                  Try a sample question
-                </Button>
-              </div>
-            )}
-            
             {messages.map((message) => (
               <div
                 key={message.id}
