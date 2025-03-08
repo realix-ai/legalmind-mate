@@ -1,8 +1,7 @@
-
 // Common legal citation formats
 type CitationStyle = 'bluebook' | 'apa' | 'chicago' | 'mla' | 'aglc';
 
-interface Citation {
+export interface Citation {
   type: 'case' | 'statute' | 'regulation' | 'article' | 'book' | 'website';
   title: string;
   year?: number;
@@ -16,83 +15,193 @@ interface Citation {
   publication?: string;
   section?: string;
   jurisdiction?: string;
+  customFormat?: {
+    template: string;
+    uppercase?: boolean;
+    italics?: string[];
+    addPeriod?: boolean;
+  };
 }
 
-export function formatCitation(citation: Citation, style: CitationStyle = 'bluebook'): string {
+export interface FormatOptions {
+  style?: CitationStyle;
+  includeUrl?: boolean;
+  shortForm?: boolean;
+  uppercase?: boolean;
+  includeJurisdiction?: boolean;
+}
+
+export function formatCitation(
+  citation: Citation, 
+  style: CitationStyle = 'bluebook',
+  options: FormatOptions = {}
+): string {
+  // Handle custom formatting if specified
+  if (citation.customFormat) {
+    let formatted = citation.customFormat.template;
+    
+    // Replace placeholders with actual values
+    formatted = formatted
+      .replace('{title}', citation.title || '')
+      .replace('{year}', citation.year?.toString() || '')
+      .replace('{volume}', citation.volume || '')
+      .replace('{reporter}', citation.reporter || '')
+      .replace('{court}', citation.court || '')
+      .replace('{page}', citation.pageNumber || '')
+      .replace('{pinpoint}', citation.pinpoint || '')
+      .replace('{jurisdiction}', citation.jurisdiction || '')
+      .replace('{url}', citation.url || '');
+    
+    // Apply uppercase if specified
+    if (citation.customFormat.uppercase) {
+      formatted = formatted.toUpperCase();
+    }
+    
+    // Add final period if specified
+    if (citation.customFormat.addPeriod && !formatted.endsWith('.')) {
+      formatted += '.';
+    }
+    
+    return formatted;
+  }
+
+  // Otherwise use the predefined styles
   switch (style) {
     case 'bluebook':
-      return formatBluebookCitation(citation);
+      return formatBluebookCitation(citation, options);
     case 'apa':
-      return formatApaCitation(citation);
+      return formatApaCitation(citation, options);
     case 'chicago':
-      return formatChicagoCitation(citation);
+      return formatChicagoCitation(citation, options);
     case 'mla':
-      return formatMlaCitation(citation);
+      return formatMlaCitation(citation, options);
     case 'aglc':
-      return formatAglcCitation(citation);
+      return formatAglcCitation(citation, options);
     default:
-      return formatBluebookCitation(citation);
+      return formatBluebookCitation(citation, options);
   }
 }
 
 // Format according to The Bluebook: A Uniform System of Citation
-function formatBluebookCitation(citation: Citation): string {
+function formatBluebookCitation(citation: Citation, options: FormatOptions = {}): string {
+  const { shortForm = false, includeUrl = false, includeJurisdiction = true } = options;
+  
   switch (citation.type) {
-    case 'case':
-      // Format: Case Name, Volume Reporter Page (Court Year)
-      return `${citation.title}, ${citation.volume || ''} ${citation.reporter || ''} ${citation.pageNumber || ''} ${citation.court ? `(${citation.court}` : ''}${citation.year ? ` ${citation.year})` : ')'}${citation.pinpoint ? `, at ${citation.pinpoint}` : ''}`;
+    case 'case': {
+      // Short form citation
+      if (shortForm) {
+        return `${citation.title}, ${citation.pinpoint || citation.pageNumber || ''}`;
+      }
+      
+      // Full citation
+      let formatted = `${citation.title}, ${citation.volume || ''} ${citation.reporter || ''} ${citation.pageNumber || ''}`;
+      
+      if (includeJurisdiction && citation.court) {
+        formatted += ` (${citation.court}`;
+        if (citation.year) formatted += ` ${citation.year})`;
+        else formatted += ')';
+      } else if (citation.year) {
+        formatted += ` (${citation.year})`;
+      }
+      
+      if (citation.pinpoint) formatted += `, at ${citation.pinpoint}`;
+      if (includeUrl && citation.url) formatted += `, ${citation.url}`;
+      
+      return formatted;
+    }
     
-    case 'statute':
+    case 'statute': {
       // Format: Title Code § Section (Year)
-      return `${citation.title}${citation.section ? ` § ${citation.section}` : ''} (${citation.year || ''})`;
+      let formatted = `${citation.title}${citation.section ? ` § ${citation.section}` : ''} (${citation.year || ''})`;
+      if (includeJurisdiction && citation.jurisdiction) {
+        formatted += ` (${citation.jurisdiction})`;
+      }
+      return formatted;
+    }
     
-    case 'article':
+    case 'article': {
       // Format: Author, Title, Volume Publication Page (Year)
       const authorText = citation.authors && citation.authors.length > 0 
         ? citation.authors.join(', ') 
         : '';
-      return `${authorText}${authorText ? ', ' : ''}${citation.title}${citation.volume ? `, ${citation.volume}` : ''}${citation.publication ? ` ${citation.publication}` : ''}${citation.pageNumber ? ` ${citation.pageNumber}` : ''} (${citation.year || ''})`;
+      let formatted = `${authorText}${authorText ? ', ' : ''}${citation.title}${citation.volume ? `, ${citation.volume}` : ''}${citation.publication ? ` ${citation.publication}` : ''}${citation.pageNumber ? ` ${citation.pageNumber}` : ''} (${citation.year || ''})`;
+      if (includeUrl && citation.url) {
+        formatted += `, available at ${citation.url}`;
+      }
+      return formatted;
+    }
       
     default:
       return citation.title;
   }
 }
 
-function formatApaCitation(citation: Citation): string {
-  // Basic APA formatting implementation
+function formatApaCitation(citation: Citation, options: FormatOptions = {}): string {
+  const { includeUrl = true } = options;
+  
   switch (citation.type) {
-    case 'case':
-      return `${citation.title} (${citation.year || ''})`;
+    case 'case': {
+      let formatted = `${citation.title} (${citation.year || ''})`;
+      if (citation.reporter) formatted += `. ${citation.volume || ''} ${citation.reporter} ${citation.pageNumber || ''}`;
+      if (includeUrl && citation.url) formatted += `. Retrieved from ${citation.url}`;
+      return formatted;
+    }
+    case 'article': {
+      const authorText = citation.authors && citation.authors.length > 0 
+        ? citation.authors.join(', ') 
+        : '';
+      let formatted = `${authorText}${authorText ? ' ' : ''}(${citation.year || ''}). ${citation.title}. ${citation.publication || ''}${citation.volume ? `, ${citation.volume}` : ''}${citation.pageNumber ? `, ${citation.pageNumber}` : ''}.`;
+      if (includeUrl && citation.url) formatted += ` Retrieved from ${citation.url}`;
+      return formatted;
+    }
     default:
       return citation.title;
   }
 }
 
-function formatChicagoCitation(citation: Citation): string {
-  // Basic Chicago formatting implementation
+function formatChicagoCitation(citation: Citation, options: FormatOptions = {}): string {
+  const { includeUrl = false } = options;
+  
   switch (citation.type) {
-    case 'case':
-      return `${citation.title}, ${citation.volume || ''} ${citation.reporter || ''} ${citation.pageNumber || ''} (${citation.year || ''})`;
+    case 'case': {
+      let formatted = `${citation.title}, ${citation.volume || ''} ${citation.reporter || ''} ${citation.pageNumber || ''} (${citation.year || ''})`;
+      if (includeUrl && citation.url) formatted += `, ${citation.url}`;
+      return formatted;
+    }
+    case 'article': {
+      const authorText = citation.authors && citation.authors.length > 0 
+        ? citation.authors.join(', ') 
+        : '';
+      let formatted = `${authorText}${authorText ? '. ' : ''}"${citation.title}." ${citation.publication || ''}${citation.volume ? ` ${citation.volume}` : ''} (${citation.year || ''})${citation.pageNumber ? `: ${citation.pageNumber}` : ''}.`;
+      return formatted;
+    }
     default:
       return citation.title;
   }
 }
 
-function formatMlaCitation(citation: Citation): string {
-  // Basic MLA formatting implementation
+function formatMlaCitation(citation: Citation, options: FormatOptions = {}): string {
+  const { includeUrl = false } = options;
+  
   switch (citation.type) {
-    case 'case':
-      return `${citation.title}. ${citation.volume || ''} ${citation.reporter || ''} ${citation.pageNumber || ''}. ${citation.year || ''}.`;
+    case 'case': {
+      let formatted = `${citation.title}. ${citation.volume || ''} ${citation.reporter || ''} ${citation.pageNumber || ''}. ${citation.year || ''}.`;
+      if (includeUrl && citation.url) formatted += ` ${citation.url}. Accessed ${new Date().toLocaleDateString()}.`;
+      return formatted;
+    }
     default:
       return citation.title;
   }
 }
 
-function formatAglcCitation(citation: Citation): string {
+function formatAglcCitation(citation: Citation, options: FormatOptions = {}): string {
   // Australian Guide to Legal Citation formatting
   switch (citation.type) {
-    case 'case':
-      return `${citation.title} (${citation.year || ''}) ${citation.volume || ''} ${citation.reporter || ''} ${citation.pageNumber || ''}`;
+    case 'case': {
+      let formatted = `${citation.title} (${citation.year || ''}) ${citation.volume || ''} ${citation.reporter || ''} ${citation.pageNumber || ''}`;
+      if (citation.court) formatted += ` (${citation.court})`;
+      return formatted;
+    }
     default:
       return citation.title;
   }
@@ -141,4 +250,23 @@ export const citationStyles = [
   { value: 'chicago', label: 'Chicago' },
   { value: 'mla', label: 'MLA' },
   { value: 'aglc', label: 'AGLC (Australian)' }
+];
+
+// Custom formatting templates
+export const customCitationTemplates = [
+  { 
+    name: 'Case with Parenthetical',
+    template: '{title}, {volume} {reporter} {page} ({court}, {year}) (explaining that...)',
+    type: 'case'
+  },
+  {
+    name: 'Short Case Citation',
+    template: '{title}, {page}',
+    type: 'case'
+  },
+  {
+    name: 'Statute with Jurisdiction',
+    template: '{title} § {section} ({jurisdiction} {year})',
+    type: 'statute'
+  }
 ];

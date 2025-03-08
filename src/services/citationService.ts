@@ -75,6 +75,34 @@ const mockCitations: Citation[] = [
     court: 'Supreme Court',
     url: 'https://example.com/taylor-v-riojas',
     summary: "Addressed qualified immunity where officials' conduct was obviously unconstitutional even without a prior case with identical facts."
+  },
+  // Additional citations with different courts and years for better filtering
+  {
+    id: 'doe-v-university-2022',
+    title: 'Doe v. University',
+    citation: '234 F.3d 567',
+    year: 2022,
+    court: 'Third Circuit',
+    url: 'https://example.com/doe-v-university',
+    summary: 'Established new standards for due process in university disciplinary proceedings.'
+  },
+  {
+    id: 'city-of-chicago-v-environmental-group-2015',
+    title: 'City of Chicago v. Environmental Group',
+    citation: '789 Ill. 2d 345',
+    year: 2015,
+    court: 'Illinois Supreme Court',
+    url: 'https://example.com/chicago-v-environmental',
+    summary: 'Key case on municipal liability in environmental regulation enforcement.'
+  },
+  {
+    id: 'tech-industries-v-patent-holder-2019',
+    title: 'Tech Industries v. Patent Holder',
+    citation: '345 F.Supp.3d 678',
+    year: 2019,
+    court: 'District of Delaware',
+    url: 'https://example.com/tech-v-patent',
+    summary: 'Important case on software patent enforcement and fair use defenses.'
   }
 ];
 
@@ -121,6 +149,28 @@ export const getCitationById = (id: string): Citation | undefined => {
   return mockCitations.find(citation => citation.id === id);
 };
 
+// Get all available courts for filtering
+export const getAvailableCourts = (): string[] => {
+  const courts = new Set<string>();
+  mockCitations.forEach(citation => courts.add(citation.court));
+  return Array.from(courts);
+};
+
+// Get year range (min and max years) for filtering
+export const getCitationYearRange = (): [number, number] => {
+  if (mockCitations.length === 0) return [1950, new Date().getFullYear()];
+  
+  let minYear = mockCitations[0].year;
+  let maxYear = mockCitations[0].year;
+  
+  mockCitations.forEach(citation => {
+    if (citation.year < minYear) minYear = citation.year;
+    if (citation.year > maxYear) maxYear = citation.year;
+  });
+  
+  return [minYear, maxYear];
+};
+
 // In a real application, this would fetch data from an actual citation API
 export const fetchRelatedCitations = async (query: string): Promise<Citation[]> => {
   console.log('CitationService: Fetching citations related to:', query);
@@ -132,3 +182,37 @@ export const fetchRelatedCitations = async (query: string): Promise<Citation[]> 
   return searchCitations(query);
 };
 
+// Filter citations based on criteria
+export const filterCitations = (
+  citations: Citation[],
+  filters: {
+    court?: string;
+    yearRange?: [number, number];
+    searchTerm?: string;
+  }
+): Citation[] => {
+  return citations.filter(citation => {
+    // Apply court filter
+    if (filters.court && citation.court !== filters.court) {
+      return false;
+    }
+    
+    // Apply year range filter
+    if (filters.yearRange && (citation.year < filters.yearRange[0] || citation.year > filters.yearRange[1])) {
+      return false;
+    }
+    
+    // Apply search term
+    if (filters.searchTerm) {
+      const searchLower = filters.searchTerm.toLowerCase();
+      return (
+        citation.title.toLowerCase().includes(searchLower) ||
+        citation.citation.toLowerCase().includes(searchLower) ||
+        citation.court.toLowerCase().includes(searchLower) ||
+        (citation.summary && citation.summary.toLowerCase().includes(searchLower))
+      );
+    }
+    
+    return true;
+  });
+};
