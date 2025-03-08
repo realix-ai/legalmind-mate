@@ -1,254 +1,84 @@
 
-import { useState, useCallback, useEffect, useRef } from "react";
-import { toast } from "sonner";
-import { v4 as uuidv4 } from 'uuid';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { useTheme } from "@/hooks/use-theme";
-import { cn } from "@/lib/utils";
-import { SettingsDialog } from "@/components/settings/SettingsDialog";
-import { Loader } from "lucide-react";
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import Navigation from '@/components/Navigation';
+import QueryTabs from '@/components/query-assistant/QueryTabs';
+import UserWelcome from '@/components/query-assistant/UserWelcome';
+import { useLegalQuery } from '@/hooks/use-legal-query';
+import { useUserProfile } from '@/hooks/use-user-profile';
+import SettingsDialog from '@/components/settings/SettingsDialog';
+import AiAssistantButton from '@/components/ai/AiAssistantButton';
+import { toast } from 'sonner';
 
 const QueryAssistant = () => {
-  const { theme } = useTheme();
-  const [session, setSession] = useState<any>({ user: { name: 'User', email: 'user@example.com' } });
-  const [status, setStatus] = useState('authenticated');
-  const [query, setQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [messages, setMessages] = useState<any[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('appearance');
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState('query');
+  const [openSettings, setOpenSettings] = useState(false);
+  const [settingsTab, setSettingsTab] = useState('integrations');
+  const { userName } = useUserProfile();
+  const { 
+    isProcessing, 
+    response, 
+    citations, 
+    currentQuery,
+    handleSubmit, 
+    handleShareQuery,
+    handleResponseEdit
+  } = useLegalQuery(setActiveTab);
+
+  const handleAssistantResponse = (response: string) => {
+    toast.info('AI Tip', {
+      description: response,
+      duration: 8000,
+    });
+  };
+
+  // Properly handle settings dialog open/close
+  const handleSettingsOpenChange = (open: boolean) => {
+    setTimeout(() => {
+      setOpenSettings(open);
+    }, 10);
+  };
 
   useEffect(() => {
-    // Scroll to the bottom when messages update
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
-
-  const handleSignOut = async () => {
-    try {
-      // Simulated sign out since we don't have next-auth
-      setSession(null);
-      setStatus('unauthenticated');
-    } catch (error) {
-      console.error("Sign out failed", error);
-    }
-  };
-
-  const handleOpenChange = useCallback((open: boolean) => {
-    if (!open) {
-      setTimeout(() => {
-        setIsSettingsOpen(false);
-      }, 10);
-    } else {
-      setIsSettingsOpen(true);
-    }
-  }, []);
-
-  const handleOpenSettings = useCallback((tab: string) => {
-    setActiveTab(tab);
-    setIsSettingsOpen(true);
-  }, []);
-
-  const handleSaveSettings = useCallback((selectedTheme: string, selectedLanguage: string) => {
-    // Here you would handle saving the settings
-    console.log("Saving settings:", selectedTheme, selectedLanguage);
-    setTimeout(() => {
-      setIsSettingsOpen(false);
-    }, 10);
-  }, []);
-
-  const sendMessage = async () => {
-    if (!query.trim()) return;
-
-    const userMessage = {
-      id: uuidv4(),
-      role: "user",
-      content: query,
-    };
-
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
-    setQuery("");
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch("/api/assistant", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: query }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const assistantMessage = {
-        id: uuidv4(),
-        role: "assistant",
-        content: data.result,
-      };
-      setMessages((prevMessages) => [...prevMessages, assistantMessage]);
-    } catch (e: any) {
-      console.error("Error sending message:", e);
-      setError(e.message || "Failed to send message");
-      toast.error(e.message || "Failed to send message");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (status === "loading") {
-    return <div>Loading...</div>;
-  }
+    console.log("QueryAssistant component mounted, userName:", userName);
+  }, [userName]);
 
   return (
-    <div className="flex flex-col h-screen">
-      {/* Navbar */}
-      <div className="bg-background border-b">
-        <div className="container flex items-center h-16 space-x-4 sm:justify-between sm:space-x-0">
-          <p className="font-bold text-2xl">
-            Acme <span className="text-primary">AI</span>
-          </p>
-          <div className="flex flex-1 items-center justify-end space-x-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || "Avatar"} />
-                    <AvatarFallback>
-                      {session?.user?.name ? session.user.name[0] : "A"}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[200px]">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem disabled>
-                  <Badge variant="secondary" className="mr-2">
-                    {session?.user?.email}
-                  </Badge>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleOpenSettings("integrations")}>
-                  Integrations
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleOpenSettings("appearance")}>
-                  Settings
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleSignOut}>
-                  Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+    <div className="flex flex-col min-h-screen w-full">
+      <Navigation />
+      
+      <main className="flex-1 w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-16">
+        <div className="w-full">
+          <QueryTabs
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            isProcessing={isProcessing}
+            response={response}
+            handleSubmit={handleSubmit}
+            onShare={handleShareQuery}
+            citations={citations}
+            currentQuery={currentQuery}
+            onResponseEdit={handleResponseEdit}
+          />
         </div>
-      </div>
+      </main>
 
-      {/* Chat Messages */}
-      <div className="flex-1 overflow-auto">
-        <ScrollArea className="h-full">
-          <div ref={scrollRef} className="container py-4">
-            {messages.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-[50vh] text-center">
-                <h2 className="text-2xl font-bold mb-2">Welcome to Acme AI Assistant</h2>
-                <p className="text-muted-foreground mb-4 max-w-md">
-                  Ask me anything about your legal cases, documents, or use me to draft content.
-                </p>
-                <Button onClick={() => setQuery("How can you help me with legal research?")}>
-                  Try a sample question
-                </Button>
-              </div>
-            )}
-            
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`mb-4 flex ${message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
-              >
-                <Card
-                  className={cn(
-                    "w-full max-w-md rounded-lg shadow-md",
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary text-secondary-foreground"
-                  )}
-                >
-                  <CardHeader>
-                    <p className="text-sm font-medium capitalize">{message.role}</p>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm break-words">{message.content}</p>
-                  </CardContent>
-                </Card>
-              </div>
-            ))}
-            {isLoading && (
-              <div className="flex justify-center">
-                <Loader className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            )}
-            {error && (
-              <div className="text-red-500 text-center">Error: {error}</div>
-            )}
-          </div>
-        </ScrollArea>
-      </div>
-
-      {/* Input Area */}
-      <div className="border-t">
-        <div className="container py-4">
-          <div className="flex items-center space-x-4">
-            <Textarea
-              placeholder="Type your message here..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="flex-1 resize-none"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  sendMessage();
-                }
-              }}
-            />
-            <Button onClick={sendMessage} disabled={isLoading}>
-              Send
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <SettingsDialog
-        open={isSettingsOpen}
-        onOpenChange={handleOpenChange}
-        activeTab={activeTab}
-        theme={theme || "system"}
-        language={"en"}
-        onSaveSettings={handleSaveSettings}
+      <UserWelcome userName={userName} />
+      
+      <SettingsDialog 
+        open={openSettings} 
+        onOpenChange={handleSettingsOpenChange}
+        defaultTab={settingsTab}
       />
+
+      {/* Fixed position assistant button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <AiAssistantButton 
+          context="Query Assistant page. The user can ask legal research questions."
+          onAssistantResponse={handleAssistantResponse}
+          buttonText="Query Tips"
+        />
+      </div>
     </div>
   );
 };

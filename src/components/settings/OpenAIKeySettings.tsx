@@ -3,8 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { KeyRound, Save, ExternalLink, CheckCircle, XCircle } from 'lucide-react';
-import { Label } from '@/components/ui/label';
+import { KeyRound, Save, CheckCircle, XCircle } from 'lucide-react';
 
 export function OpenAIKeySettings() {
   const [apiKey, setApiKey] = useState<string>(localStorage.getItem('openai-api-key') || '');
@@ -17,6 +16,7 @@ export function OpenAIKeySettings() {
       return;
     }
     
+    // Store in localStorage (in a real app, this should be handled more securely)
     localStorage.setItem('openai-api-key', apiKey.trim());
     toast.success("API key saved");
     setIsEditing(false);
@@ -55,15 +55,18 @@ export function OpenAIKeySettings() {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
+        <KeyRound className="h-5 w-5 text-primary" />
         <h3 className="text-lg font-medium">OpenAI API Key</h3>
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="openai-key">API Key</Label>
+        <p className="text-sm text-muted-foreground">
+          Enter your OpenAI API key to enable ChatGPT integration. Your key is stored locally in your browser.
+        </p>
+        
         {isEditing ? (
           <div className="space-y-2">
             <Input
-              id="openai-key"
               type="password"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
@@ -86,16 +89,11 @@ export function OpenAIKeySettings() {
                 disabled={isTesting || !apiKey.trim()}
                 className="gap-1"
               >
-                {isTesting ? "Testing..." : "Test Key"}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => window.open('https://platform.openai.com/account/api-keys', '_blank')}
-                className="gap-1 ml-auto"
-              >
-                <ExternalLink className="h-4 w-4" />
-                OpenAI Dashboard
+                {isTesting ? (
+                  <>Testing...</>
+                ) : (
+                  <>Test Key</>
+                )}
               </Button>
             </div>
           </div>
@@ -119,9 +117,6 @@ export function OpenAIKeySettings() {
             </div>
           </div>
         )}
-        <p className="text-sm text-muted-foreground mt-2">
-          Your OpenAI API key is stored locally in your browser and is used for AI-powered features.
-        </p>
       </div>
     </div>
   );

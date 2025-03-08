@@ -13,8 +13,6 @@ export function OutlookIntegration() {
   const [email, setEmail] = useState<string>(
     localStorage.getItem('outlook-email') || ''
   );
-  const [isConnecting, setIsConnecting] = useState<boolean>(false);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
   
   const handleConnect = () => {
     if (!email.trim()) {
@@ -27,8 +25,8 @@ export function OutlookIntegration() {
       return;
     }
     
-    // Simulate authentication with Microsoft
-    setIsConnecting(true);
+    // Simulate authentication with Microsoft - in a real implementation,
+    // this would redirect to Microsoft's OAuth flow
     toast.success("Connecting to Outlook...");
     
     // Simulate a successful connection after 1.5 seconds
@@ -36,7 +34,6 @@ export function OutlookIntegration() {
       localStorage.setItem('outlook-connected', 'true');
       localStorage.setItem('outlook-email', email);
       setConnected(true);
-      setIsConnecting(false);
       toast.success("Successfully connected to Outlook");
     }, 1500);
   };
@@ -53,35 +50,37 @@ export function OutlookIntegration() {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <h3 className="text-lg font-medium">Microsoft Outlook</h3>
+        <Mail className="h-5 w-5 text-primary" />
+        <h3 className="text-lg font-medium">Microsoft Outlook Integration</h3>
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="outlook-email">Email Address</Label>
+        <p className="text-sm text-muted-foreground">
+          Connect your Microsoft Outlook account to send documents directly from the application.
+        </p>
+        
         {!connected ? (
-          <div className="space-y-2">
-            <Input
-              id="outlook-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your.name@outlook.com"
-            />
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <Label htmlFor="outlook-email">Outlook Email</Label>
+              <Input
+                id="outlook-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your.name@outlook.com"
+              />
+            </div>
             
             <div className="flex gap-2">
-              <Button 
-                onClick={handleConnect} 
-                size="sm"
-                disabled={isConnecting}
-                className="gap-1"
-              >
-                {isConnecting ? "Connecting..." : "Connect to Outlook"}
+              <Button onClick={handleConnect} className="gap-1">
+                <Mail className="h-4 w-4" />
+                Connect to Outlook
               </Button>
               <Button 
                 variant="outline" 
-                size="sm"
                 onClick={() => window.open('https://outlook.office.com', '_blank')}
-                className="gap-1 ml-auto"
+                className="gap-1"
               >
                 <ExternalLink className="h-4 w-4" />
                 Open Outlook
@@ -89,72 +88,26 @@ export function OutlookIntegration() {
             </div>
           </div>
         ) : (
-          <div className="space-y-2">
-            {isEditing ? (
-              <div className="space-y-2">
-                <Input
-                  id="outlook-email-edit"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                <div className="flex gap-2">
-                  <Button 
-                    onClick={() => {
-                      localStorage.setItem('outlook-email', email);
-                      setIsEditing(false);
-                      toast.success("Email updated");
-                    }} 
-                    size="sm"
-                  >
-                    Save
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => {
-                      setEmail(localStorage.getItem('outlook-email') || '');
-                      setIsEditing(false);
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </div>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 p-3 bg-muted rounded-md">
+              <CheckCircle className="h-5 w-5 text-green-500" />
+              <div className="flex-1">
+                <p className="font-medium">Connected to Outlook</p>
+                <p className="text-sm text-muted-foreground">{email}</p>
               </div>
-            ) : (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-muted px-3 py-1.5 rounded text-sm">
-                    {email}
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => setIsEditing(true)}
-                  >
-                    Edit
-                  </Button>
-                </div>
-                <div className="flex items-center gap-1 text-sm">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span className="text-muted-foreground">Connected to Outlook</span>
-                </div>
-                <Button 
-                  variant="destructive"
-                  size="sm"
-                  onClick={handleDisconnect}
-                  className="gap-1 mt-2"
-                >
-                  <XCircle className="h-4 w-4" />
-                  Disconnect
-                </Button>
-              </div>
-            )}
+            </div>
+            
+            <Button 
+              variant="destructive"
+              size="sm"
+              onClick={handleDisconnect}
+              className="gap-1"
+            >
+              <XCircle className="h-4 w-4" />
+              Disconnect
+            </Button>
           </div>
         )}
-        <p className="text-sm text-muted-foreground mt-2">
-          Connect your Microsoft Outlook account to send documents directly from the application.
-        </p>
       </div>
     </div>
   );
