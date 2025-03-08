@@ -1,5 +1,4 @@
-
-import { Loader2, FileText, Download, Mail, Link, Share2, Edit, MoreHorizontal } from 'lucide-react';
+import { Loader2, FileText, Download, Mail, Link, Share2, Edit, MoreHorizontal, Cloud } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { toast } from "sonner";
@@ -10,6 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import SaveToIManageDialog from '@/components/document/SaveToIManageDialog';
 
 interface QueryResponseDisplayProps {
   isProcessing: boolean;
@@ -28,6 +28,7 @@ const processingStages = [
 
 const QueryResponseDisplay = ({ isProcessing, response, onShare, onEdit, showShareButton }: QueryResponseDisplayProps) => {
   const [copied, setCopied] = useState(false);
+  const [showSaveToIManageDialog, setShowSaveToIManageDialog] = useState(false);
   
   // Don't show anything if we're not processing and have no response
   if (!isProcessing && !response) {
@@ -100,6 +101,10 @@ const QueryResponseDisplay = ({ isProcessing, response, onShare, onEdit, showSha
     
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const handleSaveToIManage = () => {
+    setShowSaveToIManageDialog(true);
+  };
   
   return (
     <motion.div
@@ -138,6 +143,10 @@ const QueryResponseDisplay = ({ isProcessing, response, onShare, onEdit, showSha
                         Share Results
                       </DropdownMenuItem>
                     )}
+                    <DropdownMenuItem onClick={handleSaveToIManage}>
+                      <Cloud className="h-4 w-4 mr-2" />
+                      Save to iManage
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleExportPDF}>
                       <Download className="h-4 w-4 mr-2" />
                       Save as PDF
@@ -192,6 +201,22 @@ const QueryResponseDisplay = ({ isProcessing, response, onShare, onEdit, showSha
           )}
         </div>
       </div>
+
+      {/* Save to iManage Dialog */}
+      {response && (
+        <SaveToIManageDialog
+          title="Query Response"
+          content={response}
+          category="general"
+          currentDocumentId={null}
+          onSaved={(documentId) => {
+            toast.success("Query response saved to iManage");
+            setShowSaveToIManageDialog(false);
+          }}
+          open={showSaveToIManageDialog}
+          onOpenChange={setShowSaveToIManageDialog}
+        />
+      )}
     </motion.div>
   );
 };
