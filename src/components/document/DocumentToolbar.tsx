@@ -8,7 +8,7 @@ import AiAssistantButton from './toolbar/AiAssistantButton';
 import LegalCitationsButton from './toolbar/LegalCitationsButton';
 import SaveButton from './toolbar/SaveButton';
 import SaveToCaseButton from './toolbar/SaveToCaseButton';
-import ExportOptions from './ExportOptions';
+import ExportOptions from './export/ExportOptions';
 import { SaveToIManageButton, GetFromIManageButton } from './toolbar/IManageButtons';
 import ToolbarOverflowMenu from './toolbar/ToolbarOverflowMenu';
 import SaveToCaseDialog from './SaveToCaseDialog';
