@@ -59,7 +59,7 @@ const CaseHeader = ({
         <AiAssistantButton 
           context="Case Management page. The user can organize and manage legal cases."
           onAssistantResponse={handleAssistantResponse}
-          buttonText="Case Tips"
+          buttonText="AI Assistant"
         />
         <Button onClick={handleCreateCase} className="ml-2">
           <Plus className="mr-2 h-4 w-4" /> New Case
