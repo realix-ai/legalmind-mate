@@ -102,24 +102,23 @@ const CitationBox = ({
   }, [citations, courtFilter, yearRange]);
   
   const displayCitations = expanded ? filteredCitations : filteredCitations.slice(0, maxInitialDisplay);
-  
-  const handleCopyCitation = (citation: Citation) => {
-    // Format the citation based on the selected format
-    let citationText = "";
-    
+
+  // Format a citation based on the selected format
+  const formatCitation = (citation: Citation) => {
     switch (citationFormat) {
       case 'bluebook':
-        citationText = `${citation.title}, ${citation.citation} (${citation.court}, ${citation.year})`;
-        break;
+        return `${citation.title}, ${citation.citation} (${citation.court}, ${citation.year})`;
       case 'apa':
-        citationText = `${citation.title}. (${citation.year}). ${citation.citation}. ${citation.court}.`;
-        break;
+        return `${citation.title}. (${citation.year}). ${citation.citation}. ${citation.court}.`;
       case 'chicago':
-        citationText = `${citation.title}, ${citation.citation}, ${citation.court} ${citation.year}.`;
-        break;
+        return `${citation.title}, ${citation.citation}, ${citation.court} ${citation.year}.`;
       default:
-        citationText = `${citation.title}, ${citation.citation} (${citation.court}, ${citation.year})`;
+        return `${citation.title}, ${citation.citation} (${citation.court}, ${citation.year})`;
     }
+  };
+  
+  const handleCopyCitation = (citation: Citation) => {
+    const citationText = formatCitation(citation);
     
     navigator.clipboard.writeText(citationText);
     setCopiedId(citation.id);
@@ -280,7 +279,9 @@ const CitationBox = ({
                 <div className="flex justify-between items-start">
                   <div>
                     <h4 className="font-medium text-primary/90">{citation.title}</h4>
-                    <p className="text-muted-foreground text-xs mt-1">{citation.citation} ({citation.court}, {citation.year})</p>
+                    <p className="text-muted-foreground text-xs mt-1">
+                      {formatCitation(citation)}
+                    </p>
                   </div>
                   <div className="flex gap-1">
                     <Button
