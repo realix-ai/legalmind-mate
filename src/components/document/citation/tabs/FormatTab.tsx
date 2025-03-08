@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { FileText, Check } from 'lucide-react';
 import { formatCitation, citationTypes, citationStyles } from '@/utils/documents/citationFormatter';
 import { toast } from 'sonner';
 
@@ -25,15 +26,18 @@ export function FormatTab({ onInsertCitation }: FormatTabProps) {
   });
   const [citationStyle, setCitationStyle] = useState('bluebook');
   const [formattedCitation, setFormattedCitation] = useState('');
+  const [isGenerated, setIsGenerated] = useState(false);
 
-  // Update the formatted citation whenever any of the inputs change
-  useEffect(() => {
+  // Generate the formatted citation
+  const generateCitation = () => {
     const formatted = formatCitation(
       customCitation,
       citationStyle as any
     );
     setFormattedCitation(formatted);
-  }, [customCitation, citationStyle]);
+    setIsGenerated(true);
+    toast.success('Citation generated');
+  };
 
   // Update custom citation field
   const updateCitation = (field: string, value: any) => {
@@ -41,10 +45,18 @@ export function FormatTab({ onInsertCitation }: FormatTabProps) {
       ...customCitation,
       [field]: value
     });
+    // Reset the generated state when inputs change
+    if (isGenerated) {
+      setIsGenerated(false);
+    }
   };
 
   // Handle the insertion of a citation
   const handleInsertCitation = () => {
+    // If not generated yet, generate first
+    if (!isGenerated) {
+      generateCitation();
+    }
     onInsertCitation(formattedCitation);
     toast.success('Citation inserted');
   };
@@ -56,7 +68,10 @@ export function FormatTab({ onInsertCitation }: FormatTabProps) {
           <Label htmlFor="citation-style">Citation Style</Label>
           <Select 
             value={citationStyle} 
-            onValueChange={setCitationStyle}
+            onValueChange={(value) => {
+              setCitationStyle(value);
+              setIsGenerated(false);
+            }}
           >
             <SelectTrigger id="citation-style">
               <SelectValue placeholder="Select style" />
@@ -162,16 +177,32 @@ export function FormatTab({ onInsertCitation }: FormatTabProps) {
             placeholder="e.g., 115-116"
           />
         </div>
+
+        <Button 
+          onClick={generateCitation}
+          className="w-full mt-4"
+          variant="secondary"
+        >
+          <FileText className="mr-2 h-4 w-4" />
+          Generate Citation
+        </Button>
       </div>
       
       <Separator />
       
       <div className="space-y-2">
         <Label>Formatted Citation:</Label>
-        <div className="p-3 border rounded-md bg-muted">
-          <p className="break-all text-sm font-mono">{formattedCitation}</p>
+        <div className={`p-3 border rounded-md ${isGenerated ? 'bg-muted/80' : 'bg-muted/30'}`}>
+          <p className="break-all text-sm font-mono">
+            {isGenerated ? formattedCitation : 'Click "Generate Citation" to create your formatted citation'}
+          </p>
         </div>
-        <Button onClick={handleInsertCitation} className="w-full">
+        <Button 
+          onClick={handleInsertCitation} 
+          className="w-full"
+          disabled={!customCitation.title}
+        >
+          <Check className="mr-2 h-4 w-4" />
           Insert Citation
         </Button>
       </div>
