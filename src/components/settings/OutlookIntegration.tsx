@@ -52,7 +52,6 @@ export function OutlookIntegration() {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <Mail className="h-5 w-5 text-primary" />
         <h3 className="text-lg font-medium">Microsoft Outlook</h3>
       </div>
       
@@ -97,7 +96,7 @@ export function OutlookIntegration() {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                onClick={() => setConnected(false)}
+                onClick={() => setIsEditing(true)}
               >
                 Edit
               </Button>
