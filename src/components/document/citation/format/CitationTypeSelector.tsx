@@ -5,7 +5,7 @@ import { citationTypes } from '@/utils/documents/citationFormatter';
 
 interface CitationTypeSelectorProps {
   value: 'case' | 'statute' | 'regulation' | 'article' | 'book' | 'website';
-  onChange: (value: any) => void;
+  onChange: (value: 'case' | 'statute' | 'regulation' | 'article' | 'book' | 'website') => void;
 }
 
 export function CitationTypeSelector({ value, onChange }: CitationTypeSelectorProps) {
@@ -14,7 +14,7 @@ export function CitationTypeSelector({ value, onChange }: CitationTypeSelectorPr
       <Label htmlFor="citation-type">Citation Type</Label>
       <Select 
         value={value} 
-        onValueChange={(value) => onChange('type', value)}
+        onValueChange={onChange}
       >
         <SelectTrigger id="citation-type">
           <SelectValue placeholder="Select type" />

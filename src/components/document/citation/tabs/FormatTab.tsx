@@ -58,6 +58,11 @@ export function FormatTab({ onInsertCitation }: FormatTabProps) {
     });
   };
 
+  // Handle type changes specifically
+  const handleTypeChange = (type: 'case' | 'statute' | 'regulation' | 'article' | 'book' | 'website') => {
+    updateCitation('type', type);
+  };
+
   // Handle the insertion of a citation
   const handleInsertCitation = () => {
     if (!isGenerated && customCitation.title) {
@@ -81,7 +86,7 @@ export function FormatTab({ onInsertCitation }: FormatTabProps) {
         
         <CitationTypeSelector 
           value={customCitation.type} 
-          onChange={updateCitation} 
+          onChange={handleTypeChange} 
         />
         
         <CitationFormFields 
