@@ -40,12 +40,12 @@ const HeroSection = () => {
 
   // Features list with icons for the hero section
   const features = [
-    { icon: <Zap className="h-4 w-4 text-primary" />, text: "Fast Research" },
-    { icon: <Clock className="h-4 w-4 text-primary" />, text: "Time Saving" },
-    { icon: <ShieldCheck className="h-4 w-4 text-primary" />, text: "Secure & Compliant" },
-    { icon: <BookOpen className="h-4 w-4 text-primary" />, text: "Comprehensive Database" },
-    { icon: <CheckCircle2 className="h-4 w-4 text-primary" />, text: "High Accuracy" },
-    { icon: <Search className="h-4 w-4 text-primary" />, text: "Advanced Search" },
+    { icon: <Zap className="h-4 w-4" />, text: "Fast Research" },
+    { icon: <Clock className="h-4 w-4" />, text: "Time Saving" },
+    { icon: <ShieldCheck className="h-4 w-4" />, text: "Secure & Compliant" },
+    { icon: <BookOpen className="h-4 w-4" />, text: "Comprehensive Database" },
+    { icon: <CheckCircle2 className="h-4 w-4" />, text: "High Accuracy" },
+    { icon: <Search className="h-4 w-4" />, text: "Advanced Search" },
   ];
 
   return (
@@ -196,25 +196,33 @@ const HeroSection = () => {
               </Button>
             </motion.div>
             
-            {/* Feature highlights */}
+            {/* Feature highlights - Updated for smaller, more organized layout */}
             <motion.div 
-              className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6"
+              className="mt-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7, duration: 0.6 }}
             >
-              {features.map((feature, index) => (
-                <motion.div 
-                  key={index}
-                  className="flex items-center gap-2 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7 + (index * 0.1), duration: 0.4 }}
-                >
-                  {feature.icon}
-                  <span className="font-medium">{feature.text}</span>
-                </motion.div>
-              ))}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {features.map((feature, index) => (
+                  <motion.div 
+                    key={index}
+                    className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 py-2 px-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 + (index * 0.1), duration: 0.4 }}
+                    whileHover={{ 
+                      y: -2,
+                      backgroundColor: "rgba(var(--primary-rgb), 0.1)"
+                    }}
+                  >
+                    <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-primary/10">
+                      {React.cloneElement(feature.icon, { className: "h-3.5 w-3.5 text-primary" })}
+                    </div>
+                    <span className="text-sm font-medium line-clamp-1">{feature.text}</span>
+                  </motion.div>
+                ))}
+              </div>
             </motion.div>
           </motion.div>
           
