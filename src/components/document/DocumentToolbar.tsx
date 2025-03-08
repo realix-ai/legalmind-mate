@@ -44,6 +44,7 @@ const DocumentToolbar = ({
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showSaveToIManageDialog, setShowSaveToIManageDialog] = useState(false);
   const [showGetFromIManageDialog, setShowGetFromIManageDialog] = useState(false);
+  const [showCitationTool, setShowCitationTool] = useState(false);
 
   const handleInsertCitation = (citation: string) => {
     // Create a citation insertion event
@@ -62,10 +63,14 @@ const DocumentToolbar = ({
   };
   
   const handleCitationButtonClick = () => {
-    const citationToolTrigger = document.querySelector('[data-citation-tool-trigger]');
-    if (citationToolTrigger) {
-      (citationToolTrigger as HTMLButtonElement).click();
-    }
+    setShowCitationTool(true);
+    // Defer to next tick to ensure state is updated
+    setTimeout(() => {
+      const citationToolTrigger = document.querySelector('[data-citation-tool-trigger]');
+      if (citationToolTrigger) {
+        (citationToolTrigger as HTMLButtonElement).click();
+      }
+    }, 10);
   };
 
   // Define overflow menu actions

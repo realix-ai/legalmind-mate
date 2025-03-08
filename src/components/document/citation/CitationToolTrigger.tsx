@@ -15,7 +15,7 @@ const CitationToolTrigger = React.forwardRef<HTMLButtonElement, CitationToolTrig
         ref={ref}
         variant="outline" 
         size="xs" 
-        className={`hidden ${className || ''}`}
+        className={`${className || ''}`}
       >
         <QuoteIcon className="h-3.5 w-3.5" />
         <span className="hidden md:inline">Citations</span>
