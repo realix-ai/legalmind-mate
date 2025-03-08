@@ -14,6 +14,7 @@ export function OutlookIntegration() {
     localStorage.getItem('outlook-email') || ''
   );
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
   
   const handleConnect = () => {
     if (!email.trim()) {
@@ -89,31 +90,66 @@ export function OutlookIntegration() {
           </div>
         ) : (
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <div className="flex-1 bg-muted px-3 py-1.5 rounded text-sm">
-                {email}
+            {isEditing ? (
+              <div className="space-y-2">
+                <Input
+                  id="outlook-email-edit"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={() => {
+                      localStorage.setItem('outlook-email', email);
+                      setIsEditing(false);
+                      toast.success("Email updated");
+                    }} 
+                    size="sm"
+                  >
+                    Save
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => {
+                      setEmail(localStorage.getItem('outlook-email') || '');
+                      setIsEditing(false);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => setIsEditing(true)}
-              >
-                Edit
-              </Button>
-            </div>
-            <div className="flex items-center gap-1 text-sm">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              <span className="text-muted-foreground">Connected to Outlook</span>
-            </div>
-            <Button 
-              variant="destructive"
-              size="sm"
-              onClick={handleDisconnect}
-              className="gap-1 mt-2"
-            >
-              <XCircle className="h-4 w-4" />
-              Disconnect
-            </Button>
+            ) : (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 bg-muted px-3 py-1.5 rounded text-sm">
+                    {email}
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setIsEditing(true)}
+                  >
+                    Edit
+                  </Button>
+                </div>
+                <div className="flex items-center gap-1 text-sm">
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  <span className="text-muted-foreground">Connected to Outlook</span>
+                </div>
+                <Button 
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleDisconnect}
+                  className="gap-1 mt-2"
+                >
+                  <XCircle className="h-4 w-4" />
+                  Disconnect
+                </Button>
+              </div>
+            )}
           </div>
         )}
         <p className="text-sm text-muted-foreground mt-2">
