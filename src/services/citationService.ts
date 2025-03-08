@@ -74,7 +74,7 @@ const mockCitations: Citation[] = [
     year: 2020,
     court: 'Supreme Court',
     url: 'https://example.com/taylor-v-riojas',
-    summary: 'Addressed qualified immunity where officials' conduct was obviously unconstitutional even without a prior case with identical facts.'
+    summary: "Addressed qualified immunity where officials' conduct was obviously unconstitutional even without a prior case with identical facts."
   }
 ];
 
@@ -131,3 +131,4 @@ export const fetchRelatedCitations = async (query: string): Promise<Citation[]> 
   // Search mock database
   return searchCitations(query);
 };
+
