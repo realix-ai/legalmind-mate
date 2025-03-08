@@ -48,17 +48,72 @@ const mockCitations: Citation[] = [
     court: 'Ninth Circuit',
     url: 'https://example.com/johnson-v-metropolitan',
     summary: 'Addressed issues of standing in class action lawsuits.'
+  },
+  {
+    id: 'pearson-v-callahan-2009',
+    title: 'Pearson v. Callahan',
+    citation: '555 U.S. 223',
+    year: 2009,
+    court: 'Supreme Court',
+    url: 'https://example.com/pearson-v-callahan',
+    summary: 'Modified the Saucier protocol for qualified immunity, allowing courts discretion in deciding which prong to address first.'
+  },
+  {
+    id: 'saucier-v-katz-2001',
+    title: 'Saucier v. Katz',
+    citation: '533 U.S. 194',
+    year: 2001,
+    court: 'Supreme Court',
+    url: 'https://example.com/saucier-v-katz',
+    summary: 'Established a two-part test for qualified immunity analysis in excessive force claims.'
+  },
+  {
+    id: 'taylor-v-riojas-2020',
+    title: 'Taylor v. Riojas',
+    citation: '141 S. Ct. 52',
+    year: 2020,
+    court: 'Supreme Court',
+    url: 'https://example.com/taylor-v-riojas',
+    summary: 'Addressed qualified immunity where officials' conduct was obviously unconstitutional even without a prior case with identical facts.'
   }
 ];
 
 // Search citations based on keywords
 export const searchCitations = (query: string): Citation[] => {
+  // If the query is empty, return a few recent citations as default
+  if (!query.trim()) {
+    return mockCitations.slice(0, 3);
+  }
+  
   const normalizedQuery = query.toLowerCase();
-  return mockCitations.filter(citation => 
-    citation.title.toLowerCase().includes(normalizedQuery) ||
-    citation.summary?.toLowerCase().includes(normalizedQuery) ||
-    citation.court.toLowerCase().includes(normalizedQuery)
+  
+  // Split the query into individual words for better matching
+  const queryWords = normalizedQuery.split(/\s+/).filter(word => 
+    // Filter out common words that aren't useful for searching
+    !['the', 'and', 'or', 'of', 'in', 'on', 'at', 'to', 'a', 'an'].includes(word) && 
+    word.length > 2
   );
+  
+  // If we don't have any useful words after filtering, return some default citations
+  if (queryWords.length === 0) {
+    return mockCitations.slice(0, 3);
+  }
+  
+  const matches = mockCitations.filter(citation => {
+    const titleLower = citation.title.toLowerCase();
+    const summaryLower = citation.summary?.toLowerCase() || '';
+    const courtLower = citation.court.toLowerCase();
+    
+    // Check if any of the query words appear in the citation fields
+    return queryWords.some(word => 
+      titleLower.includes(word) || 
+      summaryLower.includes(word) || 
+      courtLower.includes(word)
+    );
+  });
+  
+  // If no matches found, return a few default citations rather than empty array
+  return matches.length > 0 ? matches : mockCitations.slice(0, 3);
 };
 
 // Get citation by ID
