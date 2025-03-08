@@ -81,7 +81,7 @@ const GetFromIManageDialog = ({
           className="hover:bg-primary/10"
           aria-label={buttonLabel}
         >
-          <Cloud className="h-3.5 w-3.5 text-muted-foreground" />
+          <Cloud className="h-5 w-5 text-muted-foreground" />
         </Button>
       );
     }
