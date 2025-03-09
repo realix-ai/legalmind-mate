@@ -1,41 +1,28 @@
 import { Case, SavedDocument } from './types';
 import { getSavedDocuments, updateDocumentCaseId, normalizeCaseId } from './documentManager';
-import { useAuth } from '@/contexts/AuthContext';
 
-// Helper function to get auth context or fall back to localStorage
-const getAuthContext = () => {
+// Helper function to get user prefix for storage keys
+const getUserPrefix = (): string => {
   try {
-    return useAuth();
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        return `user_${user.id}_`;
+      } catch (error) {
+        console.error('Failed to parse stored user:', error);
+      }
+    }
   } catch (e) {
-    // If this is called outside of the React component tree, fall back to localStorage
-    console.warn('Auth context not available, using localStorage fallback');
-    return { 
-      getUserPrefix: () => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          try {
-            const user = JSON.parse(storedUser);
-            return `user_${user.id}_`;
-          } catch (error) {
-            console.error('Failed to parse stored user:', error);
-          }
-        }
-        return '';
-      } 
-    };
+    console.error('Error getting user prefix:', e);
   }
+  return '';
 };
 
 // Helper to get storage key with user prefix
 const getStorageKey = (key: string): string => {
-  try {
-    const { getUserPrefix } = getAuthContext();
-    return `${getUserPrefix()}${key}`;
-  } catch (e) {
-    // Fallback if called outside React context
-    console.error('Error getting storage key:', e);
-    return key;
-  }
+  const prefix = getUserPrefix();
+  return `${prefix}${key}`;
 };
 
 // Case management functions

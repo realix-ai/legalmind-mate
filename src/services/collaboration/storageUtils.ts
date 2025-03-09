@@ -1,6 +1,4 @@
-
 import { TeamMember, SharedQuery, ActivityItem } from './types';
-import { useAuth } from '@/contexts/AuthContext';
 
 // Helper function to get user prefix for storage keys
 const getUserPrefix = (): string => {
