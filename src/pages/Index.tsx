@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import HeroSection from '@/components/landing/HeroSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
@@ -13,6 +14,7 @@ const Index = () => {
   // Log to check if the component is rendering
   useEffect(() => {
     console.log('Index component rendered');
+    document.title = 'Workswise.ai - AI-Powered Legal Assistant';
   }, []);
 
   const [apiStatus, setApiStatus] = useState<'connected' | 'disconnected' | 'checking'>('checking');

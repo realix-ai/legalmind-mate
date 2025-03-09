@@ -9,17 +9,21 @@ export const AppLogo = () => {
     <div className="mr-4 flex">
       <Link to="/" className="flex items-center gap-2 group">
         <div className="flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
-          <img 
-            src="/lovable-uploads/a6a6474a-8323-47ad-847f-a072100060b7.png" 
-            alt="Realix.ai Logo" 
-            className="h-14 w-auto"
-            style={{ 
-              filter: `drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.2))`
-            }}
-          />
+          <svg 
+            width="48" 
+            height="48" 
+            viewBox="0 0 48 48" 
+            fill="none" 
+            xmlns="http://www.w3.org/2000/svg"
+            className="drop-shadow-md"
+          >
+            <rect width="48" height="48" rx="10" fill="#8B5CF6" fillOpacity="0.1"/>
+            <path d="M14 12L24 8L34 12V20C34 28.2 30 32 24 36C18 32 14 28.2 14 20V12Z" fill="#8B5CF6" fillOpacity="0.8"/>
+            <path d="M24 30L32 22L28 18L24 22L20 18L16 22L24 30Z" fill="white"/>
+          </svg>
         </div>
         <span className="font-bold text-xl sm:inline-block bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent transition-all duration-300 group-hover:opacity-90">
-          Realix.ai
+          Workswise.ai
         </span>
       </Link>
     </div>

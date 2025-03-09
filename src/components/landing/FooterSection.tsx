@@ -54,16 +54,20 @@ const FooterSection = () => {
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-6">
               <div className="flex items-center justify-center">
-                <img 
-                  src="/lovable-uploads/a6a6474a-8323-47ad-847f-a072100060b7.png" 
-                  alt="Realix.ai Logo" 
-                  className="h-14 w-auto"
-                  style={{ 
-                    filter: `drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.2))`
-                  }}
-                />
+                <svg 
+                  width="48" 
+                  height="48" 
+                  viewBox="0 0 48 48" 
+                  fill="none" 
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="drop-shadow-md"
+                >
+                  <rect width="48" height="48" rx="10" fill="#8B5CF6" fillOpacity="0.1"/>
+                  <path d="M14 12L24 8L34 12V20C34 28.2 30 32 24 36C18 32 14 28.2 14 20V12Z" fill="#8B5CF6" fillOpacity="0.8"/>
+                  <path d="M24 30L32 22L28 18L24 22L20 18L16 22L24 30Z" fill="white"/>
+                </svg>
               </div>
-              <span className="font-bold text-2xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">Realix.ai</span>
+              <span className="font-bold text-2xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">Workswise.ai</span>
             </div>
             
             <p className="text-muted-foreground mb-6 max-w-md">
@@ -108,7 +112,7 @@ const FooterSection = () => {
         
         <div className="border-t border-gray-200 dark:border-gray-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-muted-foreground mb-4 md:mb-0">
-            &copy; {new Date().getFullYear()} Realix.ai. All rights reserved.
+            &copy; {new Date().getFullYear()} Workswise.ai. All rights reserved.
           </p>
           
           <div className="flex gap-6">

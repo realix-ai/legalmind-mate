@@ -22,14 +22,18 @@ const HeroContent = () => {
         transition={{ delay: 0.2, duration: 0.5 }}
         className="flex lg:justify-start justify-center mb-6"
       >
-        <img 
-          src="/lovable-uploads/a6a6474a-8323-47ad-847f-a072100060b7.png" 
-          alt="Realix.ai Logo" 
-          className="h-20 w-auto mb-4"
-          style={{ 
-            filter: `drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.25))`
-          }}
-        />
+        <svg 
+          width="80" 
+          height="80" 
+          viewBox="0 0 48 48" 
+          fill="none" 
+          xmlns="http://www.w3.org/2000/svg"
+          className="drop-shadow-lg mb-4"
+        >
+          <rect width="48" height="48" rx="10" fill="#8B5CF6" fillOpacity="0.1"/>
+          <path d="M14 12L24 8L34 12V20C34 28.2 30 32 24 36C18 32 14 28.2 14 20V12Z" fill="#8B5CF6" fillOpacity="0.8"/>
+          <path d="M24 30L32 22L28 18L24 22L20 18L16 22L24 30Z" fill="white"/>
+        </svg>
       </motion.div>
       
       <motion.div
