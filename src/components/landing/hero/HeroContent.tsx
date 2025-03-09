@@ -31,8 +31,21 @@ const HeroContent = () => {
           className="drop-shadow-lg mb-4"
         >
           <rect width="48" height="48" rx="10" fill="#0EA5E9" fillOpacity="0.1"/>
-          <path d="M14 12L24 8L34 12V20C34 28.2 30 32 24 36C18 32 14 28.2 14 20V12Z" fill="#0EA5E9" fillOpacity="0.8"/>
-          <path d="M24 30L32 22L28 18L24 22L20 18L16 22L24 30Z" fill="white"/>
+          <path d="M14 11L24 8L34 11V20C34 28.2 30 34 24 40C18 34 14 28.2 14 20V11Z" fill="#0EA5E9" fillOpacity="0.2"/>
+          <path 
+            d="M14 18L19 24L14 30M34 18L29 24L34 30" 
+            stroke="#0EA5E9" 
+            strokeWidth="3" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+          />
+          <path 
+            d="M19 24H29M19 18L29 30M29 18L19 30" 
+            stroke="#0EA5E9" 
+            strokeWidth="3" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+          />
         </svg>
       </motion.div>
       
