@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Zap, ShieldCheck, Search } from 'lucide-react';
+import { Zap, ShieldCheck, Search, BookOpen, FileText, Bookmark } from 'lucide-react';
 
 const HeroVisual = () => {
   return (
@@ -40,24 +40,55 @@ const HeroVisual = () => {
               <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
             </div>
-            <div className="mx-auto font-medium text-sm">Realix.ai - Document Drafting</div>
+            <div className="mx-auto font-medium text-sm">Works Wise - Legal Research</div>
           </div>
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="h-8 w-40 bg-gray-200 dark:bg-gray-800 rounded"></div>
-              <div className="h-8 w-20 bg-primary/20 rounded"></div>
+              <div className="h-8 w-40 bg-primary/10 rounded flex items-center justify-center">
+                <Search className="h-4 w-4 text-primary mr-2" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Case Law Search</span>
+              </div>
+              <div className="h-8 w-24 bg-orange-500/10 rounded flex items-center justify-center">
+                <BookOpen className="h-4 w-4 text-orange-500 mr-1" />
+                <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Citations</span>
+              </div>
             </div>
             <div className="space-y-3">
-              <div className="h-24 bg-gray-100 dark:bg-gray-800 rounded-lg w-full"></div>
+              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+                <div className="flex items-center mb-2">
+                  <FileText className="h-4 w-4 text-primary mr-2" />
+                  <span className="font-medium text-sm">Smith v. Johnson (2023)</span>
+                </div>
+                <div className="h-3 w-5/6 bg-gray-200 dark:bg-gray-700 rounded mb-1"></div>
+                <div className="h-3 w-full bg-gray-200 dark:bg-gray-700 rounded mb-1"></div>
+                <div className="h-3 w-4/6 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              </div>
+              
               <div className="grid grid-cols-2 gap-3">
-                <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-                <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+                <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+                  <div className="flex items-center mb-2">
+                    <Bookmark className="h-4 w-4 text-blue-500 mr-2" />
+                    <span className="font-medium text-sm">Relevant Statutes</span>
+                  </div>
+                  <div className="h-3 w-full bg-gray-200 dark:bg-gray-700 rounded mb-1"></div>
+                  <div className="h-3 w-5/6 bg-gray-200 dark:bg-gray-700 rounded mb-1"></div>
+                  <div className="h-3 w-4/5 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                </div>
+                <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+                  <div className="flex items-center mb-2">
+                    <BookOpen className="h-4 w-4 text-green-500 mr-2" />
+                    <span className="font-medium text-sm">Legal Analysis</span>
+                  </div>
+                  <div className="h-3 w-full bg-gray-200 dark:bg-gray-700 rounded mb-1"></div>
+                  <div className="h-3 w-4/5 bg-gray-200 dark:bg-gray-700 rounded mb-1"></div>
+                  <div className="h-3 w-5/6 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                </div>
               </div>
             </div>
             <div className="mt-4 p-3 bg-primary/10 rounded-lg">
               <div className="flex items-center gap-2">
                 <Search className="h-4 w-4 text-primary" />
-                <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="h-4 w-full bg-white dark:bg-gray-700 rounded text-xs text-gray-500 dark:text-gray-400 flex items-center px-2">Search legal precedents...</div>
               </div>
             </div>
           </div>
@@ -78,11 +109,25 @@ const HeroVisual = () => {
         }}
       >
         <div className="p-4">
-          <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-700 rounded mb-3"></div>
-          <div className="h-4 w-1/2 bg-gray-200 dark:bg-gray-700 rounded mb-6"></div>
+          <div className="flex items-center mb-3">
+            <Search className="h-4 w-4 text-primary mr-2" />
+            <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          </div>
+          <div className="flex items-center mb-4">
+            <FileText className="h-4 w-4 text-blue-400 mr-2" />
+            <div className="h-4 w-1/2 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          </div>
           <div className="grid grid-cols-2 gap-2">
-            <div className="h-20 bg-gray-100 dark:bg-gray-600 rounded"></div>
-            <div className="h-20 bg-gray-100 dark:bg-gray-600 rounded"></div>
+            <div className="h-20 bg-primary/5 dark:bg-gray-600 rounded p-2">
+              <div className="h-3 w-3/4 bg-gray-200 dark:bg-gray-500 rounded mb-1"></div>
+              <div className="h-3 w-full bg-gray-200 dark:bg-gray-500 rounded mb-1"></div>
+              <div className="h-3 w-2/3 bg-gray-200 dark:bg-gray-500 rounded"></div>
+            </div>
+            <div className="h-20 bg-primary/5 dark:bg-gray-600 rounded p-2">
+              <div className="h-3 w-full bg-gray-200 dark:bg-gray-500 rounded mb-1"></div>
+              <div className="h-3 w-2/3 bg-gray-200 dark:bg-gray-500 rounded mb-1"></div>
+              <div className="h-3 w-3/4 bg-gray-200 dark:bg-gray-500 rounded"></div>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -100,7 +145,7 @@ const HeroVisual = () => {
           delay: 0.5,
         }}
       >
-        <Zap className="h-8 w-8 text-primary" />
+        <BookOpen className="h-8 w-8 text-primary" />
       </motion.div>
       
       <motion.div

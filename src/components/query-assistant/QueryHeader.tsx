@@ -24,7 +24,7 @@ const QueryHeader = () => {
           <path d="M14 12L24 8L34 12V20C34 28.2 30 32 24 36C18 32 14 28.2 14 20V12Z" fill="#0EA5E9" fillOpacity="0.8"/>
           <path d="M24 30L32 22L28 18L24 22L20 18L16 22L24 30Z" fill="white"/>
         </svg>
-        <h1 className="text-3xl font-bold">Legal Query Assistant</h1>
+        <h1 className="text-3xl font-bold">Works Wise Legal Assistant</h1>
       </div>
       <p className="text-lg text-muted-foreground mb-6">
         Ask legal questions and get AI-powered answers to assist with your cases
