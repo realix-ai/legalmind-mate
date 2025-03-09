@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
-import { useAuth } from '@/contexts/AuthContext';
 
 type QueryHistoryItem = {
   id: string;
@@ -8,11 +7,28 @@ type QueryHistoryItem = {
   timestamp: number;
 };
 
+// Helper function to get user prefix for storage keys
+const getUserPrefix = (): string => {
+  try {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        return `user_${user.id}_`;
+      } catch (error) {
+        console.error('Failed to parse stored user:', error);
+      }
+    }
+  } catch (e) {
+    console.error('Error getting user prefix:', e);
+  }
+  return '';
+};
+
 export const useQueryHistory = () => {
   const [showHistory, setShowHistory] = useState(false);
   const [queryHistory, setQueryHistory] = useState<QueryHistoryItem[]>([]);
   const historyRef = useRef<HTMLDivElement>(null);
-  const { getUserPrefix } = useAuth();
 
   // Get the storage key with user prefix
   const getStorageKey = () => {
@@ -30,12 +46,12 @@ export const useQueryHistory = () => {
         toast.error('Failed to load query history');
       }
     }
-  }, [getUserPrefix]);
+  }, []);
 
   // Save history to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem(getStorageKey(), JSON.stringify(queryHistory));
-  }, [queryHistory, getStorageKey]);
+  }, [queryHistory]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

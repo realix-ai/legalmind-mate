@@ -1,3 +1,4 @@
+
 import { TeamMember, SharedQuery, ActivityItem } from './types';
 
 // Helper function to get user prefix for storage keys
