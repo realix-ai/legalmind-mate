@@ -15,7 +15,6 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   signup: (email: string, password: string, name: string) => Promise<boolean>;
   logout: () => void;
-  getAllUsers: () => User[];
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -45,34 +44,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setIsLoading(false);
   }, []);
-
-  // Get all registered users
-  const getAllUsers = (): User[] => {
-    try {
-      const registeredUsers = localStorage.getItem('registered_users');
-      if (registeredUsers) {
-        return JSON.parse(registeredUsers);
-      }
-    } catch (error) {
-      console.error('Failed to load registered users:', error);
-    }
-    return [];
-  };
-
-  // Add a user to the registered users list
-  const addToRegisteredUsers = (user: User) => {
-    try {
-      const existingUsers = getAllUsers();
-      const isUserRegistered = existingUsers.some(u => u.email === user.email);
-      
-      if (!isUserRegistered) {
-        const updatedUsers = [...existingUsers, user];
-        localStorage.setItem('registered_users', JSON.stringify(updatedUsers));
-      }
-    } catch (error) {
-      console.error('Failed to add user to registered list:', error);
-    }
-  };
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
@@ -133,9 +104,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('user', JSON.stringify(mockUser));
       setUser(mockUser);
       
-      // Add user to registered users list
-      addToRegisteredUsers(mockUser);
-      
       toast.success('Account created successfully');
       return true;
     } catch (error) {
@@ -162,7 +130,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         signup,
         logout,
-        getAllUsers,
       }}
     >
       {children}
