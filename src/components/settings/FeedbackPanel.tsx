@@ -1,6 +1,7 @@
+
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { Smile, Meh, Frown, Send } from 'lucide-react';
+import { Smile, Meh, Frown, Send, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
@@ -8,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 
-const ADMIN_EMAIL = "admin@realix.ai";
+const ADMIN_EMAIL = "lei@workswise.ai";
 
 const FeedbackPanel = () => {
   const [feedbackType, setFeedbackType] = useState<'positive' | 'neutral' | 'negative' | null>(null);
@@ -38,7 +39,7 @@ const FeedbackPanel = () => {
 
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      toast.success('Thank you for your feedback! A copy has been sent to the administrator.');
+      toast.success('Thank you for your feedback! Your message has been sent to our team.');
       setFeedbackType(null);
       setFeedbackText('');
       if (sendCopy) {
@@ -112,8 +113,9 @@ const FeedbackPanel = () => {
       )}
 
       <div className="bg-primary/5 rounded-lg p-4 mb-4">
-        <p className="text-sm text-muted-foreground">
-          All feedback will be sent to our admin team ({ADMIN_EMAIL}) to help improve the application.
+        <p className="text-sm text-muted-foreground flex items-center">
+          <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
+          All feedback will be sent to {ADMIN_EMAIL}
         </p>
       </div>
 
