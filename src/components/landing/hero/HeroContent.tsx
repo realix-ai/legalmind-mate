@@ -54,7 +54,7 @@ const HeroContent = () => {
         transition={{ delay: 0.4, duration: 0.6 }}
       >
         Transform Your Legal Practice with{" "}
-        <span className="text-primary">Intelligent AI</span>
+        <span className="text-primary">Works Wise</span>
       </motion.h1>
       
       <motion.p
