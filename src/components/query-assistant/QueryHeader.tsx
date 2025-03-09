@@ -1,6 +1,7 @@
 
 import { motion } from 'framer-motion';
 import { useUserProfile } from '@/hooks/use-user-profile';
+import { Search, AlertTriangle, FileText } from 'lucide-react';
 
 const QueryHeader = () => {
   const { userName } = useUserProfile();
@@ -29,6 +30,21 @@ const QueryHeader = () => {
       <p className="text-lg text-muted-foreground mb-6">
         Ask legal questions and get AI-powered answers to assist with your cases
       </p>
+      
+      <div className="flex flex-wrap justify-center gap-3 max-w-2xl mx-auto">
+        <div className="flex items-center gap-2 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 px-3 py-1.5 rounded-full">
+          <Search className="h-4 w-4" />
+          <span className="text-sm font-medium">Legal Research</span>
+        </div>
+        <div className="flex items-center gap-2 bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300 px-3 py-1.5 rounded-full">
+          <AlertTriangle className="h-4 w-4" />
+          <span className="text-sm font-medium">Risk Analysis</span>
+        </div>
+        <div className="flex items-center gap-2 bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300 px-3 py-1.5 rounded-full">
+          <FileText className="h-4 w-4" />
+          <span className="text-sm font-medium">Document Drafting</span>
+        </div>
+      </div>
     </motion.div>
   );
 };
