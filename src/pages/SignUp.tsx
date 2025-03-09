@@ -6,6 +6,7 @@ import { ArrowLeft, UserPlus, User, Lock, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
 
 const SignUp = () => {
@@ -14,9 +15,18 @@ const SignUp = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [formError, setFormError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError('');
+    
+    if (!agreedToTerms) {
+      setFormError('You must agree to the Terms of Service');
+      return;
+    }
+    
     const success = await signup(email, password, name);
     if (success) {
       navigate('/query-assistant');
@@ -87,6 +97,31 @@ const SignUp = () => {
                 />
               </div>
             </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="terms" 
+                checked={agreedToTerms}
+                onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)}
+              />
+              <label
+                htmlFor="terms"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                I agree to the{' '}
+                <a href="#" className="text-primary hover:underline">
+                  Terms of Service
+                </a>{' '}
+                and{' '}
+                <a href="#" className="text-primary hover:underline">
+                  Privacy Policy
+                </a>
+              </label>
+            </div>
+
+            {formError && (
+              <p className="text-sm text-red-500 mt-2">{formError}</p>
+            )}
 
             <Button
               type="submit"
