@@ -9,6 +9,24 @@ import {
   fetchSessionsList 
 } from './api';
 
+// Helper function to get user prefix for storage keys
+const getUserPrefix = (): string => {
+  try {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        return `user_${user.id}_`;
+      } catch (error) {
+        console.error('Failed to parse stored user:', error);
+      }
+    }
+  } catch (e) {
+    console.error('Error getting user prefix:', e);
+  }
+  return '';
+};
+
 // Get stored chat messages for a specific case and session
 export const getChatMessages = async (caseId: string, sessionId?: string): Promise<ChatMessageProps[]> => {
   // Try to get messages from the API first
@@ -20,7 +38,7 @@ export const getChatMessages = async (caseId: string, sessionId?: string): Promi
   // If API fails or returns empty, fall back to localStorage
   // If a sessionId is provided, try to get messages for that session first
   if (sessionId) {
-    const sessionMessages = localStorage.getItem(`chat_${caseId}_${sessionId}`);
+    const sessionMessages = localStorage.getItem(`${getUserPrefix()}chat_${caseId}_${sessionId}`);
     if (sessionMessages) {
       try {
         return JSON.parse(sessionMessages);
@@ -31,7 +49,7 @@ export const getChatMessages = async (caseId: string, sessionId?: string): Promi
   }
   
   // Fall back to the main chat storage
-  const savedMessages = localStorage.getItem(`chat_${caseId}`);
+  const savedMessages = localStorage.getItem(`${getUserPrefix()}chat_${caseId}`);
   if (!savedMessages) return [];
   
   try {
@@ -48,11 +66,11 @@ export const saveChatMessages = async (caseId: string, messages: ChatMessageProp
   const apiSuccess = await saveChatMessagesToApi(caseId, messages, sessionId);
   
   // Always save to local storage as backup
-  localStorage.setItem(`chat_${caseId}`, JSON.stringify(messages));
+  localStorage.setItem(`${getUserPrefix()}chat_${caseId}`, JSON.stringify(messages));
   
   // If a sessionId is provided, also save to that session storage
   if (sessionId) {
-    localStorage.setItem(`chat_${caseId}_${sessionId}`, JSON.stringify(messages));
+    localStorage.setItem(`${getUserPrefix()}chat_${caseId}_${sessionId}`, JSON.stringify(messages));
     
     // Update the sessions list
     updateSessionsList(caseId, sessionId, messages[0]?.timestamp || Date.now());
@@ -79,16 +97,16 @@ export const clearChatHistory = async (caseId: string): Promise<void> => {
   await clearChatHistoryApi(caseId);
   
   // Clear main chat storage
-  localStorage.removeItem(`chat_${caseId}`);
+  localStorage.removeItem(`${getUserPrefix()}chat_${caseId}`);
   
   // Clear all sessions for this case
   const sessions = await getSessionsList(caseId);
   sessions.forEach(session => {
-    localStorage.removeItem(`chat_${caseId}_${session.id}`);
+    localStorage.removeItem(`${getUserPrefix()}chat_${caseId}_${session.id}`);
   });
   
   // Clear sessions list
-  localStorage.removeItem(`chat_sessions_${caseId}`);
+  localStorage.removeItem(`${getUserPrefix()}chat_sessions_${caseId}`);
 };
 
 // Get the list of sessions for a case
@@ -100,7 +118,7 @@ export const getSessionsList = async (caseId: string): Promise<ChatSession[]> =>
   }
   
   // Fall back to localStorage
-  const savedSessions = localStorage.getItem(`chat_sessions_${caseId}`);
+  const savedSessions = localStorage.getItem(`${getUserPrefix()}chat_sessions_${caseId}`);
   if (!savedSessions) return [];
   
   try {
@@ -130,5 +148,5 @@ const updateSessionsList = async (caseId: string, sessionId: string, timestamp: 
   sessions.sort((a, b) => b.timestamp - a.timestamp);
   
   // Save updated sessions list
-  localStorage.setItem(`chat_sessions_${caseId}`, JSON.stringify(sessions));
+  localStorage.setItem(`${getUserPrefix()}chat_sessions_${caseId}`, JSON.stringify(sessions));
 };

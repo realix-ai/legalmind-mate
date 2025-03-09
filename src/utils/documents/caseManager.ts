@@ -20,12 +20,6 @@ const getUserPrefix = (): string => {
   return '';
 };
 
-// Helper to get storage key with user prefix
-const getStorageKey = (key: string): string => {
-  const prefix = getUserPrefix();
-  return `${prefix}${key}`;
-};
-
 // Case management functions
 export const createCase = (name: string): Case => {
   const cases = getCases();
@@ -39,13 +33,13 @@ export const createCase = (name: string): Case => {
   };
   
   cases.push(newCase);
-  localStorage.setItem(getStorageKey('cases'), JSON.stringify(cases));
+  localStorage.setItem(`${getUserPrefix()}cases`, JSON.stringify(cases));
   console.log("Case created and saved to storage:", newCase);
   return newCase;
 };
 
 export const getCases = (): Case[] => {
-  const saved = localStorage.getItem(getStorageKey('cases'));
+  const saved = localStorage.getItem(`${getUserPrefix()}cases`);
   if (!saved) return [];
   try {
     return JSON.parse(saved);
@@ -68,7 +62,7 @@ export const deleteCase = (id: string): void => {
   // Always normalize the case ID before comparison
   const normalizedId = normalizeCaseId(id);
   const filtered = cases.filter(c => c.id !== normalizedId);
-  localStorage.setItem(getStorageKey('cases'), JSON.stringify(filtered));
+  localStorage.setItem(`${getUserPrefix()}cases`, JSON.stringify(filtered));
   
   // Also remove case association from documents
   const documents = getSavedDocuments();
@@ -151,6 +145,6 @@ export const updateCaseDetails = (id: string, updates: Partial<Omit<Case, 'id' |
   };
   
   console.log("Updated case:", cases[index]);
-  localStorage.setItem(getStorageKey('cases'), JSON.stringify(cases));
+  localStorage.setItem(`${getUserPrefix()}cases`, JSON.stringify(cases));
   return cases[index];
 };

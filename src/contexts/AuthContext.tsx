@@ -101,7 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Create a mock user (in real app, this would come from your backend)
       const mockUser = {
-        id: Date.now().toString(),
+        id: Date.now().toString(), // Use timestamp to ensure unique IDs between different registrations
         email,
         name,
       };

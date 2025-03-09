@@ -18,12 +18,6 @@ const getUserPrefix = (): string => {
   return '';
 };
 
-// Helper to get storage key with user prefix
-const getStorageKey = (key: string): string => {
-  const prefix = getUserPrefix();
-  return `${prefix}${key}`;
-};
-
 // Document storage functions
 export const saveDocument = (title: string, content: string, id?: string | null, caseId?: string, category?: string): SavedDocument => {
   const savedDocuments = getSavedDocuments();
@@ -39,8 +33,8 @@ export const saveDocument = (title: string, content: string, id?: string | null,
   const documentTitle = title.trim() ? title.trim() : "Untitled Document";
   
   // Check for existing external system references
-  const externalSystem = id ? localStorage.getItem(getStorageKey(`doc-${id}-external-system`)) : undefined;
-  const externalId = id ? localStorage.getItem(getStorageKey(`doc-${id}-external-id`)) : undefined;
+  const externalSystem = id ? localStorage.getItem(`${getUserPrefix()}doc-${id}-external-system`) : undefined;
+  const externalId = id ? localStorage.getItem(`${getUserPrefix()}doc-${id}-external-id`) : undefined;
   
   const newDocument: SavedDocument = {
     id: id || `doc-${Date.now()}`,
@@ -85,13 +79,13 @@ export const saveDocument = (title: string, content: string, id?: string | null,
     savedDocuments.push(newDocument);
   }
   
-  localStorage.setItem(getStorageKey('savedDocuments'), JSON.stringify(savedDocuments));
+  localStorage.setItem(`${getUserPrefix()}savedDocuments`, JSON.stringify(savedDocuments));
   console.log("Saved documents to localStorage with title:", newDocument.title);
   return newDocument;
 };
 
 export const getSavedDocuments = (): SavedDocument[] => {
-  const saved = localStorage.getItem(getStorageKey('savedDocuments'));
+  const saved = localStorage.getItem(`${getUserPrefix()}savedDocuments`);
   if (!saved) return [];
   try {
     return JSON.parse(saved);
@@ -109,7 +103,7 @@ export const getSavedDocument = (id: string): SavedDocument | null => {
 export const deleteDocument = (id: string): void => {
   const documents = getSavedDocuments();
   const filtered = documents.filter(doc => doc.id !== id);
-  localStorage.setItem(getStorageKey('savedDocuments'), JSON.stringify(filtered));
+  localStorage.setItem(`${getUserPrefix()}savedDocuments`, JSON.stringify(filtered));
 };
 
 export const updateDocumentCaseId = (documentId: string, caseId?: string): SavedDocument | null => {
@@ -126,7 +120,7 @@ export const updateDocumentCaseId = (documentId: string, caseId?: string): Saved
     caseId: normalizedCaseId
   };
   
-  localStorage.setItem(getStorageKey('savedDocuments'), JSON.stringify(documents));
+  localStorage.setItem(`${getUserPrefix()}savedDocuments`, JSON.stringify(documents));
   return documents[index];
 };
 
@@ -141,7 +135,7 @@ export const updateDocumentCategory = (documentId: string, category: string): Sa
     category
   };
   
-  localStorage.setItem(getStorageKey('savedDocuments'), JSON.stringify(documents));
+  localStorage.setItem(`${getUserPrefix()}savedDocuments`, JSON.stringify(documents));
   return documents[index];
 };
 
@@ -172,13 +166,13 @@ export const updateDocumentExternalReference = (
   };
   
   // Also store in localStorage for backup
-  const docSystemKey = getStorageKey(`doc-${documentId}-external-system`);
-  const docIdKey = getStorageKey(`doc-${documentId}-external-id`);
+  const docSystemKey = `${getUserPrefix()}doc-${documentId}-external-system`;
+  const docIdKey = `${getUserPrefix()}doc-${documentId}-external-id`;
   
   localStorage.setItem(docSystemKey, externalSystem);
   localStorage.setItem(docIdKey, externalId);
   
-  localStorage.setItem(getStorageKey('savedDocuments'), JSON.stringify(documents));
+  localStorage.setItem(`${getUserPrefix()}savedDocuments`, JSON.stringify(documents));
   return documents[index];
 };
 
