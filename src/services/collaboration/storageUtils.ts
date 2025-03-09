@@ -1,9 +1,28 @@
 
 import { TeamMember, SharedQuery, ActivityItem } from './types';
+import { useAuth } from '@/contexts/AuthContext';
+
+// Helper function to get user prefix for storage keys
+const getUserPrefix = (): string => {
+  try {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        return `user_${user.id}_`;
+      } catch (error) {
+        console.error('Failed to parse stored user:', error);
+      }
+    }
+  } catch (e) {
+    console.error('Error getting user prefix:', e);
+  }
+  return '';
+};
 
 // Load team members from localStorage or initialize with defaults
 export const getTeamMembersFromStorage = (): TeamMember[] => {
-  const stored = localStorage.getItem('teamMembers');
+  const stored = localStorage.getItem(`${getUserPrefix()}teamMembers`);
   if (stored) {
     try {
       return JSON.parse(stored);
@@ -23,12 +42,12 @@ export const getTeamMembersFromStorage = (): TeamMember[] => {
 
 // Save team members to localStorage
 export const saveTeamMembers = (members: TeamMember[]): void => {
-  localStorage.setItem('teamMembers', JSON.stringify(members));
+  localStorage.setItem(`${getUserPrefix()}teamMembers`, JSON.stringify(members));
 };
 
 // Load shared queries from localStorage or initialize with defaults
 export const getSharedQueriesFromStorage = (): SharedQuery[] => {
-  const stored = localStorage.getItem('sharedQueries');
+  const stored = localStorage.getItem(`${getUserPrefix()}sharedQueries`);
   if (stored) {
     try {
       return JSON.parse(stored);
@@ -60,12 +79,12 @@ export const getSharedQueriesFromStorage = (): SharedQuery[] => {
 
 // Save shared queries to localStorage
 export const saveSharedQueries = (queries: SharedQuery[]): void => {
-  localStorage.setItem('sharedQueries', JSON.stringify(queries));
+  localStorage.setItem(`${getUserPrefix()}sharedQueries`, JSON.stringify(queries));
 };
 
 // Load activity items from localStorage or initialize with defaults
 export const getActivityItemsFromStorage = (): ActivityItem[] => {
-  const stored = localStorage.getItem('activityItems');
+  const stored = localStorage.getItem(`${getUserPrefix()}activityItems`);
   if (stored) {
     try {
       return JSON.parse(stored);
@@ -102,5 +121,5 @@ export const getActivityItemsFromStorage = (): ActivityItem[] => {
 
 // Save activity items to localStorage
 export const saveActivityItems = (items: ActivityItem[]): void => {
-  localStorage.setItem('activityItems', JSON.stringify(items));
+  localStorage.setItem(`${getUserPrefix()}activityItems`, JSON.stringify(items));
 };

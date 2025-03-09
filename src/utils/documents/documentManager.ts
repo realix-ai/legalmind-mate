@@ -1,15 +1,27 @@
-
 import { SavedDocument } from './types';
 import { useAuth } from '@/contexts/AuthContext';
 
-// Helper function to get auth context
+// Helper function to get auth context or fall back to localStorage
 const getAuthContext = () => {
   try {
     return useAuth();
   } catch (e) {
-    // If this is called outside of the React component tree, return an empty prefix
-    console.warn('Auth context not available, using default storage keys');
-    return { getUserPrefix: () => '' };
+    // If this is called outside of the React component tree, fall back to localStorage
+    console.warn('Auth context not available, using localStorage fallback');
+    return { 
+      getUserPrefix: () => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          try {
+            const user = JSON.parse(storedUser);
+            return `user_${user.id}_`;
+          } catch (error) {
+            console.error('Failed to parse stored user:', error);
+          }
+        }
+        return '';
+      } 
+    };
   }
 };
 
@@ -20,6 +32,7 @@ const getStorageKey = (key: string): string => {
     return `${getUserPrefix()}${key}`;
   } catch (e) {
     // Fallback if called outside React context
+    console.error('Error getting storage key:', e);
     return key;
   }
 };
