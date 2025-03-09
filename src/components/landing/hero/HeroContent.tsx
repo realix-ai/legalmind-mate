@@ -30,9 +30,6 @@ const HeroContent = () => {
           xmlns="http://www.w3.org/2000/svg"
           className="drop-shadow-lg mb-4"
         >
-          <rect width="48" height="48" rx="12" fill="#0EA5E9" fillOpacity="0.1"/>
-          <path d="M12 14C12 12.8954 12.8954 12 14 12H34C35.1046 12 36 12.8954 36 14V34C36 35.1046 35.1046 36 34 36H14C12.8954 36 12 35.1046 12 34V14Z" fill="#0EA5E9" fillOpacity="0.08"/>
-          
           {/* First W */}
           <path 
             d="M14 16L18 32L22 20L26 32L30 16" 
@@ -51,9 +48,6 @@ const HeroContent = () => {
             strokeLinejoin="round"
             opacity="0.7"
           />
-          
-          {/* Decorative element */}
-          <circle cx="24" cy="24" r="16" stroke="#0EA5E9" strokeWidth="1.5" strokeDasharray="2 4" opacity="0.4"/>
         </svg>
       </motion.div>
       
