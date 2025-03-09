@@ -113,8 +113,8 @@ const CTASection = () => {
                 </blockquote>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium">Sarah Johnson</p>
-                    <p className="text-sm text-muted-foreground">Partner, Johnson & Associates</p>
+                    <p className="font-medium text-gray-500">Legal Professional</p>
+                    <p className="text-sm text-muted-foreground">Law Firm Partner</p>
                   </div>
                   <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
                 </div>
