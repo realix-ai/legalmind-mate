@@ -1,5 +1,7 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 type QueryHistoryItem = {
   id: string;
@@ -11,10 +13,16 @@ export const useQueryHistory = () => {
   const [showHistory, setShowHistory] = useState(false);
   const [queryHistory, setQueryHistory] = useState<QueryHistoryItem[]>([]);
   const historyRef = useRef<HTMLDivElement>(null);
+  const { getUserPrefix } = useAuth();
+
+  // Get the storage key with user prefix
+  const getStorageKey = () => {
+    return `${getUserPrefix()}queryHistory`;
+  };
 
   // Load history from localStorage on component mount
   useEffect(() => {
-    const savedHistory = localStorage.getItem('queryHistory');
+    const savedHistory = localStorage.getItem(getStorageKey());
     if (savedHistory) {
       try {
         setQueryHistory(JSON.parse(savedHistory));
@@ -23,12 +31,12 @@ export const useQueryHistory = () => {
         toast.error('Failed to load query history');
       }
     }
-  }, []);
+  }, [getUserPrefix]);
 
   // Save history to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('queryHistory', JSON.stringify(queryHistory));
-  }, [queryHistory]);
+    localStorage.setItem(getStorageKey(), JSON.stringify(queryHistory));
+  }, [queryHistory, getStorageKey]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

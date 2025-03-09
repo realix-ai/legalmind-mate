@@ -15,6 +15,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   signup: (email: string, password: string, name: string) => Promise<boolean>;
   logout: () => void;
+  getUserPrefix: () => string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,6 +45,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setIsLoading(false);
   }, []);
+
+  // Get a prefix for user-specific localStorage keys
+  const getUserPrefix = (): string => {
+    return user ? `user_${user.id}_` : '';
+  };
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
@@ -130,6 +136,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         signup,
         logout,
+        getUserPrefix,
       }}
     >
       {children}

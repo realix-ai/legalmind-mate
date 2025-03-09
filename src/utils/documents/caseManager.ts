@@ -1,6 +1,29 @@
 
 import { Case, SavedDocument } from './types';
 import { getSavedDocuments, updateDocumentCaseId, normalizeCaseId } from './documentManager';
+import { useAuth } from '@/contexts/AuthContext';
+
+// Helper function to get auth context
+const getAuthContext = () => {
+  try {
+    return useAuth();
+  } catch (e) {
+    // If this is called outside of the React component tree, return an empty prefix
+    console.warn('Auth context not available, using default storage keys');
+    return { getUserPrefix: () => '' };
+  }
+};
+
+// Helper to get storage key with user prefix
+const getStorageKey = (key: string): string => {
+  try {
+    const { getUserPrefix } = getAuthContext();
+    return `${getUserPrefix()}${key}`;
+  } catch (e) {
+    // Fallback if called outside React context
+    return key;
+  }
+};
 
 // Case management functions
 export const createCase = (name: string): Case => {
@@ -15,13 +38,13 @@ export const createCase = (name: string): Case => {
   };
   
   cases.push(newCase);
-  localStorage.setItem('cases', JSON.stringify(cases));
+  localStorage.setItem(getStorageKey('cases'), JSON.stringify(cases));
   console.log("Case created and saved to storage:", newCase);
   return newCase;
 };
 
 export const getCases = (): Case[] => {
-  const saved = localStorage.getItem('cases');
+  const saved = localStorage.getItem(getStorageKey('cases'));
   if (!saved) return [];
   try {
     return JSON.parse(saved);
@@ -44,7 +67,7 @@ export const deleteCase = (id: string): void => {
   // Always normalize the case ID before comparison
   const normalizedId = normalizeCaseId(id);
   const filtered = cases.filter(c => c.id !== normalizedId);
-  localStorage.setItem('cases', JSON.stringify(filtered));
+  localStorage.setItem(getStorageKey('cases'), JSON.stringify(filtered));
   
   // Also remove case association from documents
   const documents = getSavedDocuments();
@@ -127,6 +150,6 @@ export const updateCaseDetails = (id: string, updates: Partial<Omit<Case, 'id' |
   };
   
   console.log("Updated case:", cases[index]);
-  localStorage.setItem('cases', JSON.stringify(cases));
+  localStorage.setItem(getStorageKey('cases'), JSON.stringify(cases));
   return cases[index];
 };

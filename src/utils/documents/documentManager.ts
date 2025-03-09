@@ -1,4 +1,28 @@
+
 import { SavedDocument } from './types';
+import { useAuth } from '@/contexts/AuthContext';
+
+// Helper function to get auth context
+const getAuthContext = () => {
+  try {
+    return useAuth();
+  } catch (e) {
+    // If this is called outside of the React component tree, return an empty prefix
+    console.warn('Auth context not available, using default storage keys');
+    return { getUserPrefix: () => '' };
+  }
+};
+
+// Helper to get storage key with user prefix
+const getStorageKey = (key: string): string => {
+  try {
+    const { getUserPrefix } = getAuthContext();
+    return `${getUserPrefix()}${key}`;
+  } catch (e) {
+    // Fallback if called outside React context
+    return key;
+  }
+};
 
 // Document storage functions
 export const saveDocument = (title: string, content: string, id?: string | null, caseId?: string, category?: string): SavedDocument => {
@@ -15,8 +39,8 @@ export const saveDocument = (title: string, content: string, id?: string | null,
   const documentTitle = title.trim() ? title.trim() : "Untitled Document";
   
   // Check for existing external system references
-  const externalSystem = id ? localStorage.getItem(`doc-${id}-external-system`) : undefined;
-  const externalId = id ? localStorage.getItem(`doc-${id}-external-id`) : undefined;
+  const externalSystem = id ? localStorage.getItem(getStorageKey(`doc-${id}-external-system`)) : undefined;
+  const externalId = id ? localStorage.getItem(getStorageKey(`doc-${id}-external-id`)) : undefined;
   
   const newDocument: SavedDocument = {
     id: id || `doc-${Date.now()}`,
@@ -61,13 +85,13 @@ export const saveDocument = (title: string, content: string, id?: string | null,
     savedDocuments.push(newDocument);
   }
   
-  localStorage.setItem('savedDocuments', JSON.stringify(savedDocuments));
+  localStorage.setItem(getStorageKey('savedDocuments'), JSON.stringify(savedDocuments));
   console.log("Saved documents to localStorage with title:", newDocument.title);
   return newDocument;
 };
 
 export const getSavedDocuments = (): SavedDocument[] => {
-  const saved = localStorage.getItem('savedDocuments');
+  const saved = localStorage.getItem(getStorageKey('savedDocuments'));
   if (!saved) return [];
   try {
     return JSON.parse(saved);
@@ -85,7 +109,7 @@ export const getSavedDocument = (id: string): SavedDocument | null => {
 export const deleteDocument = (id: string): void => {
   const documents = getSavedDocuments();
   const filtered = documents.filter(doc => doc.id !== id);
-  localStorage.setItem('savedDocuments', JSON.stringify(filtered));
+  localStorage.setItem(getStorageKey('savedDocuments'), JSON.stringify(filtered));
 };
 
 export const updateDocumentCaseId = (documentId: string, caseId?: string): SavedDocument | null => {
@@ -102,7 +126,7 @@ export const updateDocumentCaseId = (documentId: string, caseId?: string): Saved
     caseId: normalizedCaseId
   };
   
-  localStorage.setItem('savedDocuments', JSON.stringify(documents));
+  localStorage.setItem(getStorageKey('savedDocuments'), JSON.stringify(documents));
   return documents[index];
 };
 
@@ -118,7 +142,7 @@ export const updateDocumentCategory = (documentId: string, category: string): Sa
     category
   };
   
-  localStorage.setItem('savedDocuments', JSON.stringify(documents));
+  localStorage.setItem(getStorageKey('savedDocuments'), JSON.stringify(documents));
   return documents[index];
 };
 
@@ -152,10 +176,13 @@ export const updateDocumentExternalReference = (
   };
   
   // Also store in localStorage for backup
-  localStorage.setItem(`doc-${documentId}-external-system`, externalSystem);
-  localStorage.setItem(`doc-${documentId}-external-id`, externalId);
+  const docSystemKey = getStorageKey(`doc-${documentId}-external-system`);
+  const docIdKey = getStorageKey(`doc-${documentId}-external-id`);
   
-  localStorage.setItem('savedDocuments', JSON.stringify(documents));
+  localStorage.setItem(docSystemKey, externalSystem);
+  localStorage.setItem(docIdKey, externalId);
+  
+  localStorage.setItem(getStorageKey('savedDocuments'), JSON.stringify(documents));
   return documents[index];
 };
 
