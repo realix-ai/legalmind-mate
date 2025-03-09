@@ -1,15 +1,21 @@
-
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Smile, Meh, Frown, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+
+const ADMIN_EMAIL = "admin@realix.ai";
 
 const FeedbackPanel = () => {
   const [feedbackType, setFeedbackType] = useState<'positive' | 'neutral' | 'negative' | null>(null);
   const [feedbackText, setFeedbackText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [sendCopy, setSendCopy] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
 
   const handleSubmitFeedback = async () => {
     if (!feedbackType) {
@@ -20,20 +26,24 @@ const FeedbackPanel = () => {
     setIsSubmitting(true);
 
     try {
-      // In a real app, you'd send this to your backend
       console.log('Feedback submitted:', {
         type: feedbackType,
         text: feedbackText,
         timestamp: new Date().toISOString(),
         page: window.location.pathname,
+        sendEmailTo: ADMIN_EMAIL,
+        sendCopyToUser: sendCopy,
+        userEmail: sendCopy ? userEmail : null
       });
 
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      toast.success('Thank you for your feedback!');
+      toast.success('Thank you for your feedback! A copy has been sent to the administrator.');
       setFeedbackType(null);
       setFeedbackText('');
+      if (sendCopy) {
+        toast.success(`A copy has also been sent to ${userEmail}`);
+      }
     } catch (error) {
       console.error('Error submitting feedback:', error);
       toast.error('Failed to submit feedback. Please try again.');
@@ -82,11 +92,36 @@ const FeedbackPanel = () => {
         className="min-h-[120px] resize-none"
       />
 
+      <div className="flex items-center space-x-2 mb-2">
+        <Switch 
+          id="send-copy" 
+          checked={sendCopy} 
+          onCheckedChange={setSendCopy} 
+        />
+        <Label htmlFor="send-copy">Send me a copy</Label>
+      </div>
+
+      {sendCopy && (
+        <Input
+          type="email"
+          placeholder="Your email address"
+          value={userEmail}
+          onChange={(e) => setUserEmail(e.target.value)}
+          className="mb-4"
+        />
+      )}
+
+      <div className="bg-primary/5 rounded-lg p-4 mb-4">
+        <p className="text-sm text-muted-foreground">
+          All feedback will be sent to our admin team ({ADMIN_EMAIL}) to help improve the application.
+        </p>
+      </div>
+
       <div className="flex justify-end">
         <Button 
           type="button"
           onClick={handleSubmitFeedback} 
-          disabled={isSubmitting}
+          disabled={isSubmitting || (sendCopy && !userEmail)}
         >
           <Send className="mr-2 h-4 w-4" />
           {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
