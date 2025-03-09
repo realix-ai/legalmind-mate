@@ -19,12 +19,15 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useAuth } from "@/contexts/AuthContext"
+import { useNavigate } from "react-router-dom"
 
 export const ProfileMenu = () => {
   const { userProfile, updateUserProfile } = useUserProfile()
+  const { user, logout, isAuthenticated } = useAuth()
+  const navigate = useNavigate()
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [name, setName] = useState("")
   const [role, setRole] = useState("")
@@ -37,6 +40,9 @@ export const ProfileMenu = () => {
     setSpecialization(userProfile.specialization || "")
   }, [userProfile])
 
+  // Get display name (from auth if available, otherwise from profile)
+  const displayName = user?.name || userProfile.name;
+
   // Get initials for avatar
   const getInitials = (name: string) => {
     return name
@@ -46,7 +52,7 @@ export const ProfileMenu = () => {
       .toUpperCase();
   };
 
-  const userInitials = getInitials(userProfile.name);
+  const userInitials = getInitials(displayName);
 
   // Save profile changes
   const saveProfileChanges = () => {
@@ -74,6 +80,17 @@ export const ProfileMenu = () => {
     }
   };
 
+  // Handle logout
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  // If not authenticated, return nothing
+  if (!isAuthenticated) {
+    return null;
+  }
+
   return (
     <>
       <DropdownMenu>
@@ -88,8 +105,8 @@ export const ProfileMenu = () => {
               <AvatarFallback>{userInitials}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <p className="text-sm font-medium">{userProfile.name}</p>
-              <p className="text-xs text-muted-foreground capitalize">{userProfile.role} Attorney</p>
+              <p className="text-sm font-medium">{displayName}</p>
+              <p className="text-xs text-muted-foreground">{user?.email}</p>
             </div>
           </div>
           <DropdownMenuSeparator />
@@ -98,7 +115,7 @@ export const ProfileMenu = () => {
             <span>Edit Profile</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" />
             <span>Log out</span>
           </DropdownMenuItem>
