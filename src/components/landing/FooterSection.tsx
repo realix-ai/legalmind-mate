@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Twitter, Linkedin, Facebook, Instagram } from 'lucide-react';
@@ -63,29 +62,23 @@ const FooterSection = () => {
                   className="drop-shadow-md"
                 >
                   <rect width="48" height="48" rx="12" fill="#0EA5E9" fillOpacity="0.1"/>
-                  <path d="M12 14C12 12.8954 12.8954 12 14 12H34C35.1046 12 36 12.8954 36 14V34C36 35.1046 35.1046 36 34 36H14C12.8954 36 12 35.1046 12 34V14Z" fill="#0EA5E9" fillOpacity="0.08"/>
                   
-                  {/* First W */}
                   <path 
-                    d="M14 16L18 32L22 20L26 32L30 16" 
+                    d="M12 16C12 16 15 32 16 32C17 32 20 20 20 20C20 20 23 32 24 32C25 32 28 16 28 16" 
                     stroke="#0EA5E9" 
                     strokeWidth="3.5" 
                     strokeLinecap="round" 
                     strokeLinejoin="round"
                   />
                   
-                  {/* Second W - stylized and overlapping */}
                   <path 
-                    d="M18 16L22 32L26 20L30 32L34 16" 
+                    d="M20 16C20 16 23 32 24 32C25 32 28 20 28 20C28 20 31 32 32 32C33 32 36 16 36 16" 
                     stroke="#0EA5E9" 
                     strokeWidth="3.5" 
                     strokeLinecap="round" 
                     strokeLinejoin="round"
-                    opacity="0.7"
+                    opacity="0.8"
                   />
-                  
-                  {/* Decorative element */}
-                  <circle cx="24" cy="24" r="16" stroke="#0EA5E9" strokeWidth="1.5" strokeDasharray="2 4" opacity="0.4"/>
                 </svg>
               </div>
               <span className="font-bold text-2xl bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">Workswise.ai</span>

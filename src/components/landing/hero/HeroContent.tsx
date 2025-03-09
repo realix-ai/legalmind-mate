@@ -30,23 +30,23 @@ const HeroContent = () => {
           xmlns="http://www.w3.org/2000/svg"
           className="drop-shadow-lg mb-4"
         >
-          {/* First W */}
+          {/* Dynamic first W */}
           <path 
-            d="M14 16L18 32L22 20L26 32L30 16" 
+            d="M12 16C12 16 15 32 16 32C17 32 20 20 20 20C20 20 23 32 24 32C25 32 28 16 28 16" 
             stroke="#0EA5E9" 
             strokeWidth="3.5" 
             strokeLinecap="round" 
             strokeLinejoin="round"
           />
           
-          {/* Second W - stylized and overlapping */}
+          {/* Dynamic second W */}
           <path 
-            d="M18 16L22 32L26 20L30 32L34 16" 
+            d="M20 16C20 16 23 32 24 32C25 32 28 20 28 20C28 20 31 32 32 32C33 32 36 16 36 16" 
             stroke="#0EA5E9" 
             strokeWidth="3.5" 
             strokeLinecap="round" 
             strokeLinejoin="round"
-            opacity="0.7"
+            opacity="0.8"
           />
         </svg>
       </motion.div>
