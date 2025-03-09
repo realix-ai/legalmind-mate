@@ -16,6 +16,7 @@ import CaseManagement from "./pages/CaseManagement"
 import CaseAnalytics from "./pages/CaseAnalytics"
 import CaseChat from "./pages/CaseChat"
 import NotFound from "./pages/NotFound"
+import AdminDashboard from "./pages/AdminDashboard"
 import { AiAssistantProvider } from "./contexts/AiAssistantContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import AuthenticatedRoute from "./components/auth/AuthenticatedRoute";
@@ -44,6 +45,10 @@ function App() {
                   {
                     path: '/signup',
                     element: <SignUp />
+                  },
+                  {
+                    path: '/admin',
+                    element: <AuthenticatedRoute><AdminDashboard /></AuthenticatedRoute>
                   },
                   {
                     path: '/query-assistant',
