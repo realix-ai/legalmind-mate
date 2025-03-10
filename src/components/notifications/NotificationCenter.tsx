@@ -10,7 +10,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { useNotificationSystem } from '@/hooks/useNotificationSystem';
-import NotificationList from './NotificationList';
+import { NotificationList } from './NotificationList';
 
 const NotificationCenter = () => {
   const [open, setOpen] = useState(false);
