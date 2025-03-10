@@ -5,13 +5,12 @@ import CitationBox from '@/components/citation/CitationBox';
 import { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Check, Mail, X } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 
 interface ResponseSectionProps {
   isProcessing: boolean;
   response: string | null;
   onShare: () => void;
-  onEmail?: () => void;
   citations: Citation[];
   onResponseEdit?: (editedResponse: string) => void;
   query?: string;
@@ -21,7 +20,6 @@ const ResponseSection = ({
   isProcessing, 
   response, 
   onShare, 
-  onEmail,
   citations,
   onResponseEdit,
   query
@@ -86,20 +84,6 @@ const ResponseSection = ({
       
       {!isProcessing && response && !isEditing && (
         <div className="max-w-4xl mx-auto mt-8">
-          <div className="flex justify-center mb-8">
-            {onEmail && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex items-center gap-1" 
-                onClick={onEmail}
-              >
-                <Mail className="h-4 w-4" />
-                Email Results
-              </Button>
-            )}
-          </div>
-          
           <h3 className="text-xl font-medium mb-4">Related Citations</h3>
           {citations.length > 0 ? (
             <CitationBox citations={citations} />
