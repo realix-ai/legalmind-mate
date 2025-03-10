@@ -1,4 +1,5 @@
-import { Loader2, FileText, Download, Mail, Link, Share2, Edit, MoreHorizontal, Cloud } from 'lucide-react';
+
+import { Loader2, FileText, Download, Mail, Link, Share2, Edit, MoreHorizontal, Cloud, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { toast } from "sonner";
@@ -10,10 +11,12 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import SaveToIManageDialog from '@/components/document/SaveToIManageDialog';
+import { ShareResponseDialog } from '@/components/collaboration/ShareResponseDialog';
 
 interface QueryResponseDisplayProps {
   isProcessing: boolean;
   response: string | null;
+  query?: string;
   onShare?: () => void;
   onEdit?: () => void;
   showShareButton?: boolean;
@@ -26,9 +29,17 @@ const processingStages = [
   "Generating response..."
 ];
 
-const QueryResponseDisplay = ({ isProcessing, response, onShare, onEdit, showShareButton }: QueryResponseDisplayProps) => {
+const QueryResponseDisplay = ({ 
+  isProcessing, 
+  response, 
+  query,
+  onShare, 
+  onEdit, 
+  showShareButton 
+}: QueryResponseDisplayProps) => {
   const [copied, setCopied] = useState(false);
   const [showSaveToIManageDialog, setShowSaveToIManageDialog] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
   
   // Don't show anything if we're not processing and have no response
   if (!isProcessing && !response) {
@@ -106,6 +117,10 @@ const QueryResponseDisplay = ({ isProcessing, response, onShare, onEdit, showSha
     setShowSaveToIManageDialog(true);
   };
   
+  const handleShareWithColleagues = () => {
+    setShowShareDialog(true);
+  };
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -137,6 +152,10 @@ const QueryResponseDisplay = ({ isProcessing, response, onShare, onEdit, showSha
                         Revise Results
                       </DropdownMenuItem>
                     )}
+                    <DropdownMenuItem onClick={handleShareWithColleagues}>
+                      <Users className="h-4 w-4 mr-2" />
+                      Share with Colleagues
+                    </DropdownMenuItem>
                     {onShare && (
                       <DropdownMenuItem onClick={onShare}>
                         <Share2 className="h-4 w-4 mr-2" />
@@ -215,6 +234,16 @@ const QueryResponseDisplay = ({ isProcessing, response, onShare, onEdit, showSha
           }}
           open={showSaveToIManageDialog}
           onOpenChange={setShowSaveToIManageDialog}
+        />
+      )}
+      
+      {/* Share with Colleagues Dialog */}
+      {response && (
+        <ShareResponseDialog
+          open={showShareDialog}
+          onOpenChange={setShowShareDialog}
+          content={response}
+          query={query}
         />
       )}
     </motion.div>

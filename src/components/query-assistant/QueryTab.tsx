@@ -9,6 +9,7 @@ import ResponseSection from './ResponseSection';
 interface QueryTabProps {
   isProcessing: boolean;
   response: string | null;
+  currentQuery: string;
   onSubmit: (query: string, selectedOption: string, files: File[], researchTool?: ResearchToolType) => Promise<void>;
   onShare: () => void;
   citations: Citation[];
@@ -38,6 +39,7 @@ const itemVariants = {
 const QueryTab = ({ 
   isProcessing, 
   response, 
+  currentQuery,
   onSubmit, 
   onShare, 
   citations,
@@ -67,6 +69,7 @@ const QueryTab = ({
         onShare={onShare}
         citations={citations}
         onResponseEdit={onResponseEdit}
+        query={currentQuery}
       />
     </>
   );

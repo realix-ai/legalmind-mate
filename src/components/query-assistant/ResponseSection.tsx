@@ -9,6 +9,7 @@ interface ResponseSectionProps {
   onShare: () => void;
   citations: Citation[];
   onResponseEdit?: (editedResponse: string) => void;
+  query?: string;
 }
 
 const ResponseSection = ({ 
@@ -16,7 +17,8 @@ const ResponseSection = ({
   response, 
   onShare, 
   citations,
-  onResponseEdit 
+  onResponseEdit,
+  query
 }: ResponseSectionProps) => {
   const handleEdit = () => {
     if (onResponseEdit && response) {
@@ -31,6 +33,7 @@ const ResponseSection = ({
       <QueryResponseDisplay 
         isProcessing={isProcessing} 
         response={response}
+        query={query}
         onShare={onShare}
         onEdit={onResponseEdit ? handleEdit : undefined}
       />
