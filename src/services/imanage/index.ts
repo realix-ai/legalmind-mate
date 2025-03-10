@@ -1,5 +1,5 @@
 
-// Re-export all functionality from the iManage modules
+// Re-export all functions for easier imports
 export * from './core';
 export * from './connection';
 export * from './documents';

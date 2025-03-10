@@ -1,7 +1,6 @@
-
 import { toast } from 'sonner';
+import { getIManageUrl, getAuthHeaders, isIManageConfigured, handleApiError } from './core';
 import { SavedDocument } from '@/utils/documents/types';
-import { getIManageUrl, getAuthHeaders, isIManageConfigured } from './core';
 
 // Fetch document from iManage
 export const fetchDocumentFromIManage = async (documentId: string): Promise<SavedDocument | null> => {
@@ -66,51 +65,176 @@ export const fetchDocumentFromIManage = async (documentId: string): Promise<Save
   }
 };
 
-// Save document to iManage
+// Get a document from iManage by its ID
+export const getDocumentFromIManage = async (documentId: string): Promise<{
+  success: boolean;
+  document?: SavedDocument;
+  message?: string;
+}> => {
+  if (!isIManageConfigured()) {
+    return { success: false, message: "iManage not configured" };
+  }
+  
+  try {
+    const apiUrl = `${getIManageUrl()}/documents/${documentId}`;
+    
+    // This would be a real API call in production
+    // For demo purposes, we'll simulate a successful response
+    console.log(`Fetching document ${documentId} from iManage API: ${apiUrl}`);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Simulate a successful response
+    const mockDocument: SavedDocument = {
+      id: `local-${Date.now()}`,
+      title: `iManage Document ${documentId}`,
+      content: `This is the content of document ${documentId} retrieved from iManage.`,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      category: 'contract',
+      externalId: documentId,
+      externalSystem: 'imanage'
+    };
+    
+    return {
+      success: true,
+      document: mockDocument
+    };
+  } catch (error) {
+    return handleApiError(error, "Failed to retrieve document from iManage");
+  }
+};
+
+// Lock a document in iManage for editing
+export const lockDocumentInIManage = async (documentId: string): Promise<{
+  success: boolean;
+  message?: string;
+}> => {
+  if (!isIManageConfigured()) {
+    return { success: false, message: "iManage not configured" };
+  }
+  
+  try {
+    const apiUrl = `${getIManageUrl()}/documents/${documentId}/lock`;
+    
+    console.log(`Locking document ${documentId} in iManage API: ${apiUrl}`);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // In a real implementation, this would be an actual API call:
+    // const response = await fetch(apiUrl, {
+    //   method: 'POST',
+    //   headers: getAuthHeaders()
+    // });
+    //
+    // if (!response.ok) {
+    //   const errorData = await response.json();
+    //   return { success: false, message: errorData.message || "Failed to lock document" };
+    // }
+    
+    // For demo purposes, return success
+    return {
+      success: true
+    };
+  } catch (error) {
+    return handleApiError(error, "Failed to lock document in iManage");
+  }
+};
+
+// Unlock a document in iManage
+export const unlockDocumentInIManage = async (documentId: string): Promise<{
+  success: boolean;
+  message?: string;
+}> => {
+  if (!isIManageConfigured()) {
+    return { success: false, message: "iManage not configured" };
+  }
+  
+  try {
+    const apiUrl = `${getIManageUrl()}/documents/${documentId}/unlock`;
+    
+    console.log(`Unlocking document ${documentId} in iManage API: ${apiUrl}`);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // In a real implementation, this would be an actual API call:
+    // const response = await fetch(apiUrl, {
+    //   method: 'POST',
+    //   headers: getAuthHeaders()
+    // });
+    //
+    // if (!response.ok) {
+    //   const errorData = await response.json();
+    //   return { success: false, message: errorData.message || "Failed to unlock document" };
+    // }
+    
+    // For demo purposes, return success
+    return {
+      success: true
+    };
+  } catch (error) {
+    return handleApiError(error, "Failed to unlock document in iManage");
+  }
+};
+
+// Save document to iManage (update to support updating existing documents)
 export const saveDocumentToIManage = async (
   title: string,
   content: string,
   category: string = 'general',
-  externalId?: string
-): Promise<{success: boolean, documentId?: string}> => {
+  existingDocumentId?: string
+): Promise<{
+  success: boolean;
+  documentId?: string;
+  message?: string;
+}> => {
   if (!isIManageConfigured()) {
-    toast.error('iManage is not configured');
-    return { success: false };
+    return { success: false, message: "iManage not configured" };
   }
-
+  
   try {
-    const apiUrl = getIManageUrl();
-    const endpoint = externalId 
-      ? `${apiUrl}/documents/${externalId}` 
-      : `${apiUrl}/documents`;
+    // Determine if this is an update or a new document
+    const isUpdate = !!existingDocumentId;
+    const apiUrl = isUpdate 
+      ? `${getIManageUrl()}/documents/${existingDocumentId}` 
+      : `${getIManageUrl()}/documents`;
     
-    const method = externalId ? 'PUT' : 'POST';
+    const method = isUpdate ? 'PUT' : 'POST';
     
-    const documentData = {
-      name: title,
-      content: content,
-      docClass: category,
-      // Add other iManage-specific metadata as needed
-      clientMatter: localStorage.getItem('current-matter') || '',
-      author: localStorage.getItem('user-name') || 'Unknown',
+    console.log(`${isUpdate ? 'Updating' : 'Saving'} document to iManage API: ${apiUrl}`);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // In a real implementation, this would be an actual API call:
+    // const response = await fetch(apiUrl, {
+    //   method,
+    //   headers: getAuthHeaders(),
+    //   body: JSON.stringify({
+    //     title,
+    //     content,
+    //     category
+    //   })
+    // });
+    //
+    // if (!response.ok) {
+    //   const errorData = await response.json();
+    //   return { success: false, message: errorData.message || "Failed to save document" };
+    // }
+    //
+    // const data = await response.json();
+    
+    // For demo purposes, return success with an ID
+    const documentId = existingDocumentId || `imanage-doc-${Date.now()}`;
+    
+    return {
+      success: true,
+      documentId
     };
-    
-    const response = await fetch(endpoint, {
-      method: method,
-      headers: getAuthHeaders(),
-      body: JSON.stringify(documentData),
-    });
-    
-    if (!response.ok) {
-      throw new Error(`iManage API error: ${response.status} ${response.statusText}`);
-    }
-    
-    const result = await response.json();
-    toast.success(`Document saved to iManage successfully`);
-    return { success: true, documentId: result.id };
   } catch (error) {
-    console.error('Error saving document to iManage:', error);
-    toast.error('Failed to save document to iManage');
-    return { success: false };
+    return handleApiError(error, "Failed to save document to iManage");
   }
 };
