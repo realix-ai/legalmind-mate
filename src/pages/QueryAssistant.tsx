@@ -31,6 +31,11 @@ const QueryAssistant = () => {
     }, 10);
   };
 
+  // Handle opening email dialog
+  const handleOpenEmailDialog = () => {
+    setShowEmailDialog(true);
+  };
+
   return (
     <div className="flex flex-col min-h-screen w-full">
       <Navigation />
@@ -47,6 +52,7 @@ const QueryAssistant = () => {
             response={response}
             handleSubmit={handleSubmit}
             onShare={handleShareQuery}
+            onEmail={handleOpenEmailDialog}
             citations={citations}
             currentQuery={currentQuery}
             onResponseEdit={handleResponseEdit}

@@ -12,6 +12,7 @@ interface QueryTabProps {
   currentQuery: string;
   onSubmit: (query: string, selectedOption: string, files: File[], researchTool?: ResearchToolType) => Promise<void>;
   onShare: () => void;
+  onEmail?: () => void;
   citations: Citation[];
   onResponseEdit?: (editedResponse: string) => void;
 }
@@ -41,7 +42,8 @@ const QueryTab = ({
   response, 
   currentQuery,
   onSubmit, 
-  onShare, 
+  onShare,
+  onEmail,
   citations,
   onResponseEdit 
 }: QueryTabProps) => {
@@ -67,6 +69,7 @@ const QueryTab = ({
         isProcessing={isProcessing}
         response={response}
         onShare={onShare}
+        onEmail={onEmail}
         citations={citations}
         onResponseEdit={onResponseEdit}
         query={currentQuery}
