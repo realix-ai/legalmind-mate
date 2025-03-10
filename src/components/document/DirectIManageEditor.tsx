@@ -166,9 +166,9 @@ const DirectIManageEditor = ({ externalId, onClose }: DirectIManageEditorProps) 
           
           <div className="min-h-[500px]">
             <DocumentEditor
-              content={content}
-              onChange={setContent}
-              readOnly={!isEditing}
+              documentContent={content}
+              setDocumentContent={setContent}
+              documentId={null}
             />
           </div>
         </div>
