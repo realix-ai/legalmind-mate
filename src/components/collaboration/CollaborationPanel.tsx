@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Share2, History } from 'lucide-react';
+import { Share2, History, Inbox } from 'lucide-react';
 import { 
   getTeamMembers, 
   getSharedQueries, 
@@ -17,6 +17,7 @@ import {
 import ShareQueryTab from './ShareQueryTab';
 import TeamMembersTab from './TeamMembersTab';
 import ActivityFeed from './ActivityFeed';
+import { SharedResponsesPanel } from './SharedResponsesPanel';
 
 const CollaborationPanel = () => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -47,8 +48,9 @@ const CollaborationPanel = () => {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="share" className="mt-2">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="share">Share Results</TabsTrigger>
+                  <TabsTrigger value="received">Received Content</TabsTrigger>
                   <TabsTrigger value="team">Team Members</TabsTrigger>
                 </TabsList>
                 
@@ -57,6 +59,10 @@ const CollaborationPanel = () => {
                     sharedQueries={sharedQueries} 
                     setSharedQueries={setSharedQueries} 
                   />
+                </TabsContent>
+                
+                <TabsContent value="received">
+                  <SharedResponsesPanel />
                 </TabsContent>
                 
                 <TabsContent value="team">
