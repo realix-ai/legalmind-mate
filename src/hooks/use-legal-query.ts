@@ -111,6 +111,7 @@ export const useLegalQuery = (setActiveTab: (tab: string) => void) => {
     setResponse(editedResponse);
     // In a real app, you might want to save this edited response to a database
     console.log("Response edited:", editedResponse);
+    toast.success("Response has been updated");
   };
 
   return {
