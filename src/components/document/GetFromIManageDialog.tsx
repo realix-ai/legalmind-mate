@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import { Cloud } from 'lucide-react';
 import { 
   Dialog,
@@ -21,6 +21,7 @@ interface GetFromIManageDialogProps {
   onDocumentSelected: (document: SavedDocument) => void;
   buttonSize?: 'xs' | 'sm' | 'default' | 'lg' | 'icon';
   buttonLabel?: string;
+  buttonIcon?: ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
@@ -29,6 +30,7 @@ const GetFromIManageDialog = ({
   onDocumentSelected,
   buttonSize = 'xs',
   buttonLabel = "Get from iManage",
+  buttonIcon,
   open,
   onOpenChange
 }: GetFromIManageDialogProps) => {
@@ -81,7 +83,7 @@ const GetFromIManageDialog = ({
           className="hover:bg-primary/10"
           aria-label={buttonLabel}
         >
-          <Cloud className="h-5 w-5 text-muted-foreground" />
+          {buttonIcon || <Cloud className="h-5 w-5 text-muted-foreground" />}
         </Button>
       );
     }
@@ -92,7 +94,7 @@ const GetFromIManageDialog = ({
         size={buttonSize}
         className={buttonSize === 'lg' ? 'gap-2' : 'gap-1'}
       >
-        <Cloud className={buttonSize === 'lg' ? 'h-4 w-4' : 'h-3.5 w-3.5'} />
+        {buttonIcon || <Cloud className={buttonSize === 'lg' ? 'h-4 w-4' : 'h-3.5 w-3.5'} />}
         {buttonLabel}
       </Button>
     );

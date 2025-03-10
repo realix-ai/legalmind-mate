@@ -1,11 +1,14 @@
+
 import { useState } from 'react';
 import { toast } from "sonner";
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, Upload } from 'lucide-react';
+import { PlusCircle, Upload, Cloud } from 'lucide-react';
 import { QueryType } from '@/services/legalQueryService';
 import { BatchQuery } from './types';
+import GetFromIManageDialog from '@/components/document/GetFromIManageDialog';
+import { SavedDocument } from '@/utils/documents/types';
 
 interface BatchInputFormProps {
   onAddQuery: (query: BatchQuery) => void;
@@ -97,6 +100,14 @@ const BatchInputForm = ({ onAddQuery, isProcessing }: BatchInputFormProps) => {
     input.click();
   };
   
+  const handleDocumentSelected = (document: SavedDocument) => {
+    setQueryText(prevQuery => {
+      const prefix = prevQuery.trim() ? `${prevQuery}\n\nReferencing document: ` : `Referencing document: `;
+      return `${prefix}${document.title}`;
+    });
+    toast.success(`Document "${document.title}" referenced in your query`);
+  };
+  
   return (
     <div className="space-y-4">
       <Textarea
@@ -162,6 +173,13 @@ const BatchInputForm = ({ onAddQuery, isProcessing }: BatchInputFormProps) => {
         </div>
         
         <div className="flex gap-2 w-full sm:w-auto">
+          <GetFromIManageDialog
+            onDocumentSelected={handleDocumentSelected}
+            buttonSize="default"
+            buttonLabel="iManage"
+            buttonIcon={<Cloud className="h-4 w-4" />}
+          />
+          
           <Button 
             type="button"
             onClick={handleFileUpload} 
