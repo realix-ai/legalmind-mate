@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Cloud, Link2, Link2Off } from 'lucide-react';
 import { 
@@ -22,20 +23,14 @@ import {
 
 interface IManageConfigDialogProps {
   inSettings?: boolean;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
 }
 
-const IManageConfigDialog = ({ inSettings = false, open: controlledOpen, onOpenChange }: IManageConfigDialogProps) => {
-  const [internalOpen, setInternalOpen] = useState(false);
+const IManageConfigDialog = ({ inSettings = false }: IManageConfigDialogProps) => {
+  const [open, setOpen] = useState(false);
   const [url, setUrl] = useState('');
   const [token, setToken] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
-  
-  const isControlled = controlledOpen !== undefined && onOpenChange !== undefined;
-  const open = isControlled ? controlledOpen : internalOpen;
-  const setOpen = isControlled ? onOpenChange : setInternalOpen;
   
   useEffect(() => {
     if (open) {
@@ -53,7 +48,6 @@ const IManageConfigDialog = ({ inSettings = false, open: controlledOpen, onOpenC
     const connected = await checkIManageConnection();
     setIsConnected(connected);
     setIsChecking(false);
-    return connected;
   };
   
   const handleSave = () => {
@@ -111,11 +105,9 @@ const IManageConfigDialog = ({ inSettings = false, open: controlledOpen, onOpenC
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      {!isControlled && (
-        <DialogTrigger asChild>
-          {renderTriggerButton()}
-        </DialogTrigger>
-      )}
+      <DialogTrigger asChild>
+        {renderTriggerButton()}
+      </DialogTrigger>
       
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>

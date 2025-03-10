@@ -12,8 +12,11 @@ import QueryHistoryView from '@/components/query/QueryHistoryView';
 import FileUploadSection from '@/components/query/FileUploadSection';
 import ResearchToolSelector from '@/components/query/ResearchToolSelector';
 import { useFileHandler } from '@/hooks/use-file-handler';
-import GetFromIManageDialog from '@/components/document/GetFromIManageDialog';
-import DirectIManageEditorDialog from '@/components/document/DirectIManageEditorDialog';
+
+interface QueryFormProps {
+  onSubmit: (query: string, queryType: QueryType, files: File[], researchTool?: ResearchToolType) => Promise<void>;
+  isProcessing: boolean;
+}
 
 const itemVariants = {
   hidden: { y: 20, opacity: 0 },
@@ -24,16 +27,10 @@ const itemVariants = {
   }
 };
 
-interface QueryFormProps {
-  onSubmit: (query: string, queryType: QueryType, files: File[], researchTool?: ResearchToolType) => Promise<void>;
-  isProcessing: boolean;
-}
-
 const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
   const [query, setQuery] = useState('');
   const [selectedOption, setSelectedOption] = useState<QueryType>('legal-research');
   const [selectedResearchTool, setSelectedResearchTool] = useState<ResearchToolType>('none');
-  const [selectedIManageDoc, setSelectedIManageDoc] = useState<string | null>(null);
   
   const {
     uploadedFiles,
@@ -108,10 +105,6 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
       return `${prefix}${document.title}`;
     });
 
-    if (document.externalId && document.externalSystem === 'imanage') {
-      setSelectedIManageDoc(document.externalId);
-    }
-
     toast.success(`Document "${document.title}" referenced in your query`);
   };
 
@@ -132,24 +125,6 @@ const QueryForm = ({ onSubmit, isProcessing }: QueryFormProps) => {
           setUploadedFiles={setUploadedFiles}
           setFileError={setFileError}
         />
-        
-        <div className="flex justify-between items-center mt-2 mb-4">
-          <div className="flex items-center gap-2">
-            <GetFromIManageDialog
-              onDocumentSelected={handleDocumentSelected}
-              buttonSize="xs"
-              buttonLabel="Reference iManage Document"
-            />
-            
-            {selectedIManageDoc && (
-              <DirectIManageEditorDialog
-                documentId={selectedIManageDoc}
-                buttonSize="xs"
-                buttonLabel="Edit Referenced Document"
-              />
-            )}
-          </div>
-        </div>
         
         <PromptManagerSection 
           showPromptManager={showPromptManager}
