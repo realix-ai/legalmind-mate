@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { useAiAssistant } from '@/contexts/AiAssistantContext';
 import { Bot, Send, PaperclipIcon, History, PlusCircle, List, Cloud } from 'lucide-react';
@@ -24,7 +23,7 @@ const AiCommunicationPanel = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome',
-      content: "Hello! I'm your AI assistant. How can I help you today with your legal queries or research?",
+      content: "Hello! I'm your legal AI assistant. I can help with legal research, risk analysis, document drafting, summarization, data analysis, and more. How can I assist you today?",
       isUser: false,
       timestamp: new Date()
     }
@@ -73,8 +72,15 @@ const AiCommunicationPanel = () => {
       
       if (apiKey) {
         // Use OpenAI to generate response
-        const systemPrompt = `You are an expert legal AI assistant. Provide helpful, accurate, and clear responses to legal questions. 
-          Be concise yet informative, focusing on relevant legal principles, cases, and practical advice.`;
+        const systemPrompt = `You are an expert legal AI assistant for lawyers. Help with:
+          1. Legal Research: Find relevant cases, statutes, and regulations
+          2. Risk Analysis: Identify potential legal risks in scenarios
+          3. Document Drafting: Suggest language for legal documents
+          4. Summarization: Condense legal documents and case law
+          5. Data Analysis: Extract insights from legal data
+          
+          Answer thoroughly with citations where appropriate. Use clear, organized responses with headings for complex questions.
+          When analyzing documents, extract key information and provide actionable insights.`;
         
         const response = await generateCompletion(prompt, systemPrompt, 'gpt-4o-mini');
         aiResponseContent = response || "I'm having trouble generating a response. Please try again later.";
@@ -110,7 +116,7 @@ const AiCommunicationPanel = () => {
     // Clear chat history except for the welcome message
     setMessages([{
       id: 'welcome',
-      content: "Hello! I'm your AI assistant. How can I help you today with your legal queries or research?",
+      content: "Hello! I'm your legal AI assistant. I can help with legal research, risk analysis, document drafting, summarization, data analysis, and more. How can I assist you today?",
       isUser: false,
       timestamp: new Date()
     }]);
@@ -156,27 +162,145 @@ const AiCommunicationPanel = () => {
     setShowIManageDialog(false);
   };
 
-  // Generate a simple response for demonstration when no API key is available
+  // Generate a more comprehensive simulated response for demonstration when no API key is available
   const generateSimulatedResponse = (message: string, files: File[]): string => {
     const lowerMessage = message.toLowerCase();
     
     if (files.length > 0) {
-      return `I've received your message along with ${files.length} file(s). In a real implementation, I would analyze these files and provide insights based on their content. For demonstration purposes, I can tell you that I would examine these documents for relevant legal information and incorporate it into my response.`;
+      return `I've received your message along with ${files.length} file(s). As a legal AI assistant, I would typically:
+
+1. Extract the text content from these documents
+2. Analyze the legal language and identify key clauses, terms, and potential issues
+3. Provide you with a detailed analysis in the context of your query
+
+For demonstration purposes, I can tell you that I would examine these files for relevant legal information and incorporate it into my analysis of your question about "${message.substring(0, 30)}..."`;
     }
     
-    if (lowerMessage.includes('legal') || lowerMessage.includes('law') || lowerMessage.includes('case')) {
-      return "Based on your query about legal matters, I would typically provide information on relevant cases, statutes, and legal principles. To get the most accurate legal information, please connect your OpenAI API key in the settings or provide specific details about your legal question.";
+    // Legal research related response
+    if (lowerMessage.includes('research') || lowerMessage.includes('case law') || lowerMessage.includes('precedent') || lowerMessage.includes('statute')) {
+      return `## Legal Research Response
+
+Based on your query about "${message.substring(0, 30)}...", I would typically provide:
+
+1. **Relevant Case Law**: Key precedents from state and federal courts
+2. **Statutory References**: Applicable statutes and regulations
+3. **Legal Doctrines**: Controlling legal principles
+4. **Jurisdiction-Specific Guidance**: How this varies across jurisdictions
+
+To provide more specific research, please connect your OpenAI API key in settings or provide more details about your legal question.`;
     }
     
-    if (lowerMessage.includes('contract') || lowerMessage.includes('agreement')) {
-      return "Regarding your question about contracts or agreements, I would typically analyze contract terms, legal obligations, and potential risks. To get detailed assistance with contract analysis, please connect your OpenAI API key in the settings.";
+    // Risk analysis related response
+    if (lowerMessage.includes('risk') || lowerMessage.includes('liability') || lowerMessage.includes('compliance') || lowerMessage.includes('violation')) {
+      return `## Risk Analysis
+
+Regarding your query about "${message.substring(0, 30)}...", I would typically provide a comprehensive risk assessment including:
+
+**HIGH RISK FACTORS**:
+- Key regulatory compliance issues
+- Potential liability exposure areas
+- Statutory violation concerns
+
+**MEDIUM RISK FACTORS**:
+- Procedural considerations
+- Documentation requirements
+
+**LOW RISK FACTORS**:
+- Standard industry practices
+- Administrative considerations
+
+For a detailed risk analysis with mitigation strategies, please connect your OpenAI API key in settings.`;
     }
     
+    // Document drafting related response
+    if (lowerMessage.includes('draft') || lowerMessage.includes('contract') || lowerMessage.includes('agreement') || lowerMessage.includes('clause')) {
+      return `## Document Drafting Assistance
+
+For your request about "${message.substring(0, 30)}...", I would typically help by:
+
+1. **Suggested Language**: Providing recommended clause text
+2. **Structure Guidance**: Advising on document organization
+3. **Term Definitions**: Suggesting clear definitions for key terms
+4. **Alternative Phrasings**: Offering variations for different legal positions
+
+To get specific drafting assistance tailored to your jurisdiction and needs, please connect your OpenAI API key in settings.`;
+    }
+    
+    // Summary related response
+    if (lowerMessage.includes('summarize') || lowerMessage.includes('summary') || lowerMessage.includes('brief') || lowerMessage.includes('overview')) {
+      return `## Document Summary
+
+If I were to summarize material related to "${message.substring(0, 30)}...", I would structure it as:
+
+**KEY FACTS**:
+- Primary parties and relationships
+- Timeline of critical events
+- Disputed issues or claims
+
+**LEGAL FRAMEWORK**:
+- Applicable legal doctrines
+- Relevant statutory authority
+- Controlling precedent
+
+**CRITICAL ANALYSIS**:
+- Strengths and weaknesses
+- Potential outcomes and implications
+
+For a comprehensive summary tailored to your specific documents, please connect your OpenAI API key in settings.`;
+    }
+    
+    // Data analysis related response
+    if (lowerMessage.includes('data') || lowerMessage.includes('analytics') || lowerMessage.includes('trends') || lowerMessage.includes('statistics')) {
+      return `## Legal Data Analysis
+
+Regarding your query about "${message.substring(0, 30)}...", I would typically provide:
+
+**STATISTICAL INSIGHTS**:
+- Case outcome probabilities
+- Settlement value ranges
+- Timelines for similar proceedings
+
+**TREND ANALYSIS**:
+- Recent shifts in legal interpretations
+- Emerging patterns in judgments
+- Changes in regulatory enforcement
+
+**JURISDICTIONAL COMPARISON**:
+- Variations across courts and regions
+- Forum selection considerations
+
+For detailed legal data analysis with visualizations and projections, please connect your OpenAI API key in settings.`;
+    }
+    
+    // iManage related response
     if (lowerMessage.includes('imanage') || lowerMessage.includes('document')) {
-      return "I see you're interested in documents or iManage. I can help analyze documents from iManage, provide summaries, or extract key information. Please select a document from iManage using the iManage button in the toolbar, or provide more details about what you're looking for.";
+      return `## Document Management
+
+I see you're interested in documents or iManage. As your legal AI assistant, I can:
+
+1. **Extract Key Information**: Identify critical clauses, parties, dates, and terms
+2. **Analyze Documents**: Review for compliance, risks, and opportunities
+3. **Compare Documents**: Highlight differences between versions or similar documents
+4. **Summarize Content**: Create concise summaries of lengthy legal documents
+
+You can select documents from iManage using the iManage button in the toolbar for me to analyze directly.`;
     }
     
-    return "I understand you're seeking information. For the most accurate and helpful responses to your legal queries, please connect your OpenAI API key in the settings or provide more specific details about your question.";
+    // Default comprehensive response
+    return `As your legal AI assistant, I can help with a wide range of tasks including:
+
+1. **Legal Research**: Finding relevant cases, statutes, and legal principles
+2. **Risk Analysis**: Evaluating scenarios for potential legal exposure
+3. **Document Drafting**: Assisting with contract language, pleadings, and legal communications
+4. **Summarization**: Condensing lengthy legal materials into concise briefs
+5. **Data Analysis**: Extracting insights from legal data sets
+
+For the most helpful response to your query about "${message.substring(0, 30)}...", please:
+- Provide specific details about your legal question
+- Mention relevant jurisdiction, practice area, or legal context
+- Connect your OpenAI API key in settings for enhanced capabilities
+
+Remember, you can also upload documents using the paperclip icon or access iManage documents for direct analysis.`;
   };
 
   return (
