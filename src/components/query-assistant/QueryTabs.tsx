@@ -34,7 +34,7 @@ const QueryTabs = ({
       <TabsList className="grid w-full grid-cols-4 max-w-2xl mx-auto">
         <TabsTrigger value="query">Single Query</TabsTrigger>
         <TabsTrigger value="batch">Batch Processing</TabsTrigger>
-        <TabsTrigger value="ai-communication">AI Communication</TabsTrigger>
+        <TabsTrigger value="ai-communication">AI Chatbot</TabsTrigger>
         <TabsTrigger value="collaboration">Collaboration</TabsTrigger>
       </TabsList>
       
