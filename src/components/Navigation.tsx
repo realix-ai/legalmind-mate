@@ -5,6 +5,7 @@ import { SettingsMenu } from "./navigation/SettingsMenu"
 import { ProfileMenu } from "./navigation/ProfileMenu"
 import { LoginButton } from "./auth/LoginButton"
 import { useAuth } from "@/contexts/AuthContext"
+import { NotificationBell } from "@/components/notifications/NotificationBell"
 
 export default function Navigation() {
   const { isAuthenticated } = useAuth();
@@ -16,6 +17,7 @@ export default function Navigation() {
         <NavigationLinks />
         <nav className="ml-auto flex items-center space-x-2">
           <LoginButton />
+          {isAuthenticated && <NotificationBell />}
           <SettingsMenu />
           {isAuthenticated && <ProfileMenu />}
         </nav>
