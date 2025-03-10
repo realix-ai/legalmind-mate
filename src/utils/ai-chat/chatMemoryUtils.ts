@@ -1,30 +1,44 @@
-
 import { v4 as uuidv4 } from 'uuid';
 
 export interface ChatMessage {
   id: string;
   content: string;
   isUser: boolean;
-  timestamp: Date;
+  timestamp: Date | string | number;
   files?: File[];
 }
 
 export interface ChatSession {
   id: string;
   name: string;
-  timestamp: Date;
+  timestamp: Date | string | number;
   messages: ChatMessage[];
 }
 
 const STORAGE_KEY_PREFIX = 'ai_chat_';
 const MAX_CONTEXT_LENGTH = 10;
 
+// Convert stored dates back to Date objects
+const deserializeSession = (session: ChatSession): ChatSession => {
+  return {
+    ...session,
+    timestamp: new Date(session.timestamp),
+    messages: session.messages.map(msg => ({
+      ...msg,
+      timestamp: new Date(msg.timestamp)
+    }))
+  };
+};
+
 // Get a list of all chat sessions
 export const getChatSessions = (): ChatSession[] => {
   try {
     const sessionsJson = localStorage.getItem(`${STORAGE_KEY_PREFIX}sessions`);
     if (!sessionsJson) return [];
-    return JSON.parse(sessionsJson);
+    
+    const parsedSessions = JSON.parse(sessionsJson);
+    // Convert stored timestamps to Date objects
+    return parsedSessions.map(deserializeSession);
   } catch (error) {
     console.error('Error retrieving chat sessions:', error);
     return [];
@@ -34,6 +48,7 @@ export const getChatSessions = (): ChatSession[] => {
 // Save the list of chat sessions
 export const saveChatSessions = (sessions: ChatSession[]): void => {
   try {
+    // When saving to localStorage, keep all data as is (will be serialized to JSON)
     localStorage.setItem(`${STORAGE_KEY_PREFIX}sessions`, JSON.stringify(sessions));
   } catch (error) {
     console.error('Error saving chat sessions:', error);
@@ -92,7 +107,12 @@ export const addMessageToSession = (sessionId: string, message: ChatMessage): vo
   );
   
   // Sort by timestamp (newest first)
-  updatedSessions.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  updatedSessions.sort((a, b) => {
+    const timestampA = a.timestamp instanceof Date ? a.timestamp.getTime() : new Date(a.timestamp).getTime();
+    const timestampB = b.timestamp instanceof Date ? b.timestamp.getTime() : new Date(b.timestamp).getTime();
+    return timestampB - timestampA;
+  });
+  
   saveChatSessions(updatedSessions);
 };
 

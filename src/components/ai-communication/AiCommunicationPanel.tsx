@@ -23,6 +23,7 @@ import {
   searchRelevantConversations
 } from '@/utils/ai-chat/chatMemoryUtils';
 import { v4 as uuidv4 } from 'uuid';
+import { format } from 'date-fns';
 
 const AiCommunicationPanel = () => {
   const [activeSession, setActiveSession] = useState<ChatSession>(() => getCurrentOrCreateSession());
@@ -325,6 +326,17 @@ For the most helpful response to your query about "${message.substring(0, 30)}..
 Remember, you can also upload documents using the paperclip icon or access iManage documents for direct analysis.${memoryContext}`;
   };
 
+  const formatTimestamp = (timestamp: Date | string | number) => {
+    if (timestamp instanceof Date) {
+      return format(timestamp, 'h:mm a');
+    } else if (typeof timestamp === 'string') {
+      return format(new Date(timestamp), 'h:mm a');
+    } else if (typeof timestamp === 'number') {
+      return format(new Date(timestamp), 'h:mm a');
+    }
+    return 'Unknown time';
+  };
+
   return (
     <div className="flex flex-col h-[600px] max-h-[70vh] gap-4">
       <div className="flex-1 overflow-y-auto border rounded-lg p-4 bg-background">
@@ -349,7 +361,7 @@ Remember, you can also upload documents using the paperclip icon or access iMana
               )}
               <div className="whitespace-pre-wrap">{message.content}</div>
               <div className="text-xs mt-1 opacity-70 text-right">
-                {message.timestamp.toLocaleTimeString()}
+                {formatTimestamp(message.timestamp)}
               </div>
             </div>
           </div>
