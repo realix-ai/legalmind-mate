@@ -90,8 +90,7 @@ export const getDocumentFromIManage = async (documentId: string): Promise<{
       id: `local-${Date.now()}`,
       title: `iManage Document ${documentId}`,
       content: `This is the content of document ${documentId} retrieved from iManage.`,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
+      lastModified: Date.now(),
       category: 'contract',
       externalId: documentId,
       externalSystem: 'imanage'

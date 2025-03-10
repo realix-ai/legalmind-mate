@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useIManageDocumentEditing } from '@/hooks/document/useIManageDocumentEditing';
-import { DocumentEditor } from '@/components/document/DocumentEditor';
+import DocumentEditor from '@/components/document/DocumentEditor';
 import { formatDistanceToNow } from 'date-fns';
 
 interface DirectIManageEditorProps {

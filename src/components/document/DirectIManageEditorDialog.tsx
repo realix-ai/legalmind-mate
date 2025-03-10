@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Cloud } from 'lucide-react';
 import { 
@@ -98,7 +97,7 @@ const DirectIManageEditorDialog = ({
             </DialogTrigger>
           )}
           
-          <DialogContent className="max-w-4xl h-[80vh]" closeButtonLabel="Close Edit Session">
+          <DialogContent className="max-w-4xl h-[80vh]">
             {open && (
               <DirectIManageEditor 
                 externalId={documentId} 
