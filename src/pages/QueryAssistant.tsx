@@ -37,7 +37,7 @@ const QueryAssistant = () => {
       
       <main className="flex-1 w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-16">
         <div className="w-full">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-center items-center mb-6">
             <h1 className="text-2xl font-semibold">Query Assistant</h1>
           </div>
           <QueryTabs
