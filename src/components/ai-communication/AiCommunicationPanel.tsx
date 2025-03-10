@@ -1,7 +1,6 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useAiAssistant } from '@/contexts/AiAssistantContext';
-import { Bot, Send, PaperclipIcon, History, PlusCircle, List, Cloud } from 'lucide-react';
+import { Bot, Send, PaperclipIcon, History, PlusCircle, List, Cloud, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
@@ -12,6 +11,7 @@ import PromptManager from '@/components/PromptManager';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import GetFromIManageDialog from '@/components/document/GetFromIManageDialog';
 import { SavedDocument } from '@/utils/documents/types';
+import EmailDialog from './EmailDialog';
 import {
   ChatMessage,
   ChatSession,
@@ -34,6 +34,8 @@ const AiCommunicationPanel = () => {
   const [showPrompts, setShowPrompts] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showIManageDialog, setShowIManageDialog] = useState(false);
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [selectedContent, setSelectedContent] = useState('');
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { addResponse } = useAiAssistant();
@@ -52,7 +54,6 @@ const AiCommunicationPanel = () => {
     setSessions(allSessions);
   }, []);
 
-  // Update session state when active session changes
   useEffect(() => {
     setMessages(activeSession.messages);
   }, [activeSession]);
@@ -64,7 +65,6 @@ const AiCommunicationPanel = () => {
   const handleSendMessage = async () => {
     if (!currentMessage.trim() && uploadedFiles.length === 0) return;
     
-    // Bug fix: Create a copy of uploadedFiles to prevent reference issues
     const filesCopy = [...uploadedFiles];
     
     const userMessage: ChatMessage = {
@@ -75,12 +75,10 @@ const AiCommunicationPanel = () => {
       files: filesCopy.length > 0 ? filesCopy : undefined
     };
     
-    // Add to local state immediately for UI responsiveness
     setMessages(prev => [...prev, userMessage]);
     setCurrentMessage('');
     setIsProcessing(true);
     
-    // Add to persistent storage
     addMessageToSession(activeSession.id, userMessage);
     
     const conversationContext = getConversationContext(messages);
@@ -206,6 +204,20 @@ const AiCommunicationPanel = () => {
     addMessageToSession(activeSession.id, documentContentMessage);
     
     setShowIManageDialog(false);
+  };
+
+  const handleOpenEmailDialog = (content?: string) => {
+    let emailContent = content || '';
+    
+    if (!emailContent) {
+      const lastAiMessage = [...messages].reverse().find(m => !m.isUser);
+      if (lastAiMessage) {
+        emailContent = lastAiMessage.content;
+      }
+    }
+    
+    setSelectedContent(emailContent);
+    setShowEmailDialog(true);
   };
 
   const generateSimulatedResponse = (message: string, files: File[]): string => {
@@ -392,6 +404,21 @@ Remember, you can also upload documents using the paperclip icon or access iMana
               <div className="text-xs mt-1 opacity-70 text-right">
                 {formatTimestamp(message.timestamp)}
               </div>
+              {!message.isUser && (
+                <div className="mt-2 pt-2 border-t border-border/40 flex justify-end gap-1">
+                  <Button 
+                    variant="ghost" 
+                    size="xs" 
+                    className="h-6 text-xs"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenEmailDialog(message.content);
+                    }}
+                  >
+                    <Mail className="h-3 w-3 mr-1" /> Email
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         ))}
@@ -511,6 +538,16 @@ Remember, you can also upload documents using the paperclip icon or access iMana
           <Cloud className="h-3 w-3" />
           iManage
         </Button>
+        
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="flex items-center gap-1 z-10 text-xs py-1 px-2 h-7"
+          onClick={() => handleOpenEmailDialog()}
+        >
+          <Mail className="h-3 w-3" />
+          Email
+        </Button>
       </div>
       
       <div className="flex gap-2">
@@ -558,6 +595,13 @@ Remember, you can also upload documents using the paperclip icon or access iMana
         onDocumentSelected={handleIManageDocument}
         open={showIManageDialog}
         onOpenChange={setShowIManageDialog}
+      />
+      
+      <EmailDialog
+        open={showEmailDialog}
+        onOpenChange={setShowEmailDialog}
+        content={selectedContent}
+        subject="Legal AI Assistant Response"
       />
     </div>
   );

@@ -6,7 +6,6 @@ import UserWelcome from '@/components/query-assistant/UserWelcome';
 import { useLegalQuery } from '@/hooks/use-legal-query';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import SettingsDialog from '@/components/settings/SettingsDialog';
-import { toast } from 'sonner';
 
 const QueryAssistant = () => {
   const [activeTab, setActiveTab] = useState('query');
