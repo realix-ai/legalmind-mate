@@ -32,8 +32,8 @@ const QueryOptions = ({ onSelect, selectedOption }: QueryOptionsProps) => {
     },
     {
       id: 'summarize' as QueryType,
-      title: 'Draft/Summarize',
-      description: 'Create concise summaries or drafts of legal documents',
+      title: 'Draft',
+      description: 'Create concise drafts of legal documents',
       icon: <FileText className="h-4 w-4" />,
       color: 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400'
     },
