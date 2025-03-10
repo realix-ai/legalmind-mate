@@ -4,11 +4,12 @@ import { toast } from "sonner";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { MessageSquare, UserPlus } from 'lucide-react';
+import { MessageSquare, UserPlus, Trash } from 'lucide-react';
 import { 
   TeamMember,
   inviteTeamMember,
-  getTeamMembers
+  getTeamMembers,
+  removeTeamMember
 } from '@/services/collaborationService';
 
 interface TeamMembersTabProps {
@@ -21,17 +22,23 @@ const TeamMembersTab = ({ teamMembers, setTeamMembers, setActivityItems }: TeamM
   const [inviteEmail, setInviteEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const handleInviteTeamMember = () => {
+  const handleInviteTeamMember = async () => {
     if (!inviteEmail) {
       toast.error('Please enter an email address');
       return;
     }
     
+    if (!isValidEmail(inviteEmail)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+    
     setIsSubmitting(true);
     
-    // Simulate network delay for better UX
-    setTimeout(() => {
-      if (inviteTeamMember(inviteEmail)) {
+    try {
+      const success = await inviteTeamMember(inviteEmail);
+      
+      if (success) {
         toast.success(`Invitation sent to ${inviteEmail}`);
         setInviteEmail('');
         
@@ -42,11 +49,32 @@ const TeamMembersTab = ({ teamMembers, setTeamMembers, setActivityItems }: TeamM
           setActivityItems(getActivityItems());
         });
       } else {
-        toast.error('Invalid email address');
+        toast.error('Failed to send invitation');
       }
-      
+    } catch (error) {
+      console.error('Error inviting team member:', error);
+      toast.error('An error occurred while sending the invitation');
+    } finally {
       setIsSubmitting(false);
-    }, 800);
+    }
+  };
+
+  const handleRemoveTeamMember = (id: string, name: string) => {
+    if (window.confirm(`Are you sure you want to remove ${name} from the team?`)) {
+      if (removeTeamMember(id)) {
+        toast.success(`${name} has been removed from the team`);
+        setTeamMembers(getTeamMembers());
+        import('@/services/collaborationService').then(({ getActivityItems }) => {
+          setActivityItems(getActivityItems());
+        });
+      } else {
+        toast.error('Failed to remove team member');
+      }
+    }
+  };
+  
+  const isValidEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
   
   return (
@@ -92,7 +120,11 @@ const TeamMembersTab = ({ teamMembers, setTeamMembers, setActivityItems }: TeamM
           <p className="text-sm text-muted-foreground italic">No team members yet</p>
         ) : (
           teamMembers.map(member => (
-            <TeamMemberItem key={member.id} member={member} />
+            <TeamMemberItem 
+              key={member.id} 
+              member={member}
+              onRemove={() => handleRemoveTeamMember(member.id, member.name)}
+            />
           ))
         )}
       </div>
@@ -102,9 +134,10 @@ const TeamMembersTab = ({ teamMembers, setTeamMembers, setActivityItems }: TeamM
 
 interface TeamMemberItemProps {
   member: TeamMember;
+  onRemove: () => void;
 }
 
-const TeamMemberItem = ({ member }: TeamMemberItemProps) => {
+const TeamMemberItem = ({ member, onRemove }: TeamMemberItemProps) => {
   const isPending = member.role === 'Invited User';
   
   return (
@@ -124,6 +157,9 @@ const TeamMemberItem = ({ member }: TeamMemberItemProps) => {
               member.role
             )}
           </p>
+          {member.email && (
+            <p className="text-xs text-muted-foreground">{member.email}</p>
+          )}
         </div>
       </div>
       
@@ -133,6 +169,9 @@ const TeamMemberItem = ({ member }: TeamMemberItemProps) => {
             <MessageSquare className="h-4 w-4" />
           </Button>
         )}
+        <Button size="sm" variant="ghost" className="text-destructive" onClick={onRemove}>
+          <Trash className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   );

@@ -18,11 +18,14 @@ import ShareQueryTab from './ShareQueryTab';
 import TeamMembersTab from './TeamMembersTab';
 import ActivityFeed from './ActivityFeed';
 import { SharedResponsesPanel } from './SharedResponsesPanel';
+import { useAuth } from '@/contexts/AuthContext';
 
 const CollaborationPanel = () => {
+  const { user } = useAuth();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [sharedQueries, setSharedQueries] = useState<SharedQuery[]>([]);
   const [activityItems, setActivityItems] = useState<ActivityItem[]>([]);
+  const [activeTab, setActiveTab] = useState('share');
   
   // Load collaboration data
   useEffect(() => {
@@ -47,7 +50,7 @@ const CollaborationPanel = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="share" className="mt-2">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-2">
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="share">Share Results</TabsTrigger>
                   <TabsTrigger value="received">Received Content</TabsTrigger>
