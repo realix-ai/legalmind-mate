@@ -32,16 +32,25 @@ const QueryAssistant = () => {
     });
   };
 
-  // Properly handle settings dialog open/close
+  // Handle settings dialog open/close
   const handleSettingsOpenChange = (open: boolean) => {
     setTimeout(() => {
       setOpenSettings(open);
     }, 10);
   };
 
+  // Check if OpenAI API key is configured and show a toast if not when AI Communication tab is selected
   useEffect(() => {
-    console.log("QueryAssistant component mounted, userName:", userName);
-  }, [userName]);
+    if (activeTab === 'ai-communication') {
+      const apiKey = localStorage.getItem('openai-api-key');
+      if (!apiKey) {
+        toast.info('AI Communication Tip', {
+          description: 'For the best experience, connect your OpenAI API key in Settings > Integrations.',
+          duration: 8000,
+        });
+      }
+    }
+  }, [activeTab]);
 
   return (
     <div className="flex flex-col min-h-screen w-full">
