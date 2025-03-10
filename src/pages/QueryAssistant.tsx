@@ -6,10 +6,14 @@ import UserWelcome from '@/components/query-assistant/UserWelcome';
 import { useLegalQuery } from '@/hooks/use-legal-query';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import SettingsDialog from '@/components/settings/SettingsDialog';
+import EmailDialog from '@/components/ai-communication/EmailDialog';
+import { Mail } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const QueryAssistant = () => {
   const [activeTab, setActiveTab] = useState('query');
   const [openSettings, setOpenSettings] = useState(false);
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [settingsTab, setSettingsTab] = useState('integrations');
   const { userName } = useUserProfile();
   const { 
@@ -35,6 +39,20 @@ const QueryAssistant = () => {
       
       <main className="flex-1 w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-16">
         <div className="w-full">
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-2xl font-semibold">Query Assistant</h1>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1"
+                onClick={() => setShowEmailDialog(true)}
+              >
+                <Mail className="h-4 w-4" />
+                Email Results
+              </Button>
+            </div>
+          </div>
           <QueryTabs
             activeTab={activeTab}
             setActiveTab={setActiveTab}
@@ -55,6 +73,13 @@ const QueryAssistant = () => {
         open={openSettings} 
         onOpenChange={handleSettingsOpenChange}
         defaultTab={settingsTab}
+      />
+      
+      <EmailDialog
+        open={showEmailDialog}
+        onOpenChange={setShowEmailDialog}
+        content={response || ""}
+        subject="Legal Query Results"
       />
     </div>
   );
