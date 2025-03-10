@@ -9,18 +9,39 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { useNotificationSystem } from '@/hooks/useNotificationSystem';
 import { NotificationList } from './NotificationList';
+import { getNotifications, markNotificationAsRead } from '@/services/collaboration/notificationService';
+import { Notification } from '@/services/collaboration/notificationTypes';
 
 const NotificationCenter = () => {
   const [open, setOpen] = useState(false);
-  const { 
-    notifications, 
-    unreadCount, 
-    markAsRead, 
-    markAllAsRead, 
-    removeNotification 
-  } = useNotificationSystem();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  
+  // Load notifications when component mounts and when sheet opens
+  React.useEffect(() => {
+    if (open) {
+      refreshNotifications();
+    }
+  }, [open]);
+  
+  // Function to refresh notifications
+  const refreshNotifications = () => {
+    const allNotifications = getNotifications();
+    setNotifications(allNotifications);
+  };
+  
+  // Count unread notifications
+  const unreadCount = notifications.filter(notification => !notification.read).length;
+  
+  // Handle marking all as read
+  const handleMarkAllAsRead = () => {
+    notifications.forEach(notification => {
+      if (!notification.read) {
+        markNotificationAsRead(notification.id);
+      }
+    });
+    refreshNotifications();
+  };
   
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -42,7 +63,7 @@ const NotificationCenter = () => {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                onClick={markAllAsRead}
+                onClick={handleMarkAllAsRead}
                 className="text-xs h-8"
               >
                 Mark all as read
@@ -53,9 +74,7 @@ const NotificationCenter = () => {
         
         <NotificationList 
           notifications={notifications}
-          onMarkAsRead={markAsRead}
-          onDelete={removeNotification}
-          onClose={() => setOpen(false)}
+          onAction={refreshNotifications}
         />
       </SheetContent>
     </Sheet>
