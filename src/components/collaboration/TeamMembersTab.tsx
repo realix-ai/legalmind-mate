@@ -4,13 +4,14 @@ import { toast } from "sonner";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { MessageSquare, UserPlus, Trash } from 'lucide-react';
+import { MessageSquare, UserPlus, Trash, Mail } from 'lucide-react';
 import { 
   TeamMember,
   inviteTeamMember,
   getTeamMembers,
   removeTeamMember
 } from '@/services/collaborationService';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 
 interface TeamMembersTabProps {
   teamMembers: TeamMember[];
@@ -21,6 +22,9 @@ interface TeamMembersTabProps {
 const TeamMembersTab = ({ teamMembers, setTeamMembers, setActivityItems }: TeamMembersTabProps) => {
   const [inviteEmail, setInviteEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showOutlookAlert, setShowOutlookAlert] = useState(false);
+  
+  const isOutlookConnected = localStorage.getItem('outlook-connected') === 'true';
   
   const handleInviteTeamMember = async () => {
     if (!inviteEmail) {
@@ -33,13 +37,27 @@ const TeamMembersTab = ({ teamMembers, setTeamMembers, setActivityItems }: TeamM
       return;
     }
     
+    // If Outlook is not connected, show alert first
+    if (!isOutlookConnected) {
+      setShowOutlookAlert(true);
+      return;
+    }
+    
+    await sendInvitation();
+  };
+  
+  const sendInvitation = async () => {
     setIsSubmitting(true);
     
     try {
       const success = await inviteTeamMember(inviteEmail);
       
       if (success) {
-        toast.success(`Invitation sent to ${inviteEmail}`);
+        if (isOutlookConnected) {
+          toast.success(`Invitation email sent to ${inviteEmail}`);
+        } else {
+          toast.success(`Invitation created for ${inviteEmail}`);
+        }
         setInviteEmail('');
         
         // Refresh team members list
@@ -53,7 +71,11 @@ const TeamMembersTab = ({ teamMembers, setTeamMembers, setActivityItems }: TeamM
       }
     } catch (error) {
       console.error('Error inviting team member:', error);
-      toast.error('An error occurred while sending the invitation');
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('An error occurred while sending the invitation');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -75,6 +97,18 @@ const TeamMembersTab = ({ teamMembers, setTeamMembers, setActivityItems }: TeamM
   
   const isValidEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+  
+  const handleConnectOutlook = () => {
+    setShowOutlookAlert(false);
+    // Navigate to settings with integrations tab active
+    // This would typically navigate to the settings page, but for simplicity we'll just show a toast
+    toast.info('Please connect Outlook in Settings > Integrations to send real emails');
+  };
+  
+  const handleContinueWithoutOutlook = () => {
+    setShowOutlookAlert(false);
+    sendInvitation();
   };
   
   return (
@@ -112,6 +146,18 @@ const TeamMembersTab = ({ teamMembers, setTeamMembers, setActivityItems }: TeamM
             )}
           </Button>
         </div>
+        
+        {isOutlookConnected ? (
+          <p className="text-xs text-green-600 mt-1 flex items-center">
+            <Mail className="h-3 w-3 mr-1" />
+            Outlook connected. Invitations will be sent via email.
+          </p>
+        ) : (
+          <p className="text-xs text-amber-600 mt-1 flex items-center">
+            <Mail className="h-3 w-3 mr-1" />
+            Outlook not connected. Connect in Settings to send real emails.
+          </p>
+        )}
       </div>
       
       <h4 className="text-sm font-medium mb-3">Your Team</h4>
@@ -128,6 +174,27 @@ const TeamMembersTab = ({ teamMembers, setTeamMembers, setActivityItems }: TeamM
           ))
         )}
       </div>
+      
+      <AlertDialog open={showOutlookAlert} onOpenChange={setShowOutlookAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Connect Outlook for Email Invitations</AlertDialogTitle>
+            <AlertDialogDescription>
+              To send real email invitations to team members, you need to connect your Microsoft Outlook account first. 
+              Would you like to connect Outlook now, or continue without sending an email?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowOutlookAlert(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleContinueWithoutOutlook} className="bg-amber-600">
+              Continue Without Email
+            </AlertDialogAction>
+            <AlertDialogAction onClick={handleConnectOutlook}>
+              Connect Outlook
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

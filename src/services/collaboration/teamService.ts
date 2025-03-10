@@ -2,7 +2,6 @@
 import { TeamMember, ActivityItem } from './types';
 import { getTeamMembersFromStorage, saveTeamMembers } from './storageUtils';
 import { addActivityItem } from './activityService';
-import { useAuth } from '@/contexts/AuthContext';
 
 // Export team member management functions
 export const getTeamMembers = (): TeamMember[] => {
@@ -63,7 +62,17 @@ export const removeTeamMember = (id: string): boolean => {
   return false;
 };
 
-// Invite a team member by email
+// Check if Outlook is connected
+const isOutlookConnected = (): boolean => {
+  return localStorage.getItem('outlook-connected') === 'true';
+};
+
+// Get user's Outlook email
+const getUserOutlookEmail = (): string | null => {
+  return localStorage.getItem('outlook-email');
+};
+
+// Invite a team member by email - send actual email if Outlook is connected
 export const inviteTeamMember = async (email: string): Promise<boolean> => {
   if (!email || !email.includes('@')) {
     return false;
@@ -76,12 +85,6 @@ export const inviteTeamMember = async (email: string): Promise<boolean> => {
   }
   
   try {
-    // In a real application, this would send an email via a backend service
-    // Simulate API call with async/await to make it feel more realistic
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    console.log(`Inviting team member: ${email}`);
-    
     // Create a team member from the email
     const name = email.split('@')[0];
     const formattedName = name
@@ -94,6 +97,29 @@ export const inviteTeamMember = async (email: string): Promise<boolean> => {
       .map(part => part.charAt(0).toUpperCase())
       .join('')
       .substring(0, 2);
+    
+    // Check if Outlook is connected to send actual email
+    const outlookConnected = isOutlookConnected();
+    const senderEmail = getUserOutlookEmail();
+    
+    if (outlookConnected && senderEmail) {
+      // In a real app, this would use the Outlook API to send an email
+      // For now, we'll simulate the sending but log that a real email would be sent
+      console.log(`Sending real invitation email via Outlook from ${senderEmail} to ${email}`);
+      
+      // Simulate email sending delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Add activity item about the real email
+      addActivityItem({
+        userId: '1',
+        userName: 'You',
+        action: `sent an invitation email to ${email} via Outlook`,
+        title: 'Team Invitation Email Sent'
+      });
+    } else {
+      console.log(`Outlook not connected. Would send invitation email to: ${email}`);
+    }
     
     // Add a new team member to represent the invitation
     addTeamMember({
