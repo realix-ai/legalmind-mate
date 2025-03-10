@@ -10,6 +10,8 @@ import { toast } from 'sonner';
 import { generateCompletion } from '@/services/openAiService';
 import PromptManager from '@/components/PromptManager';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import GetFromIManageDialog from '@/components/document/GetFromIManageDialog';
+import { SavedDocument } from '@/utils/documents/types';
 
 interface ChatMessage {
   id: string;
@@ -31,6 +33,7 @@ const AiCommunicationPanel = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPrompts, setShowPrompts] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showIManageDialog, setShowIManageDialog] = useState(false);
   const { addResponse } = useAiAssistant();
   
   const {
@@ -125,11 +128,32 @@ const AiCommunicationPanel = () => {
     setShowPrompts(false);
   };
 
-  const handleIManageClick = () => {
-    toast.info('iManage integration', { 
-      description: 'iManage document management feature would be integrated here.',
-      duration: 3000
-    });
+  const handleIManageDocument = (document: SavedDocument) => {
+    // Add a user message indicating document selection
+    const userMessage: ChatMessage = {
+      id: `user-${Date.now()}`,
+      content: `I've selected a document from iManage: "${document.title}"`,
+      isUser: true,
+      timestamp: new Date()
+    };
+    
+    setMessages(prev => [...prev, userMessage]);
+    
+    // Set current message to ask about the document
+    setCurrentMessage(`Please analyze this document from iManage: "${document.title}"`);
+    
+    // Add the document content as a system message
+    const documentContentMessage: ChatMessage = {
+      id: `system-${Date.now()}`,
+      content: `[Document content from iManage: ${document.content.substring(0, 100)}...]`,
+      isUser: false,
+      timestamp: new Date()
+    };
+    
+    setMessages(prev => [...prev, documentContentMessage]);
+    
+    // Close the dialog
+    setShowIManageDialog(false);
   };
 
   // Generate a simple response for demonstration when no API key is available
@@ -146,6 +170,10 @@ const AiCommunicationPanel = () => {
     
     if (lowerMessage.includes('contract') || lowerMessage.includes('agreement')) {
       return "Regarding your question about contracts or agreements, I would typically analyze contract terms, legal obligations, and potential risks. To get detailed assistance with contract analysis, please connect your OpenAI API key in the settings.";
+    }
+    
+    if (lowerMessage.includes('imanage') || lowerMessage.includes('document')) {
+      return "I see you're interested in documents or iManage. I can help analyze documents from iManage, provide summaries, or extract key information. Please select a document from iManage using the iManage button in the toolbar, or provide more details about what you're looking for.";
     }
     
     return "I understand you're seeking information. For the most accurate and helpful responses to your legal queries, please connect your OpenAI API key in the settings or provide more specific details about your question.";
@@ -287,7 +315,7 @@ const AiCommunicationPanel = () => {
           variant="outline" 
           size="sm"
           className="flex items-center gap-1 z-10 text-xs py-1 px-2 h-7"
-          onClick={handleIManageClick}
+          onClick={() => setShowIManageDialog(true)}
         >
           <Cloud className="h-3 w-3" />
           iManage
@@ -335,6 +363,13 @@ const AiCommunicationPanel = () => {
           <Send className="h-4 w-4" />
         </Button>
       </div>
+
+      {/* iManage Document Dialog */}
+      <GetFromIManageDialog
+        onDocumentSelected={handleIManageDocument}
+        open={showIManageDialog}
+        onOpenChange={setShowIManageDialog}
+      />
     </div>
   );
 };
