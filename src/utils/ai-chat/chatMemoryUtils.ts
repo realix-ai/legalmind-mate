@@ -1,3 +1,4 @@
+
 import { v4 as uuidv4 } from 'uuid';
 
 export interface ChatMessage {
@@ -6,6 +7,7 @@ export interface ChatMessage {
   isUser: boolean;
   timestamp: Date | string | number;
   files?: File[];
+  fileInfo?: { name: string, type: string, size: number }[]; // For serialization
 }
 
 export interface ChatSession {
@@ -48,8 +50,28 @@ export const getChatSessions = (): ChatSession[] => {
 // Save the list of chat sessions
 export const saveChatSessions = (sessions: ChatSession[]): void => {
   try {
-    // When saving to localStorage, keep all data as is (will be serialized to JSON)
-    localStorage.setItem(`${STORAGE_KEY_PREFIX}sessions`, JSON.stringify(sessions));
+    // Before saving to localStorage, prepare Files by extracting info
+    // since File objects can't be serialized to JSON
+    const serializableSessions = sessions.map(session => ({
+      ...session,
+      messages: session.messages.map(msg => {
+        // Extract file info before serialization
+        if (msg.files && msg.files.length > 0) {
+          return {
+            ...msg,
+            fileInfo: msg.files.map(file => ({
+              name: file.name,
+              type: file.type,
+              size: file.size
+            })),
+            files: undefined // Remove the non-serializable File objects
+          };
+        }
+        return msg;
+      })
+    }));
+    
+    localStorage.setItem(`${STORAGE_KEY_PREFIX}sessions`, JSON.stringify(serializableSessions));
   } catch (error) {
     console.error('Error saving chat sessions:', error);
   }
@@ -141,8 +163,11 @@ export const getConversationContext = (messages: ChatMessage[]): string => {
     let content = `${role}: ${msg.content}`;
     
     // Add file information if present
-    if (msg.files && msg.files.length > 0) {
-      content += `\n[Attached ${msg.files.length} file(s): ${msg.files.map(f => f.name).join(', ')}]`;
+    if ((msg.files && msg.files.length > 0) || (msg.fileInfo && msg.fileInfo.length > 0)) {
+      const fileCount = msg.files?.length || msg.fileInfo?.length || 0;
+      const fileNames = msg.files?.map(f => f.name).join(', ') || 
+                       msg.fileInfo?.map(f => f.name).join(', ') || '';
+      content += `\n[Attached ${fileCount} file(s): ${fileNames}]`;
     }
     
     return content;

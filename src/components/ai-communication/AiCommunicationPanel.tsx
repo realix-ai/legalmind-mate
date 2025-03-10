@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useAiAssistant } from '@/contexts/AiAssistantContext';
 import { Bot, Send, PaperclipIcon, History, PlusCircle, List, Cloud } from 'lucide-react';
@@ -51,6 +52,11 @@ const AiCommunicationPanel = () => {
     setSessions(allSessions);
   }, []);
 
+  // Update session state when active session changes
+  useEffect(() => {
+    setMessages(activeSession.messages);
+  }, [activeSession]);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -58,23 +64,30 @@ const AiCommunicationPanel = () => {
   const handleSendMessage = async () => {
     if (!currentMessage.trim() && uploadedFiles.length === 0) return;
     
+    // Bug fix: Create a copy of uploadedFiles to prevent reference issues
+    const filesCopy = [...uploadedFiles];
+    
     const userMessage: ChatMessage = {
       id: uuidv4(),
       content: currentMessage,
       isUser: true,
       timestamp: new Date(),
-      files: uploadedFiles.length > 0 ? [...uploadedFiles] : undefined
+      files: filesCopy.length > 0 ? filesCopy : undefined
     };
     
+    // Add to local state immediately for UI responsiveness
     setMessages(prev => [...prev, userMessage]);
     setCurrentMessage('');
     setIsProcessing(true);
     
+    // Add to persistent storage
+    addMessageToSession(activeSession.id, userMessage);
+    
     const conversationContext = getConversationContext(messages);
     let prompt = currentMessage;
     
-    if (uploadedFiles.length > 0) {
-      prompt += `\n\n[User has uploaded ${uploadedFiles.length} file(s): ${uploadedFiles.map(f => f.name).join(', ')}]`;
+    if (filesCopy.length > 0) {
+      prompt += `\n\n[User has uploaded ${filesCopy.length} file(s): ${filesCopy.map(f => f.name).join(', ')}]`;
     }
     
     if (conversationContext) {
@@ -84,39 +97,55 @@ const AiCommunicationPanel = () => {
     const apiKey = localStorage.getItem('openai-api-key');
     let aiResponseContent = '';
     
-    if (apiKey) {
-      const systemPrompt = `You are an expert legal AI assistant for lawyers. Help with:
-        1. Legal Research: Find relevant cases, statutes, and regulations
-        2. Risk Analysis: Identify potential legal risks in scenarios
-        3. Document Drafting: Suggest language for legal documents
-        4. Summarization: Condense legal documents and case law
-        5. Data Analysis: Extract insights from legal data
+    try {
+      if (apiKey) {
+        const systemPrompt = `You are an expert legal AI assistant for lawyers. Help with:
+          1. Legal Research: Find relevant cases, statutes, and regulations
+          2. Risk Analysis: Identify potential legal risks in scenarios
+          3. Document Drafting: Suggest language for legal documents
+          4. Summarization: Condense legal documents and case law
+          5. Data Analysis: Extract insights from legal data
+          
+          Answer thoroughly with citations where appropriate. Use clear, organized responses with headings for complex questions.
+          When analyzing documents, extract key information and provide actionable insights.
+          
+          You should try to maintain memory of the conversation so far and refer back to previous information if relevant.`;
         
-        Answer thoroughly with citations where appropriate. Use clear, organized responses with headings for complex questions.
-        When analyzing documents, extract key information and provide actionable insights.
-        
-        You should try to maintain memory of the conversation so far and refer back to previous information if relevant.`;
+        const response = await generateCompletion(prompt, systemPrompt, 'gpt-4o-mini');
+        aiResponseContent = response || "I'm having trouble generating a response. Please try again later.";
+      } else {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        aiResponseContent = generateSimulatedResponse(currentMessage, filesCopy);
+      }
       
-      const response = await generateCompletion(prompt, systemPrompt, 'gpt-4o-mini');
-      aiResponseContent = response || "I'm having trouble generating a response. Please try again later.";
-    } else {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      aiResponseContent = generateSimulatedResponse(currentMessage, uploadedFiles);
+      const aiMessage: ChatMessage = {
+        id: uuidv4(),
+        content: aiResponseContent,
+        isUser: false,
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, aiMessage]);
+      addMessageToSession(activeSession.id, aiMessage);
+      
+      addResponse(aiResponseContent);
+    } catch (error) {
+      console.error('Error generating AI response:', error);
+      toast.error('Failed to generate response');
+      
+      const errorMessage: ChatMessage = {
+        id: uuidv4(),
+        content: "I'm sorry, there was an error processing your request. Please try again.",
+        isUser: false,
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+      addMessageToSession(activeSession.id, errorMessage);
+    } finally {
+      setIsProcessing(false);
+      setUploadedFiles([]);
     }
-    
-    const aiMessage: ChatMessage = {
-      id: uuidv4(),
-      content: aiResponseContent,
-      isUser: false,
-      timestamp: new Date()
-    };
-    
-    setMessages(prev => [...prev, aiMessage]);
-    addMessageToSession(activeSession.id, aiMessage);
-    
-    addResponse(aiResponseContent);
-    
-    setUploadedFiles([]);
   };
 
   const handleNewDialog = () => {
