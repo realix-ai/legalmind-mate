@@ -2,6 +2,7 @@
 import { TeamMember, ActivityItem } from './types';
 import { getTeamMembersFromStorage, saveTeamMembers } from './storageUtils';
 import { addActivityItem } from './activityService';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Export team member management functions
 export const getTeamMembers = (): TeamMember[] => {
@@ -62,7 +63,7 @@ export const removeTeamMember = (id: string): boolean => {
   return false;
 };
 
-// Invite a team member by email - now works directly without simulated API calls
+// Invite a team member by email
 export const inviteTeamMember = async (email: string): Promise<boolean> => {
   if (!email || !email.includes('@')) {
     return false;
@@ -75,6 +76,10 @@ export const inviteTeamMember = async (email: string): Promise<boolean> => {
   }
   
   try {
+    // In a real application, this would send an email via a backend service
+    // Simulate API call with async/await to make it feel more realistic
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
     console.log(`Inviting team member: ${email}`);
     
     // Create a team member from the email
