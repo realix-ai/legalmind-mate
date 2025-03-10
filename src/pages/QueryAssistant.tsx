@@ -7,6 +7,7 @@ import UserWelcome from '@/components/query-assistant/UserWelcome';
 import { useLegalQuery } from '@/hooks/use-legal-query';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import SettingsDialog from '@/components/settings/SettingsDialog';
+import AiAssistantButton from '@/components/ai/AiAssistantButton';
 import { toast } from 'sonner';
 
 const QueryAssistant = () => {
@@ -24,6 +25,13 @@ const QueryAssistant = () => {
     handleResponseEdit
   } = useLegalQuery(setActiveTab);
 
+  const handleAssistantResponse = (response: string) => {
+    toast.info('AI Tip', {
+      description: response,
+      duration: 8000,
+    });
+  };
+
   // Handle settings dialog open/close
   const handleSettingsOpenChange = (open: boolean) => {
     setTimeout(() => {
@@ -33,7 +41,7 @@ const QueryAssistant = () => {
 
   // Check if OpenAI API key is configured and show a toast if not when AI Communication tab is selected
   useEffect(() => {
-    if (activeTab === 'ai-chatbot') {
+    if (activeTab === 'ai-communication') {
       const apiKey = localStorage.getItem('openai-api-key');
       if (!apiKey) {
         toast.info('AI Communication Tip', {
@@ -71,6 +79,15 @@ const QueryAssistant = () => {
         onOpenChange={handleSettingsOpenChange}
         defaultTab={settingsTab}
       />
+
+      {/* Fixed position assistant button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <AiAssistantButton 
+          context="Query Assistant page. The user can ask legal research questions."
+          onAssistantResponse={handleAssistantResponse}
+          buttonText="Query Tips"
+        />
+      </div>
     </div>
   );
 };
