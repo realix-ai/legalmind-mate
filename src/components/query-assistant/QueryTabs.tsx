@@ -40,6 +40,7 @@ const QueryTabs = ({
         <QueryTab 
           isProcessing={isProcessing}
           response={response}
+          currentQuery={currentQuery}
           onSubmit={handleSubmit}
           onShare={onShare}
           citations={citations}

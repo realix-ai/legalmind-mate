@@ -11,7 +11,7 @@ import ResearchToolsPanel from '@/components/legal-research/ResearchToolsPanel';
 
 interface QueryTabsProps {
   activeTab: string;
-  setActiveTab: (tab: string) => void;
+  setActiveTab: (value: string) => void;
   isProcessing: boolean;
   response: string | null;
   currentQuery: string;
@@ -42,7 +42,7 @@ const QueryTabs = ({
   onResponseEdit
 }: QueryTabsProps) => {
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+    <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value)} className="w-full">
       <div className="flex justify-between items-center mb-6">
         <TabsList className="grid w-[400px] grid-cols-3">
           <TabsTrigger value="query" className="flex items-center gap-1.5">
@@ -98,7 +98,7 @@ const QueryTabs = ({
           initial="hidden"
           animate="visible"
         >
-          <ResearchToolsPanel />
+          <ResearchToolsPanel isVisible={true} onClose={() => setActiveTab('query')} />
         </motion.div>
       </TabsContent>
     </Tabs>
